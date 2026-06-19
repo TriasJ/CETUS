@@ -1,0 +1,345 @@
+"""Repositories: the only place that knows SQL. UI and domain never touch sqlite.
+
+Each repo wraps a ``Database`` and maps between rows and the dataclasses in
+``domain.models``. Booleans are stored as 0/1 integers.
+"""
+
+from __future__ import annotations
+
+import sqlite3
+from typing import Optional
+
+from ..domain.models import (
+    Clinician,
+    CopingEvent,
+    CravingRating,
+    CueConfig,
+    IntensityEvent,
+    Patient,
+    Session,
+)
+from .database import Database
+
+
+def _b(value) -> bool:
+    return bool(value)
+
+
+class ClinicianRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def create(self, c: Clinician) -> Clinician:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO clinician (username, display_name, password_hash, created_at) "
+                "VALUES (?,?,?,?)",
+                (c.username, c.display_name, c.password_hash, c.created_at),
+            )
+            c.id = cur.lastrowid
+        return c
+
+    def get_by_username(self, username: str) -> Optional[Clinician]:
+        row = self.db.conn.execute(
+            "SELECT * FROM clinician WHERE username = ?", (username,)
+        ).fetchone()
+        return self._row(row) if row else None
+
+    def count(self) -> int:
+        return int(self.db.conn.execute("SELECT COUNT(*) FROM clinician").fetchone()[0])
+
+    def list_all(self) -> list[Clinician]:
+        rows = self.db.conn.execute("SELECT * FROM clinician ORDER BY username").fetchall()
+        return [self._row(r) for r in rows]
+
+    def update_password(self, clinician_id: int, password_hash: str) -> None:
+        with self.db.transaction() as conn:
+            conn.execute("UPDATE clinician SET password_hash = ? WHERE id = ?",
+                         (password_hash, clinician_id))
+
+    @staticmethod
+    def _row(r: sqlite3.Row) -> Clinician:
+        return Clinician(
+            id=r["id"],
+            username=r["username"],
+            display_name=r["display_name"],
+            password_hash=r["password_hash"],
+            created_at=r["created_at"],
+        )
+
+
+class PatientRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def create(self, p: Patient) -> Patient:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO patient (code, display_name, birth_year, primary_substance, "
+                "notes, created_by, created_at, archived) VALUES (?,?,?,?,?,?,?,?)",
+                (
+                    p.code, p.display_name, p.birth_year, p.primary_substance,
+                    p.notes, p.created_by, p.created_at, int(p.archived),
+                ),
+            )
+            p.id = cur.lastrowid
+        return p
+
+    def get(self, patient_id: int) -> Optional[Patient]:
+        row = self.db.conn.execute(
+            "SELECT * FROM patient WHERE id = ?", (patient_id,)
+        ).fetchone()
+        return self._row(row) if row else None
+
+    def list_active(self) -> list[Patient]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM patient WHERE archived = 0 ORDER BY code"
+        ).fetchall()
+        return [self._row(r) for r in rows]
+
+    def update(self, p: Patient) -> None:
+        with self.db.transaction() as conn:
+            conn.execute(
+                "UPDATE patient SET code=?, display_name=?, birth_year=?, primary_substance=?, "
+                "notes=?, archived=? WHERE id=?",
+                (
+                    p.code, p.display_name, p.birth_year, p.primary_substance,
+                    p.notes, int(p.archived), p.id,
+                ),
+            )
+
+    @staticmethod
+    def _row(r: sqlite3.Row) -> Patient:
+        return Patient(
+            id=r["id"], code=r["code"], display_name=r["display_name"],
+            birth_year=r["birth_year"], primary_substance=r["primary_substance"],
+            notes=r["notes"], created_by=r["created_by"], created_at=r["created_at"],
+            archived=_b(r["archived"]),
+        )
+
+
+class CueConfigRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def create(self, c: CueConfig) -> CueConfig:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO cue_config (patient_id, substance, media_path, media_type, "
+                "appetitive_rank, enabled, is_personal_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+                (
+                    c.patient_id, c.substance, c.media_path, c.media_type,
+                    c.appetitive_rank, int(c.enabled), int(c.is_personal_reason), c.created_at,
+                ),
+            )
+            c.id = cur.lastrowid
+        return c
+
+    def list_for_patient(self, patient_id: int) -> list[CueConfig]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM cue_config WHERE patient_id = ? ORDER BY appetitive_rank, id",
+            (patient_id,),
+        ).fetchall()
+        return [self._row(r) for r in rows]
+
+    def delete(self, cue_id: int) -> None:
+        with self.db.transaction() as conn:
+            conn.execute("DELETE FROM cue_config WHERE id = ?", (cue_id,))
+
+    def update(self, c: CueConfig) -> None:
+        with self.db.transaction() as conn:
+            conn.execute(
+                "UPDATE cue_config SET substance=?, media_path=?, media_type=?, "
+                "appetitive_rank=?, enabled=?, is_personal_reason=? WHERE id=?",
+                (
+                    c.substance, c.media_path, c.media_type, c.appetitive_rank,
+                    int(c.enabled), int(c.is_personal_reason), c.id,
+                ),
+            )
+
+    @staticmethod
+    def _row(r: sqlite3.Row) -> CueConfig:
+        return CueConfig(
+            id=r["id"], patient_id=r["patient_id"], substance=r["substance"],
+            media_path=r["media_path"], media_type=r["media_type"],
+            appetitive_rank=r["appetitive_rank"], enabled=_b(r["enabled"]),
+            is_personal_reason=_b(r["is_personal_reason"]), created_at=r["created_at"],
+        )
+
+
+class SessionRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def create(self, s: Session) -> Session:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO session (patient_id, clinician_id, substance, started_at, "
+                "consent_given, app_version) VALUES (?,?,?,?,?,?)",
+                (s.patient_id, s.clinician_id, s.substance, s.started_at,
+                 int(s.consent_given), s.app_version),
+            )
+            s.id = cur.lastrowid
+        return s
+
+    def finalize(self, s: Session) -> None:
+        """Write end-of-session fields (end_reason, VAS summary, slope)."""
+        with self.db.transaction() as conn:
+            conn.execute(
+                "UPDATE session SET ended_at=?, end_reason=?, baseline_vas=?, peak_vas=?, "
+                "endpoint_vas=?, habituation_slope=? WHERE id=?",
+                (s.ended_at, s.end_reason, s.baseline_vas, s.peak_vas,
+                 s.endpoint_vas, s.habituation_slope, s.id),
+            )
+
+    def update_notes(self, session_id: int, notes: str | None) -> None:
+        """Set/clear the clinician's free-text notes for a session (post-hoc edit)."""
+        with self.db.transaction() as conn:
+            conn.execute("UPDATE session SET clinician_notes = ? WHERE id = ?",
+                         (notes, session_id))
+
+    def get(self, session_id: int) -> Optional[Session]:
+        row = self.db.conn.execute(
+            "SELECT * FROM session WHERE id = ?", (session_id,)
+        ).fetchone()
+        return self._row(row) if row else None
+
+    def list_for_patient(self, patient_id: int) -> list[Session]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM session WHERE patient_id = ? ORDER BY started_at", (patient_id,)
+        ).fetchall()
+        return [self._row(r) for r in rows]
+
+    @staticmethod
+    def _row(r: sqlite3.Row) -> Session:
+        return Session(
+            id=r["id"], patient_id=r["patient_id"], clinician_id=r["clinician_id"],
+            substance=r["substance"], started_at=r["started_at"], ended_at=r["ended_at"],
+            end_reason=r["end_reason"], consent_given=_b(r["consent_given"]),
+            baseline_vas=r["baseline_vas"], peak_vas=r["peak_vas"],
+            endpoint_vas=r["endpoint_vas"], habituation_slope=r["habituation_slope"],
+            app_version=r["app_version"],
+            clinician_notes=r["clinician_notes"] if "clinician_notes" in r.keys() else None,
+        )
+
+
+class CravingRatingRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def add(self, r: CravingRating) -> CravingRating:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO craving_rating (session_id, ts, elapsed_sec, value, kind, cue_config_id) "
+                "VALUES (?,?,?,?,?,?)",
+                (r.session_id, r.ts, r.elapsed_sec, r.value, r.kind, r.cue_config_id),
+            )
+            r.id = cur.lastrowid
+        return r
+
+    def list_for_session(self, session_id: int) -> list[CravingRating]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM craving_rating WHERE session_id = ? ORDER BY elapsed_sec, id",
+            (session_id,),
+        ).fetchall()
+        return [
+            CravingRating(
+                id=r["id"], session_id=r["session_id"], ts=r["ts"],
+                elapsed_sec=r["elapsed_sec"], value=r["value"], kind=r["kind"],
+                cue_config_id=r["cue_config_id"],
+            )
+            for r in rows
+        ]
+
+
+class CopingEventRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def add(self, e: CopingEvent) -> CopingEvent:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO coping_event (session_id, ts, elapsed_sec, skill, detail) "
+                "VALUES (?,?,?,?,?)",
+                (e.session_id, e.ts, e.elapsed_sec, e.skill, e.detail),
+            )
+            e.id = cur.lastrowid
+        return e
+
+    def list_for_session(self, session_id: int) -> list[CopingEvent]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM coping_event WHERE session_id = ? ORDER BY elapsed_sec, id",
+            (session_id,),
+        ).fetchall()
+        return [
+            CopingEvent(
+                id=r["id"], session_id=r["session_id"], ts=r["ts"],
+                elapsed_sec=r["elapsed_sec"], skill=r["skill"], detail=r["detail"],
+            )
+            for r in rows
+        ]
+
+
+class IntensityEventRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def add(self, e: IntensityEvent) -> IntensityEvent:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO intensity_event (session_id, ts, elapsed_sec, action, "
+                "scale_pct, blur_pct, dim_pct, muted) VALUES (?,?,?,?,?,?,?,?)",
+                (e.session_id, e.ts, e.elapsed_sec, e.action, e.scale_pct,
+                 e.blur_pct, e.dim_pct, None if e.muted is None else int(e.muted)),
+            )
+            e.id = cur.lastrowid
+        return e
+
+    def list_for_session(self, session_id: int) -> list[IntensityEvent]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM intensity_event WHERE session_id = ? ORDER BY elapsed_sec, id",
+            (session_id,),
+        ).fetchall()
+        return [
+            IntensityEvent(
+                id=r["id"], session_id=r["session_id"], ts=r["ts"],
+                elapsed_sec=r["elapsed_sec"], action=r["action"], scale_pct=r["scale_pct"],
+                blur_pct=r["blur_pct"], dim_pct=r["dim_pct"],
+                muted=None if r["muted"] is None else _b(r["muted"]),
+            )
+            for r in rows
+        ]
+
+
+class SettingRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def get(self, key: str, default: Optional[str] = None) -> Optional[str]:
+        row = self.db.conn.execute(
+            "SELECT value FROM app_setting WHERE key = ?", (key,)
+        ).fetchone()
+        return row[0] if row else default
+
+    def set(self, key: str, value: str) -> None:
+        with self.db.transaction() as conn:
+            conn.execute(
+                "INSERT INTO app_setting (key, value) VALUES (?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                (key, value),
+            )
+
+
+class Repositories:
+    """Convenience bundle wiring every repo to one Database."""
+
+    def __init__(self, db: Database) -> None:
+        self.db = db
+        self.clinicians = ClinicianRepo(db)
+        self.patients = PatientRepo(db)
+        self.cues = CueConfigRepo(db)
+        self.sessions = SessionRepo(db)
+        self.ratings = CravingRatingRepo(db)
+        self.coping = CopingEventRepo(db)
+        self.intensity = IntensityEventRepo(db)
+        self.settings = SettingRepo(db)

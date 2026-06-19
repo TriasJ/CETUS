@@ -1,0 +1,13 @@
+{
+  "app.title": "CETUS",
+  "app.subtitle": "Cue Exposure Therapy (CET) with coping skills",
+  "common.start": "Start",
+  "common.back": "Back",
+  "common.close": "Close",
+  "common.save": "Save",
+  "common.finish": "Finish",
+  "exposure.panic": "STOP",
+  "vas.question": "How strong is your urge to use right now?",
+  "calm.title": "You are safe. Breathe.",
+  "summary.title": "Session summary"
+}

@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# PyInstaller
+build/
+dist/
+*.spec.bak
+
+# Clinical data — NEVER commit (contains patient/clinician PII)
+/data/
+
+# Cue media: ignore folder *contents*, but ship a small curated CC sample
+# (sample_* files) + attribution + the folder structure so a clone runs out-of-box.
+# Clinician-added and bulk-fetched media stay local.
+/media/*/*
+!/media/*/.gitkeep
+!/media/*/sample_*
+!/media/*/_SAMPLES.csv
+/media/clinic_logo.*
+
+# Secrets
+.env
+*.key
+*.pem
+
+# Backup of redundant/regenerable items (tidied here, safe to delete)
+/_backup/
+
+# Dev scratch renders (regenerable via scripts/); keep the curated NN_*.png screenshots
+docs/screenshots/montage_*.png
+docs/screenshots/pdf_*.png
+docs/screenshots/full_patient.pdf
+
+# IDE / editor / local agent settings
+.idea/
+.vscode/
+.claude/
+*.swp
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
