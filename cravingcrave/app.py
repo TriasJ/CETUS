@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 import sys
+
+_log = logging.getLogger(__name__)
 
 
 def _ensure_media_backend() -> None:
@@ -35,8 +38,8 @@ def _ensure_media_backend() -> None:
                     ctypes.WinDLL(os.path.join(pyside_dir, dll))
                 except OSError:
                     pass
-    except Exception:
-        pass  # best-effort; the app still runs (media just may not play)
+    except Exception:  # best-effort; the app still runs (media just may not play)
+        _log.exception("Media backend preload failed; audio/video may not play.")
 
 
 _ensure_media_backend()
@@ -44,6 +47,7 @@ _ensure_media_backend()
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from .config import AppConfig  # noqa: E402
+from .logging_setup import configure_logging  # noqa: E402
 from .services import i18n  # noqa: E402
 from .ui.context import AppContext  # noqa: E402
 from .ui.main_window import MainWindow  # noqa: E402
@@ -55,6 +59,8 @@ def main() -> int:
     app.setApplicationName("CETUS")
 
     config = AppConfig()
+    configure_logging(config.data_dir)
+    _log.info("Starting CETUS (locale=%s).", config.locale)
     i18n.set_locale(config.locale)
     apply_theme(app)
 

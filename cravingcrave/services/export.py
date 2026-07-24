@@ -10,9 +10,9 @@ from __future__ import annotations
 
 import csv
 import re
-from datetime import datetime, timezone
+from collections.abc import Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Sequence
 
 from ..domain.models import CopingEvent, CravingRating, IntensityEvent, Session
 
@@ -28,8 +28,8 @@ _SAFE = re.compile(r"[^A-Za-z0-9_-]")
 
 def safe_filename(patient_code: str, suffix: str) -> str:
     code = _SAFE.sub("_", patient_code or "anon")
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    return f"cravingcrave_{code}_{suffix}_{stamp}.csv"
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    return f"cetus_{code}_{suffix}_{stamp}.csv"
 
 
 def export_sessions_summary(path: Path, patient_code: str, sessions: Sequence[Session]) -> Path:

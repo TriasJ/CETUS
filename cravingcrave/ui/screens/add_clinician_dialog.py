@@ -9,7 +9,12 @@ username is unique (the underlying UNIQUE constraint also enforces this).
 from __future__ import annotations
 
 from PySide6.QtWidgets import (
-    QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QMessageBox, QWidget,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLineEdit,
+    QMessageBox,
+    QWidget,
 )
 
 from ...services.i18n import tr

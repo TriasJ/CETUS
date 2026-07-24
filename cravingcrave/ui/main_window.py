@@ -7,18 +7,12 @@ Esc triggers it too.
 
 from __future__ import annotations
 
-from typing import Optional
-
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence, QShortcut
-from PySide6.QtWidgets import QMainWindow, QStackedWidget, QWidget
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QStackedWidget, QWidget
 
-from ..domain.models import Clinician
 from ..services.i18n import tr
 from .context import AppContext
-from .session_controller_factory import build_controller
-from .widgets.panic_button import PanicButton
-
 from .screens.calm_screen import CalmScreen
 from .screens.cue_config_screen import CueConfigScreen
 from .screens.dashboard_screen import DashboardScreen
@@ -30,6 +24,8 @@ from .screens.report_screen import ReportScreen
 from .screens.session_setup_screen import SessionSetupScreen
 from .screens.settings_screen import SettingsScreen
 from .screens.summary_screen import SummaryScreen
+from .session_controller_factory import build_controller
+from .widgets.panic_button import PanicButton
 
 
 class MainWindow(QMainWindow):
@@ -42,7 +38,7 @@ class MainWindow(QMainWindow):
 
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)
-        self._current: Optional[QWidget] = None
+        self._current: QWidget | None = None
 
         self.panic = PanicButton(self)
         self.panic.clicked.connect(self._on_panic)
@@ -50,9 +46,11 @@ class MainWindow(QMainWindow):
         self._panic_shortcut.activated.connect(self._on_panic)
         self._help_shortcut = QShortcut(QKeySequence(Qt.Key.Key_F1), self)
         self._help_shortcut.activated.connect(self.show_help)
+        self._fullscreen_shortcut = QShortcut(QKeySequence(Qt.Key.Key_F11), self)
+        self._fullscreen_shortcut.activated.connect(self._toggle_fullscreen)
 
         self._active_controller = None
-        self._active_exposure: Optional[ExposureScreen] = None
+        self._active_exposure: ExposureScreen | None = None
 
         self.show_login()
 
@@ -101,12 +99,25 @@ class MainWindow(QMainWindow):
     def show_help(self) -> None:
         HelpDialog(self).exec()
 
+    def _toggle_fullscreen(self) -> None:
+        """F11: toggle fullscreen. The panic overlay re-anchors via resizeEvent, so no
+        extra repositioning is needed. Esc remains dedicated to the ALTO panic button."""
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
+
     def show_report(self, patient) -> None:
         self._set_panic_active(False)
         self._swap(ReportScreen(self, self.context, patient))
 
     def start_exposure(self, patient, substance: str, exposure_cues, positive_paths,
                        ambient_path=None, loop: bool = False) -> None:
+        # Defense-in-depth: never enter EXPOSURE against a blank cue surface, even if a
+        # caller bypasses the session-setup gate.
+        if not exposure_cues:
+            QMessageBox.warning(self, tr("app.title"), tr("setup.no_cues"))
+            return
         controller = build_controller(self.context, patient, substance, exposure_cues, loop=loop)
         screen = ExposureScreen(self, self.context, controller, positive_paths, ambient_path)
         self._active_controller = controller

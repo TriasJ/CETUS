@@ -33,6 +33,7 @@ built with Python + PySide6.
   → choose an alternative) and an on-demand **positive counter-stimuli gallery**.
 - **Ambient sound bed** layered under the visual cue (boosts presence).
 - **Always-on ALTO panic button** (Esc) → calm screen with therapist/crisis numbers.
+- **Fullscreen / kiosk mode** — `F11` toggles fullscreen for distraction-free sessions.
 - **Multi-patient clinician dashboard** with local login, pseudonymous patient codes,
   per-patient cue configuration, custom substances, and an in-app admin recovery.
 - **Clinical reports** — per-session detail (annotated curve, evidence-based metrics,
@@ -142,11 +143,19 @@ without a GUI.
 
 ---
 
-## Scientific basis
+## Scientific basis & behavioral mechanisms
 
-Grounded in `Research Basis/Repository.txt` and the cited literature. The report's
-craving metrics are descriptive/exploratory (small n, no statistical inference):
+CETUS is a theory-grounded **adjunct**, not a proven standalone treatment — CET effects
+are **small, mixed, and debated**. See **[`docs/MECHANISMS.md`](docs/MECHANISMS.md)** for a
+thorough, cited explanation of the six mechanisms each feature targets (Pavlovian cue
+reactivity, extinction/within-session habituation, spontaneous recovery, affect modulation,
+urge-specific coping, mechanistic monitoring) and an honest efficacy summary.
 
+Key references (report metrics are descriptive/exploratory — small n, no statistical inference):
+
+- Cue-reactivity foundation — Carter & Tiffany 1999 (*Addiction*, PMID 10605857)
+- CET efficacy meta-analysis (small–medium, GRADE low) — Kiyak et al. 2022
+  ([10.1016/j.addbeh.2022.107578](https://doi.org/10.1016/j.addbeh.2022.107578))
 - Mean craving during exposure predicts abstinence — Schröder et al. 2024
   ([10.1038/s41598-024-58168-7](https://doi.org/10.1038/s41598-024-58168-7))
 - Cue reactivity (peak − baseline) — Lütt et al. 2026
@@ -155,7 +164,11 @@ craving metrics are descriptive/exploratory (small n, no statistical inference):
   ([10.1111/j.2044-8260.1993.tb01026.x](https://doi.org/10.1111/j.2044-8260.1993.tb01026.x))
 - Between-session spontaneous recovery — Price et al. 2010
   ([10.1016/j.brat.2010.05.010](https://doi.org/10.1016/j.brat.2010.05.010))
-- CET-USCS protocol/app — Mellentin et al. 2017/2019; Monti & Rohsenow 1999
+- Affect × craving — Heckman et al. 2013 ([10.1111/add.12284](https://doi.org/10.1111/add.12284))
+- CET-USCS protocol/app — Mellentin et al. 2017/2019
+  ([10.2196/13793](https://doi.org/10.2196/13793)); Monti & Rohsenow 1999
+
+*References retrieved from PubMed.*
 
 ---
 

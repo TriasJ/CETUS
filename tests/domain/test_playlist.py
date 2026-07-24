@@ -1,5 +1,5 @@
-from cravingcrave.domain.models import CueConfig
 from cravingcrave.domain import playlist
+from cravingcrave.domain.models import CueConfig
 
 
 def _cue(cid, rank, enabled=True, personal=False):

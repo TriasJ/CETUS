@@ -4,8 +4,14 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QDialog, QHBoxLayout, QListWidget, QListWidgetItem, QPushButton, QTextBrowser,
-    QVBoxLayout, QWidget,
+    QDialog,
+    QHBoxLayout,
+    QListWidget,
+    QListWidgetItem,
+    QPushButton,
+    QTextBrowser,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...services.help import load_help

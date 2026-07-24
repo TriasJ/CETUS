@@ -12,7 +12,7 @@ on-demand gallery — so they are separated out here.
 from __future__ import annotations
 
 import random
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from .models import CueConfig
 
@@ -34,7 +34,7 @@ def positive_cues(cues: Sequence[CueConfig]) -> list[CueConfig]:
     return [c for c in cues if c.enabled and c.is_personal_reason]
 
 
-def randomized(cues: Sequence[CueConfig], rng: Optional[random.Random] = None) -> list[CueConfig]:
+def randomized(cues: Sequence[CueConfig], rng: random.Random | None = None) -> list[CueConfig]:
     """A shuffled copy of the playlist (counterbalances order to isolate cue content
     from habituation effects, per the VR-CET literature). ``rng`` is injectable for
     deterministic tests."""

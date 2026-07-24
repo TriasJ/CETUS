@@ -11,13 +11,17 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from PySide6.QtCore import Qt  # noqa: E402
 from PySide6.QtGui import QImage  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from cravingcrave.config import AppConfig  # noqa: E402
 from cravingcrave.domain.models import (  # noqa: E402
-    CopingEvent, CravingRating, CueConfig, IntensityEvent, Patient, Session,
+    CopingEvent,
+    CravingRating,
+    CueConfig,
+    IntensityEvent,
+    Patient,
+    Session,
 )
 from cravingcrave.ui.context import AppContext  # noqa: E402
 from cravingcrave.ui.screens.report_screen import ReportScreen  # noqa: E402

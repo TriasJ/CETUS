@@ -7,7 +7,7 @@ screen — always stays clickable on top of them.
 
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent, QObject, Qt
+from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import QFrame, QWidget
 
 

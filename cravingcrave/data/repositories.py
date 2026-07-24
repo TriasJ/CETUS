@@ -7,7 +7,6 @@ Each repo wraps a ``Database`` and maps between rows and the dataclasses in
 from __future__ import annotations
 
 import sqlite3
-from typing import Optional
 
 from ..domain.models import (
     Clinician,
@@ -39,7 +38,7 @@ class ClinicianRepo:
             c.id = cur.lastrowid
         return c
 
-    def get_by_username(self, username: str) -> Optional[Clinician]:
+    def get_by_username(self, username: str) -> Clinician | None:
         row = self.db.conn.execute(
             "SELECT * FROM clinician WHERE username = ?", (username,)
         ).fetchone()
@@ -85,7 +84,7 @@ class PatientRepo:
             p.id = cur.lastrowid
         return p
 
-    def get(self, patient_id: int) -> Optional[Patient]:
+    def get(self, patient_id: int) -> Patient | None:
         row = self.db.conn.execute(
             "SELECT * FROM patient WHERE id = ?", (patient_id,)
         ).fetchone()
@@ -198,7 +197,7 @@ class SessionRepo:
             conn.execute("UPDATE session SET clinician_notes = ? WHERE id = ?",
                          (notes, session_id))
 
-    def get(self, session_id: int) -> Optional[Session]:
+    def get(self, session_id: int) -> Session | None:
         row = self.db.conn.execute(
             "SELECT * FROM session WHERE id = ?", (session_id,)
         ).fetchone()
@@ -315,7 +314,7 @@ class SettingRepo:
     def __init__(self, db: Database) -> None:
         self.db = db
 
-    def get(self, key: str, default: Optional[str] = None) -> Optional[str]:
+    def get(self, key: str, default: str | None = None) -> str | None:
         row = self.db.conn.execute(
             "SELECT value FROM app_setting WHERE key = ?", (key,)
         ).fetchone()

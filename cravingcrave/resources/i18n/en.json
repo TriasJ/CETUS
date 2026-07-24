@@ -1,6 +1,7 @@
 {
   "app.title": "CETUS",
   "app.subtitle": "Cue Exposure Therapy (CET) with coping skills",
+  "app.fullscreen_hint": "Fullscreen: F11",
   "common.start": "Start",
   "common.back": "Back",
   "common.close": "Close",

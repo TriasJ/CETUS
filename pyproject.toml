@@ -1,6 +1,6 @@
 [project]
 name = "cravingcrave"
-version = "0.1.0"
+version = "0.2.0"
 description = "CETUS — clinician-supervised, non-VR Cue Exposure Therapy (CET-USCS) desktop app"
 requires-python = ">=3.11"
 dependencies = [
@@ -8,9 +8,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-qt", "pyinstaller"]
+# Pinned to lower bounds known good with this project for reproducible dev/CI builds.
+dev = ["pytest>=8.0", "pytest-qt>=4.4", "pyinstaller>=6.10", "ruff>=0.6"]
 
 [project.scripts]
+# NOTE: the console-script and package id remain `cravingcrave` (the product/brand
+# is "CETUS"; product name != package id, kept stable to avoid churn/DB breakage).
+cetus = "cravingcrave.app:main"
 cravingcrave = "cravingcrave.app:main"
 
 [build-system]
@@ -26,3 +30,21 @@ cravingcrave = ["resources/**/*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Dev/QA helpers and offline tooling are not part of the shipped app.
+extend-exclude = [".venv", "dist", "build", "_backup"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    "E501",  # line length is enforced by the formatter, not the linter
+    "E741",  # ambiguous var names (l/O) appear in short local math helpers
+    "E702",  # compact `a; b` statements are an intentional style in the UI layout code
+    "UP042", # keep `class X(str, Enum)` for stable .value string serialization to SQLite
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]

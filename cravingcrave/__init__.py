@@ -5,4 +5,4 @@ Spanish UI. See docs/plan for the clinical rationale (Mellentin CET-USCS,
 Monti cue-exposure-with-coping-skills).
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

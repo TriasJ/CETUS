@@ -6,7 +6,12 @@ import pytest
 
 from cravingcrave.config import AppConfig
 from cravingcrave.domain.models import (
-    CopingEvent, CravingRating, CueConfig, IntensityEvent, Patient, Session,
+    CopingEvent,
+    CravingRating,
+    CueConfig,
+    IntensityEvent,
+    Patient,
+    Session,
 )
 from cravingcrave.ui.context import AppContext
 from cravingcrave.ui.main_window import MainWindow
@@ -213,8 +218,8 @@ def test_comments_toggle_excludes_notes(ctx, qtbot):
 
 
 def test_clinic_logo_embedded_in_pdf(ctx, qtbot, tmp_path):
-    from PySide6.QtGui import QImage, QTextDocument
     from PySide6.QtCore import Qt
+    from PySide6.QtGui import QImage, QTextDocument
     logo = tmp_path / "logo.png"
     img = QImage(120, 60, QImage.Format.Format_RGB32); img.fill(Qt.GlobalColor.blue); img.save(str(logo))
     ctx.repos.settings.set("clinic_logo_path", str(logo))

@@ -2,20 +2,30 @@
 
 from __future__ import annotations
 
-from typing import Optional
+import logging
+import sqlite3
 
 from PySide6.QtWidgets import (
-    QComboBox, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QMessageBox,
-    QPlainTextEdit, QSpinBox, QWidget,
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLineEdit,
+    QMessageBox,
+    QPlainTextEdit,
+    QSpinBox,
+    QWidget,
 )
 
 from ...domain.models import Patient
 from ...services import substances as subs
 from ...services.i18n import tr
 
+_log = logging.getLogger(__name__)
+
 
 class PatientFormDialog(QDialog):
-    def __init__(self, context, parent: Optional[QWidget] = None, patient: Optional[Patient] = None) -> None:
+    def __init__(self, context, parent: QWidget | None = None, patient: Patient | None = None) -> None:
         super().__init__(parent)
         self.context = context
         self.patient = patient
@@ -87,7 +97,11 @@ class PatientFormDialog(QDialog):
                 self.patient.primary_substance = substance
                 self.patient.notes = notes
                 self.context.repos.patients.update(self.patient)
-        except Exception:  # e.g. UNIQUE code collision
+        except sqlite3.IntegrityError:  # UNIQUE code collision
             QMessageBox.warning(self, tr("app.title"), tr("patient.code_taken"))
+            return
+        except Exception as exc:  # disk/DB/other — don't mislabel as a duplicate code
+            _log.exception("Patient save failed: %s", exc)
+            QMessageBox.warning(self, tr("app.title"), tr("error.save_failed"))
             return
         self.accept()

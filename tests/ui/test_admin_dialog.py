@@ -3,7 +3,6 @@
 import pytest
 
 from cravingcrave.config import AppConfig
-from cravingcrave.ui import context as context_mod
 from cravingcrave.ui.context import AppContext
 from cravingcrave.ui.screens import admin_dialog as admin_mod
 from cravingcrave.ui.screens.admin_dialog import AdminDialog
@@ -45,7 +44,7 @@ def test_default_key_unlocks_and_resets_password(context, qtbot, monkeypatch):
     dlg = AdminDialog(context)
     qtbot.addWidget(dlg)
 
-    dlg.key_input.setText("cravingcrave-admin")
+    dlg.key_input.setText("cetus-admin")
     dlg._check_key()
     assert dlg.stack.currentIndex() == 1          # admin recovery page shown
     assert dlg.clinician_list.count() == 1

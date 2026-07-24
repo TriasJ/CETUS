@@ -1,4 +1,6 @@
 -r requirements.txt
-pytest
-pytest-qt
-pyinstaller
+# Pinned to lower bounds known good with this project (mirror pyproject [dev]).
+pytest>=8.0
+pytest-qt>=4.4
+pyinstaller>=6.10
+ruff>=0.6

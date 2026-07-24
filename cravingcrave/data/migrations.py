@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import importlib.resources as resources
 import sqlite3
-from typing import Callable
+from collections.abc import Callable
 
 CURRENT_VERSION = 2
 

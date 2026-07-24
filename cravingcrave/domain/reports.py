@@ -6,7 +6,7 @@ No Qt, no DB — easy to unit-test. The UI layer calls these to populate charts/
 from __future__ import annotations
 
 from collections import Counter, OrderedDict
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 
 def per_cue_craving(ratings) -> list[dict]:
@@ -16,7 +16,7 @@ def per_cue_craving(ratings) -> list[dict]:
     table needs. ``cue_reactivity`` is peak − first-rating-on-this-cue (induction
     magnitude for that cue; Lütt 2026). Ratings with no associated cue are skipped.
     """
-    by_cue: "OrderedDict[int, list[int]]" = OrderedDict()
+    by_cue: OrderedDict[int, list[int]] = OrderedDict()
     for r in ratings:
         cid = r.cue_config_id
         if cid is None:
@@ -31,7 +31,7 @@ def per_cue_craving(ratings) -> list[dict]:
     return out
 
 
-def highest_reactivity_cue_id(ratings) -> Optional[int]:
+def highest_reactivity_cue_id(ratings) -> int | None:
     """cue_config_id with the greatest cue-reactivity this session (relapse-risk
     context; Schröder 2024). None if no cued ratings."""
     per_cue = per_cue_craving(ratings)
@@ -96,7 +96,7 @@ def session_metrics(session, ratings) -> dict:
     }
 
 
-def spontaneous_recovery(sessions: Sequence) -> list[tuple[int, Optional[float]]]:
+def spontaneous_recovery(sessions: Sequence) -> list[tuple[int, float | None]]:
     """Per (1-indexed) finished session: baseline − previous session's endpoint.
 
     Positive = craving returned toward baseline between sessions (recovery; less
@@ -104,7 +104,7 @@ def spontaneous_recovery(sessions: Sequence) -> list[tuple[int, Optional[float]]
     explicitly tracked between-session spontaneous recovery in meth cue extinction.
     """
     finished = [s for s in sessions if s.baseline_vas is not None]
-    out: list[tuple[int, Optional[float]]] = []
+    out: list[tuple[int, float | None]] = []
     prev_endpoint = None
     for idx, s in enumerate(finished, start=1):
         if prev_endpoint is None or s.baseline_vas is None:

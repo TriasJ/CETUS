@@ -11,11 +11,10 @@ from __future__ import annotations
 import hashlib
 import hmac
 import os
-from typing import Optional
 
 from .. import config
-from ..domain.models import Clinician
 from ..data.repositories import ClinicianRepo, SettingRepo
+from ..domain.models import Clinician
 
 _ITERATIONS = 200_000
 ADMIN_KEY_SETTING = "admin_key_hash"
@@ -56,7 +55,7 @@ class AuthService:
             )
         )
 
-    def login(self, username: str, password: str) -> Optional[Clinician]:
+    def login(self, username: str, password: str) -> Clinician | None:
         clinician = self.clinicians.get_by_username(username.strip())
         if clinician and verify_password(password, clinician.password_hash):
             return clinician

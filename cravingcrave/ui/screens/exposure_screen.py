@@ -13,11 +13,17 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
-    QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...domain.models import EndReason, IntensityAction, RatingKind
 from ...services.i18n import tr
+from ...session.session_controller import SessionController
 from ..context import AppContext
 from ..widgets.craving_chart import CravingChart
 from ..widgets.cue_view import CueView
@@ -25,7 +31,6 @@ from ..widgets.gallery_panel import GalleryPanel
 from ..widgets.intensity_controls import IntensityControls
 from ..widgets.uscs_panel import UscsPanel
 from ..widgets.vas_slider import VasPrompt
-from ...session.session_controller import SessionController
 
 
 class ExposureScreen(QWidget):

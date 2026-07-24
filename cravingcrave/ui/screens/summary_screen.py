@@ -2,19 +2,28 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from pathlib import Path
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QFileDialog, QFormLayout, QFrame, QHBoxLayout, QLabel, QMessageBox,
-    QPushButton, QVBoxLayout, QWidget,
+    QFileDialog,
+    QFormLayout,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
 from ..widgets.craving_chart import CravingChart
+
+_log = logging.getLogger(__name__)
 
 _END_REASON_KEYS = {
     "habituated": "endreason.habituated", "time_cap": "endreason.time_cap",
@@ -115,10 +124,15 @@ class SummaryScreen(QWidget):
         path, _ = QFileDialog.getSaveFileName(self, tr("summary.export"), default, "CSV (*.csv)")
         if not path:
             return
-        export.export_session_timeline(
-            Path(path), self.patient.code, self.session,
-            repos.ratings.list_for_session(self.session.id),
-            repos.coping.list_for_session(self.session.id),
-            repos.intensity.list_for_session(self.session.id),
-        )
+        try:
+            export.export_session_timeline(
+                Path(path), self.patient.code, self.session,
+                repos.ratings.list_for_session(self.session.id),
+                repos.coping.list_for_session(self.session.id),
+                repos.intensity.list_for_session(self.session.id),
+            )
+        except OSError as exc:
+            _log.exception("CSV export failed: %s", exc)
+            QMessageBox.warning(self, tr("app.title"), tr("report.export_failed"))
+            return
         QMessageBox.information(self, tr("app.title"), tr("summary.saved"))

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from PySide6.QtCore import QPointF, Qt  # noqa: E402
-from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QBrush, QFont  # noqa: E402
+from PySide6.QtGui import QBrush, QColor, QFont, QImage, QLinearGradient, QPainter  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from cravingcrave.config import AppConfig  # noqa: E402

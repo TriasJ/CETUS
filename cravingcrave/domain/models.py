@@ -8,14 +8,13 @@ the database and written to CSV exports, so they must stay stable.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Optional
 
 
 def utc_now_iso() -> str:
     """ISO-8601 UTC timestamp (stored as TEXT everywhere)."""
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 class Substance(str, Enum):
@@ -65,7 +64,7 @@ class IntensityAction(str, Enum):
 
 @dataclass
 class Clinician:
-    id: Optional[int] = None
+    id: int | None = None
     username: str = ""
     display_name: str = ""
     password_hash: str = ""
@@ -74,20 +73,20 @@ class Clinician:
 
 @dataclass
 class Patient:
-    id: Optional[int] = None
+    id: int | None = None
     code: str = ""                       # pseudonymous; the ONLY id used in exports
-    display_name: Optional[str] = None   # stays in DB, never in export filenames
-    birth_year: Optional[int] = None
-    primary_substance: Optional[str] = None
-    notes: Optional[str] = None
-    created_by: Optional[int] = None
+    display_name: str | None = None   # stays in DB, never in export filenames
+    birth_year: int | None = None
+    primary_substance: str | None = None
+    notes: str | None = None
+    created_by: int | None = None
     created_at: str = field(default_factory=utc_now_iso)
     archived: bool = False
 
 
 @dataclass
 class CueConfig:
-    id: Optional[int] = None
+    id: int | None = None
     patient_id: int = 0
     substance: str = ""
     media_path: str = ""                 # relative to media root
@@ -100,54 +99,54 @@ class CueConfig:
 
 @dataclass
 class Session:
-    id: Optional[int] = None
+    id: int | None = None
     patient_id: int = 0
     clinician_id: int = 0
     substance: str = ""
     started_at: str = field(default_factory=utc_now_iso)
-    ended_at: Optional[str] = None
-    end_reason: Optional[str] = None
+    ended_at: str | None = None
+    end_reason: str | None = None
     consent_given: bool = False
-    baseline_vas: Optional[int] = None
-    peak_vas: Optional[int] = None
-    endpoint_vas: Optional[int] = None
-    habituation_slope: Optional[float] = None
+    baseline_vas: int | None = None
+    peak_vas: int | None = None
+    endpoint_vas: int | None = None
+    habituation_slope: float | None = None
     app_version: str = ""
-    clinician_notes: Optional[str] = None
+    clinician_notes: str | None = None
 
 
 @dataclass
 class CravingRating:
-    id: Optional[int] = None
+    id: int | None = None
     session_id: int = 0
     ts: str = field(default_factory=utc_now_iso)
     elapsed_sec: int = 0
     value: int = 0                       # 0..10 VAS
     kind: str = RatingKind.PERIODIC.value
-    cue_config_id: Optional[int] = None
+    cue_config_id: int | None = None
 
 
 @dataclass
 class CopingEvent:
-    id: Optional[int] = None
+    id: int | None = None
     session_id: int = 0
     ts: str = field(default_factory=utc_now_iso)
     elapsed_sec: int = 0
     skill: str = ""
-    detail: Optional[str] = None
+    detail: str | None = None
 
 
 @dataclass
 class IntensityEvent:
-    id: Optional[int] = None
+    id: int | None = None
     session_id: int = 0
     ts: str = field(default_factory=utc_now_iso)
     elapsed_sec: int = 0
     action: str = ""
-    scale_pct: Optional[int] = None
-    blur_pct: Optional[int] = None
-    dim_pct: Optional[int] = None
-    muted: Optional[bool] = None
+    scale_pct: int | None = None
+    blur_pct: int | None = None
+    dim_pct: int | None = None
+    muted: bool | None = None
 
 
 @dataclass

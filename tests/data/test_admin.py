@@ -13,14 +13,14 @@ def _repos():
 def test_admin_key_default_then_custom():
     r = _repos()
     assert auth.admin_key_is_default(r.settings)
-    assert auth.verify_admin_key(r.settings, "cravingcrave-admin")
+    assert auth.verify_admin_key(r.settings, "cetus-admin")
     assert not auth.verify_admin_key(r.settings, "wrong-key")
 
     auth.set_admin_key(r.settings, "clinic-secret")
     assert not auth.admin_key_is_default(r.settings)
     assert auth.verify_admin_key(r.settings, "clinic-secret")
     # default no longer works once a custom key is set
-    assert not auth.verify_admin_key(r.settings, "cravingcrave-admin")
+    assert not auth.verify_admin_key(r.settings, "cetus-admin")
 
 
 def test_reset_password_and_list():

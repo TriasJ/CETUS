@@ -2,20 +2,30 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from PySide6.QtCharts import QChart, QChartView, QLineSeries, QValueAxis
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (
-    QFileDialog, QFrame, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QMessageBox, QPushButton, QVBoxLayout, QWidget,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QListWidget,
+    QListWidgetItem,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
 from .patient_form import PatientFormDialog
+
+_log = logging.getLogger(__name__)
 
 _END_REASON_KEYS = {
     "habituated": "endreason.habituated",
@@ -161,7 +171,12 @@ class PatientScreen(QWidget):
         path, _ = QFileDialog.getSaveFileName(self, tr("patient.export"), default, "CSV (*.csv)")
         if not path:
             return
-        export.export_sessions_summary(Path(path), self.patient.code, sessions)
+        try:
+            export.export_sessions_summary(Path(path), self.patient.code, sessions)
+        except OSError as exc:
+            _log.exception("CSV summary export failed: %s", exc)
+            QMessageBox.warning(self, tr("app.title"), tr("report.export_failed"))
+            return
         QMessageBox.information(self, tr("app.title"), tr("summary.saved"))
 
     def _edit(self) -> None:

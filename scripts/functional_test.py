@@ -16,12 +16,18 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import cravingcrave.app  # noqa: F401,E402  (runs media-backend fix on import)
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
+import cravingcrave.app  # noqa: F401,E402  (runs media-backend fix on import)
 from cravingcrave.config import AppConfig  # noqa: E402
-from cravingcrave.domain.models import CravingRating, CueConfig, Patient, RatingKind, Session  # noqa: E402
 from cravingcrave.domain import playlist as playlist_rules  # noqa: E402
+from cravingcrave.domain.models import (  # noqa: E402
+    CravingRating,
+    CueConfig,
+    Patient,
+    RatingKind,
+    Session,
+)
 from cravingcrave.services import export  # noqa: E402
 from cravingcrave.session.session_controller import SessionController  # noqa: E402
 from cravingcrave.ui.context import AppContext  # noqa: E402
@@ -233,8 +239,8 @@ def main() -> int:
     # ---- 9. custom substance round-trips end to end ----
     @check("custom substance: add -> folder -> patient/session -> metrics")
     def _():
-        from cravingcrave.services import substances as _subs
         from cravingcrave.domain import reports as _reports
+        from cravingcrave.services import substances as _subs
         key = _subs.add_custom(ctx.repos.settings, "Cocaína")
         assert key == "cocaina"
         (cfg.media_root / key).mkdir(parents=True, exist_ok=True)

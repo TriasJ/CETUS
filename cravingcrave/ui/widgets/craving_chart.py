@@ -13,7 +13,6 @@ from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import QWidget
 
 from ...services.i18n import tr
-from ..theme import PRIMARY
 
 
 class CravingChart(QChartView):

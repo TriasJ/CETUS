@@ -1,7 +1,13 @@
 from cravingcrave.data.database import Database
 from cravingcrave.data.repositories import Repositories
 from cravingcrave.domain.models import (
-    Clinician, CopingEvent, CravingRating, CueConfig, IntensityEvent, Patient, Session,
+    Clinician,
+    CopingEvent,
+    CravingRating,
+    CueConfig,
+    IntensityEvent,
+    Patient,
+    Session,
 )
 
 

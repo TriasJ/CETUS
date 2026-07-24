@@ -33,7 +33,7 @@ dlg.show()
 app.processEvents()
 dlg.grab().save(str(out / "14_admin_key.png"))
 
-dlg.key_input.setText("cravingcrave-admin")
+dlg.key_input.setText("cetus-admin")
 dlg._check_key()
 app.processEvents()
 dlg.grab().save(str(out / "15_admin_recovery.png"))

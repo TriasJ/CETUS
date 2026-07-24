@@ -7,8 +7,8 @@ add personalized cues simply by dropping files into these folders — no rebuild
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 from ..domain.models import MediaItem, MediaType
 

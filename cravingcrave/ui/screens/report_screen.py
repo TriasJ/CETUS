@@ -6,28 +6,59 @@ sessions). Pure aggregation lives in :mod:`cravingcrave.domain.reports`.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+import logging
+from datetime import UTC, datetime
 from html import escape as _html_escape
 from pathlib import Path
 
 from PySide6.QtCharts import (
-    QBarCategoryAxis, QBarSeries, QBarSet, QChart, QChartView, QLineSeries,
-    QScatterSeries, QValueAxis,
+    QBarCategoryAxis,
+    QBarSeries,
+    QBarSet,
+    QChart,
+    QChartView,
+    QLineSeries,
+    QScatterSeries,
+    QValueAxis,
 )
 from PySide6.QtCore import QMarginsF, QSizeF, Qt, QUrl
 from PySide6.QtGui import (
-    QColor, QFont, QImage, QPageLayout, QPageSize, QPainter, QPdfWriter, QTextDocument,
+    QColor,
+    QFont,
+    QImage,
+    QPageLayout,
+    QPageSize,
+    QPainter,
+    QPdfWriter,
+    QTextDocument,
 )
 from PySide6.QtWidgets import (
-    QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QHeaderView, QLabel,
-    QLayout, QListWidget, QMessageBox, QPlainTextEdit, QPushButton, QScrollArea,
-    QTabWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
+    QCheckBox,
+    QComboBox,
+    QFileDialog,
+    QFrame,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLayout,
+    QListWidget,
+    QMessageBox,
+    QPlainTextEdit,
+    QPushButton,
+    QScrollArea,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...domain import reports
 from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
+
+_log = logging.getLogger(__name__)
 
 # Stable colours for the 4 USCS skills (used in detail chart + bar charts).
 SKILL_LABELS = {
@@ -423,8 +454,19 @@ class ReportScreen(QWidget):
         path, _ = QFileDialog.getSaveFileName(self, tr("report.export_png"), default, "PNG (*.png)")
         if not path:
             return
-        view.grab().save(path)
-        QMessageBox.information(self, tr("app.title"), tr("summary.saved"))
+        try:
+            ok = view.grab().save(path)
+        except OSError as exc:
+            ok = False
+            _log.exception("PNG export failed: %s", exc)
+        self._notify_export(ok)
+
+    def _notify_export(self, ok: bool) -> None:
+        """Show a success or failure dialog for an export instead of always claiming success."""
+        if ok:
+            QMessageBox.information(self, tr("app.title"), tr("summary.saved"))
+        else:
+            QMessageBox.warning(self, tr("app.title"), tr("report.export_failed"))
 
     def _new_landscape_doc(self, path: str):
         """A4-landscape QPdfWriter + QTextDocument laid out to the printable area.
@@ -470,8 +512,13 @@ class ReportScreen(QWidget):
         doc.addResource(QTextDocument.ResourceType.ImageResource, QUrl("img://recovery"),
                         _print_chart_pixmap(self._build_recovery_chart(sessions)))
         doc.setHtml(self._build_html())
-        doc.print_(writer)
-        QMessageBox.information(self, tr("app.title"), tr("summary.saved"))
+        try:
+            doc.print_(writer)
+            ok = Path(path).exists() and Path(path).stat().st_size > 0
+        except OSError as exc:
+            ok = False
+            _log.exception("Session PDF export failed: %s", exc)
+        self._notify_export(ok)
 
     # ---- full per-patient PDF (every session, with changes-between view) ---
     def _export_pdf_full(self) -> None:
@@ -503,8 +550,13 @@ class ReportScreen(QWidget):
                             QUrl(f"img://session-{s.id}"), _print_chart_pixmap(chart))
 
         doc.setHtml(self._build_full_html(sessions, cue_index))
-        doc.print_(writer)
-        QMessageBox.information(self, tr("app.title"), tr("summary.saved"))
+        try:
+            doc.print_(writer)
+            ok = Path(path).exists() and Path(path).stat().st_size > 0
+        except OSError as exc:
+            ok = False
+            _log.exception("Full-patient PDF export failed: %s", exc)
+        self._notify_export(ok)
 
     # ---- PDF header (clinic logo + name) -----------------------------------
     def _add_logo_resource(self, doc: QTextDocument) -> bool:
@@ -573,7 +625,7 @@ class ReportScreen(QWidget):
         include_notes = self.include_notes.isChecked()
         has_logo = bool(self.context.repos.settings.get("clinic_logo_path")
                         and Path(self.context.repos.settings.get("clinic_logo_path")).is_file())
-        gen = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        gen = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
         # ----- summary table (changes between sessions) -----
         rows = []
         for i, s in enumerate(sessions, start=1):
@@ -656,7 +708,7 @@ class ReportScreen(QWidget):
         sessions = self._finished_sessions()
         sid = self.session_combo.currentData()
         sel = next((s for s in sessions if s.id == sid), None)
-        gen = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        gen = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
         sel_block = ""
         if sel:
             ratings = self.context.repos.ratings.list_for_session(sel.id)

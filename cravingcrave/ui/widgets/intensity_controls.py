@@ -9,7 +9,13 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
-    QFormLayout, QFrame, QLabel, QPushButton, QSlider, QVBoxLayout, QWidget,
+    QFormLayout,
+    QFrame,
+    QLabel,
+    QPushButton,
+    QSlider,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...domain.models import IntensityAction

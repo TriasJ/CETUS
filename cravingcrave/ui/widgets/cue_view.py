@@ -17,13 +17,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import QRectF, QSizeF, QUrl, Qt, Signal
+from PySide6.QtCore import QRectF, QSizeF, Qt, QUrl, Signal
 from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPixmap
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtMultimediaWidgets import QGraphicsVideoItem
 from PySide6.QtWidgets import (
-    QGraphicsBlurEffect, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsScene,
-    QGraphicsView, QWidget,
+    QGraphicsBlurEffect,
+    QGraphicsPixmapItem,
+    QGraphicsRectItem,
+    QGraphicsScene,
+    QGraphicsView,
+    QWidget,
 )
 
 MAX_BLUR_RADIUS = 45.0   # at blur_pct = 100

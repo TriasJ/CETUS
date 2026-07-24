@@ -1,6 +1,7 @@
 {
   "app.title": "CETUS",
   "app.subtitle": "Terapia de Exposición a Señales (CET) con habilidades de afrontamiento",
+  "app.fullscreen_hint": "Pantalla completa: F11",
 
   "common.ok": "Aceptar",
   "common.cancel": "Cancelar",
@@ -293,5 +294,7 @@
 
   "error.media_missing": "No se encontró el archivo de medios: {path}",
   "error.codec": "No se pudo reproducir este medio. Verifica el formato (se recomienda MP4 H.264 / MP3).",
-  "error.no_cues": "No hay señales para mostrar."
+  "error.no_cues": "No hay señales para mostrar.",
+  "error.save_failed": "No se pudo guardar. Verifica los permisos y el espacio en disco.",
+  "report.export_failed": "No se pudo generar el archivo. Verifica la ruta, los permisos y el espacio en disco."
 }

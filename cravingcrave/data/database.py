@@ -8,15 +8,15 @@ patient hitting PANIC — never leaves a half-written session.
 from __future__ import annotations
 
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator, Optional, Union
 
 from . import migrations
 
 
 class Database:
-    def __init__(self, path: Union[str, Path] = ":memory:") -> None:
+    def __init__(self, path: str | Path = ":memory:") -> None:
         self.path = str(path)
         if self.path != ":memory:":
             Path(self.path).parent.mkdir(parents=True, exist_ok=True)
@@ -40,5 +40,5 @@ class Database:
         self.conn.close()
 
 
-def open_database(path: Optional[Union[str, Path]] = None) -> Database:
+def open_database(path: str | Path | None = None) -> Database:
     return Database(path if path is not None else ":memory:")

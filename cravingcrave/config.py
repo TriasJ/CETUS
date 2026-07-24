@@ -12,7 +12,6 @@ from pathlib import Path
 
 from . import paths
 
-
 # --- Clinical defaults (overridable via app_setting) -------------------------
 # VAS is 0..10. The VR-CET literature habituates "until two consecutive low
 # ratings"; we encode that as a configurable threshold + count.
@@ -32,7 +31,7 @@ DEFAULT_LOCALE = "es"
 # Bootstrap admin-recovery key for the in-app debug/recovery dialog (Ctrl+Shift+A
 # on the login screen). Applies only until a clinic sets its own key in the dialog.
 # Change this per deployment, or set a custom key in-app. See README.
-DEFAULT_ADMIN_KEY = "cravingcrave-admin"
+DEFAULT_ADMIN_KEY = "cetus-admin"
 
 
 @dataclass

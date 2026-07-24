@@ -14,10 +14,9 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
-from typing import Optional
 
-from .i18n import tr
 from ..data.repositories import SettingRepo
+from .i18n import tr
 
 BUILTIN_KEYS = ("alcohol", "cigarettes", "meth")
 SETTING_KEY = "custom_substances"
@@ -64,7 +63,7 @@ def display_name(settings: SettingRepo, key: str) -> str:
     return key
 
 
-def add_custom(settings: SettingRepo, label: str) -> Optional[str]:
+def add_custom(settings: SettingRepo, label: str) -> str | None:
     """Add a custom substance from a free-text label. Returns its key, or None if the
     label is empty/duplicate/collides with a built-in."""
     label = label.strip()

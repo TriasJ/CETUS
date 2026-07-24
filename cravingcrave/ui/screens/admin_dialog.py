@@ -7,15 +7,30 @@ list accounts, reset a password, create a clinician, or change the admin key.
 
 from __future__ import annotations
 
+import logging
+import sqlite3
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QDialog, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QListWidget,
-    QListWidgetItem, QMessageBox, QPushButton, QStackedWidget, QVBoxLayout, QWidget,
+    QDialog,
+    QHBoxLayout,
+    QInputDialog,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMessageBox,
+    QPushButton,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...services import auth
 from ...services.i18n import tr
 from ..context import AppContext
+
+_log = logging.getLogger(__name__)
 
 
 class AdminDialog(QDialog):
@@ -118,8 +133,12 @@ class AdminDialog(QDialog):
             return
         try:
             self.context.auth.register(user, name, pw)
-        except Exception:
-            QMessageBox.warning(self, tr("admin.title"), tr("patient.code_taken"))
+        except sqlite3.IntegrityError:  # UNIQUE username collision
+            QMessageBox.warning(self, tr("admin.title"), tr("addclinician.duplicate"))
+            return
+        except Exception as exc:  # disk/DB/other — surface honestly, don't mislabel
+            _log.exception("Clinician create failed: %s", exc)
+            QMessageBox.warning(self, tr("admin.title"), tr("error.save_failed"))
             return
         self._refresh_clinicians()
         QMessageBox.information(self, tr("admin.title"), tr("admin.done_create", user=user.strip()))

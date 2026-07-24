@@ -10,7 +10,7 @@ Pure functions only — no Qt, no DB.
 
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from .models import EndReason
 
@@ -39,7 +39,7 @@ def is_habituated(values: Sequence[int], threshold: int, consecutive: int) -> bo
     return count_trailing_low(values, threshold) >= consecutive
 
 
-def compute_slope(points: Sequence[tuple[float, float]]) -> Optional[float]:
+def compute_slope(points: Sequence[tuple[float, float]]) -> float | None:
     """Least-squares slope of craving over time (units: VAS points per second).
 
     ``points`` is a sequence of ``(elapsed_sec, value)``. A *negative* slope is the
@@ -66,7 +66,7 @@ def evaluate_end(
     threshold: int,
     consecutive: int,
     time_cap_sec: float,
-) -> Optional[EndReason]:
+) -> EndReason | None:
     """Decide whether the exposure should end on its own.
 
     Returns ``HABITUATED`` if the habituation criterion is met, else ``TIME_CAP``

@@ -7,7 +7,6 @@ startup in ``app.py``.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from ..config import AppConfig
 from ..data.database import Database
@@ -26,10 +25,10 @@ class AppContext:
     auth: AuthService
     crisis: CrisisService
     media: MediaLibrary
-    clinician: Optional[Clinician] = None
+    clinician: Clinician | None = None
 
     @classmethod
-    def create(cls, config: AppConfig) -> "AppContext":
+    def create(cls, config: AppConfig) -> AppContext:
         config.ensure_dirs()
         db = Database(config.db_path)
         repos = Repositories(db)

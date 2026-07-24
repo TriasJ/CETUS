@@ -20,10 +20,16 @@ def test_help_content_loads_with_citations():
     assert "consecutivas" in hab and "Umbral" in hab and "Pendiente" in hab
     assert "Ajustes" in hab and "PMC10980682" in hab
 
-    # The shortcuts topic lists the new intensity / loop bindings.
+    # The shortcuts topic lists the new intensity / loop / fullscreen bindings.
     sc = next(s for s in sections if s["id"] == "shortcuts")["html"]
-    for token in ("T</b>", "D</b>", "O</b>", "M</b>", "R</b>", "L</b>", "Tamaño", "Desenfoque", "Oscurecer", "bucle"):
+    for token in ("T</b>", "D</b>", "O</b>", "M</b>", "R</b>", "L</b>", "F11</b>",
+                  "Tamaño", "Desenfoque", "Oscurecer", "bucle"):
         assert token in sc, f"missing shortcut token: {token}"
+
+    # The mechanisms topic exists and cites the behavioral-science evidence.
+    mech = next(s for s in sections if s["id"] == "mecanismos")["html"]
+    assert "Pavloviano" in mech or "pavloviano" in mech
+    assert "Carter" in mech and "Kiyak" in mech and "extinción" in mech.lower()
 
 
 def test_help_dialog_renders_and_navigates(qtbot):

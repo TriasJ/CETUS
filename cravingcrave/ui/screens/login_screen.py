@@ -5,7 +5,14 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
-    QFrame, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QVBoxLayout, QWidget,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ...services.i18n import tr
@@ -75,6 +82,9 @@ class LoginScreen(QWidget):
         hint = QLabel(tr("login.admin_hint"))
         hint.setObjectName("Muted")
         hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        fs_hint = QLabel(tr("app.fullscreen_hint"))
+        fs_hint.setObjectName("Muted")
+        fs_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         layout = QVBoxLayout(self)
         layout.addStretch(1)
@@ -83,6 +93,7 @@ class LoginScreen(QWidget):
         layout.addLayout(row)
         layout.addStretch(1)
         layout.addWidget(hint)
+        layout.addWidget(fs_hint)
 
         # Admin/debug recovery shortcut (gated by the admin key inside the dialog).
         self._admin_shortcut = QShortcut(QKeySequence("Ctrl+Shift+A"), self)

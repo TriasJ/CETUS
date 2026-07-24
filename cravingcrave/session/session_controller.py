@@ -1,7 +1,7 @@
-"""Orchestrates one exposure session: VAS, cues, coping, intensity, panic, logging.
+"""Orchestrates one exposure session: VAS, cues, coping, intensity, panic, persistence.
 
 The controller is a ``QObject`` so screens can react to signals, but every clinical
-decision delegates to the pure ``domain`` functions, and all data goes through the
+decision delegates to the pure ``domain`` functions, and all data is written through the
 repositories incrementally (so a panic/close still leaves a coherent session).
 
 Elapsed time uses an injectable monotonic clock so the controller can be unit
@@ -11,7 +11,7 @@ tested without Qt or wall-clock sleeps.
 from __future__ import annotations
 
 import time
-from typing import Callable, Optional, Sequence
+from collections.abc import Callable, Sequence
 
 from PySide6.QtCore import QObject, Signal
 
@@ -20,8 +20,16 @@ from ..config import AppConfig
 from ..data.repositories import Repositories
 from ..domain import habituation
 from ..domain.models import (
-    Clinician, CopingEvent, CravingRating, CueConfig, EndReason,
-    IntensityEvent, Patient, RatingKind, Session, utc_now_iso,
+    Clinician,
+    CopingEvent,
+    CravingRating,
+    CueConfig,
+    EndReason,
+    IntensityEvent,
+    Patient,
+    RatingKind,
+    Session,
+    utc_now_iso,
 )
 from .session_state import SessionState
 
@@ -43,7 +51,7 @@ class SessionController(QObject):
         exposure_cues: Sequence[CueConfig],
         clock: Callable[[], float] = time.monotonic,
         loop: bool = False,
-        parent: Optional[QObject] = None,
+        parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
         self.repos = repos
@@ -55,14 +63,14 @@ class SessionController(QObject):
         self._clock = clock
         self.loop = loop  # advance/previous wrap when True
 
-        self.session: Optional[Session] = None
+        self.session: Session | None = None
         self.state = SessionState.CONSENT
-        self._t0: Optional[float] = None
+        self._t0: float | None = None
         self._cue_index = 0
         self._last_periodic_sec = 0.0
         self._values: list[int] = []
         self._peak = 0
-        self._baseline: Optional[int] = None
+        self._baseline: int | None = None
         self._finalized = False
 
     # --- lifecycle ----------------------------------------------------------
@@ -95,7 +103,7 @@ class SessionController(QObject):
     def cue_count(self) -> int:
         return len(self.exposure_cues)
 
-    def current_cue(self) -> Optional[CueConfig]:
+    def current_cue(self) -> CueConfig | None:
         if 0 <= self._cue_index < len(self.exposure_cues):
             return self.exposure_cues[self._cue_index]
         return None
@@ -103,7 +111,7 @@ class SessionController(QObject):
     def current_cue_index(self) -> int:
         return self._cue_index
 
-    def advance_cue(self) -> Optional[CueConfig]:
+    def advance_cue(self) -> CueConfig | None:
         if not self.exposure_cues:
             return None
         if self._cue_index < len(self.exposure_cues) - 1:
@@ -113,7 +121,7 @@ class SessionController(QObject):
         self.cueChanged.emit(self._cue_index)
         return self.current_cue()
 
-    def previous_cue(self) -> Optional[CueConfig]:
+    def previous_cue(self) -> CueConfig | None:
         if not self.exposure_cues:
             return None
         if self._cue_index > 0:
@@ -160,7 +168,7 @@ class SessionController(QObject):
         self._last_periodic_sec = self.elapsed_sec()
 
     # --- coping & intensity logging ----------------------------------------
-    def record_coping(self, skill: str, detail: Optional[str] = None) -> None:
+    def record_coping(self, skill: str, detail: str | None = None) -> None:
         self.repos.coping.add(
             CopingEvent(session_id=self.session.id, ts=utc_now_iso(),
                         elapsed_sec=self.elapsed_sec(), skill=skill, detail=detail)
@@ -182,7 +190,7 @@ class SessionController(QObject):
     def go_to_endpoint(self) -> None:
         self._set_state(SessionState.ENDPOINT)
 
-    def finalize(self, end_reason: EndReason, endpoint_value: Optional[int] = None) -> Session:
+    def finalize(self, end_reason: EndReason, endpoint_value: int | None = None) -> Session:
         """Write the closing fields exactly once. Idempotent against double-calls."""
         if self._finalized or self.session is None:
             return self.session

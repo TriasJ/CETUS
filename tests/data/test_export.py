@@ -2,14 +2,14 @@
 
 from pathlib import Path
 
+from cravingcrave.domain.models import CravingRating, Session
 from cravingcrave.services import export
 from cravingcrave.services.auth import hash_password, verify_password
-from cravingcrave.domain.models import CravingRating, Session
 
 
 def test_safe_filename_has_no_pii_and_is_sanitized():
     name = export.safe_filename("PT/01 *bad*", "summary")
-    assert name.startswith("cravingcrave_PT_01__bad__summary_")
+    assert name.startswith("cetus_PT_01__bad__summary_")
     assert name.endswith(".csv")
 
 
