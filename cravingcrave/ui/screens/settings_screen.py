@@ -7,6 +7,7 @@ from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QComboBox,
     QFileDialog,
     QFormLayout,
     QFrame,
@@ -26,7 +27,7 @@ from PySide6.QtWidgets import (
 
 from ...services import substances as subs
 from ...services.crisis import CrisisInfo
-from ...services.i18n import tr
+from ...services.i18n import available_locales, current_locale, tr
 from ..context import AppContext
 
 _CARD_STYLE = (
@@ -87,6 +88,7 @@ class SettingsScreen(QWidget):
         save.clicked.connect(self._save)
         form.addRow(save)
 
+        language_card = self._build_language_card()
         substances_card = self._build_substances_card()
         branding_card = self._build_branding_card()
 
@@ -95,7 +97,7 @@ class SettingsScreen(QWidget):
         col = QVBoxLayout(content)
         col.setContentsMargins(0, 0, 0, 0)
         col.setSpacing(20)
-        for c in (card, branding_card, substances_card):
+        for c in (card, language_card, branding_card, substances_card):
             row = QHBoxLayout(); row.addStretch(1); row.addWidget(c); row.addStretch(1)
             col.addLayout(row)
         col.addStretch(1)
@@ -109,6 +111,35 @@ class SettingsScreen(QWidget):
         layout.setContentsMargins(36, 24, 36, 24)
         layout.addLayout(header)
         layout.addWidget(scroll, 1)
+
+    # --- UI language --------------------------------------------------------
+    def _build_language_card(self) -> QFrame:
+        card = QFrame(); card.setObjectName("Card"); card.setMaximumWidth(760)
+        card.setStyleSheet(_CARD_STYLE)
+        v = QVBoxLayout(card)
+        v.setContentsMargins(28, 24, 28, 24); v.setSpacing(12)
+
+        title = QLabel(tr("app.language")); title.setObjectName("H2")
+        v.addWidget(title)
+
+        self.lang_combo = QComboBox()
+        for code, name in available_locales():
+            self.lang_combo.addItem(name, code)
+        current = current_locale()
+        idx = self.lang_combo.findData(current)
+        if idx >= 0:
+            self.lang_combo.setCurrentIndex(idx)
+        # Live re-render: changing the language rebuilds this screen in the new language.
+        self.lang_combo.activated.connect(self._on_language_changed)
+
+        form = QFormLayout(); form.setSpacing(12)
+        form.addRow(tr("app.language"), self.lang_combo)
+        v.addLayout(form)
+        return card
+
+    def _on_language_changed(self, index: int) -> None:
+        code = self.lang_combo.itemData(index)
+        self.window.change_language(code, redisplay=self.window.show_settings)
 
     # --- clinic branding for PDF reports ------------------------------------
     def _build_branding_card(self) -> QFrame:

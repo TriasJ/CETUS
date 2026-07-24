@@ -5,8 +5,8 @@
 CETUS presents personalized substance cues (images, video, sound for alcohol,
 tobacco, methamphetamine, and clinic-defined custom substances) in a controlled,
 supervised session to **induce and then habituate craving**, paired with the four
-evidence-based urge-specific coping skills (USCS) and CBT. Spanish UI, local-only data,
-built with Python + PySide6.
+evidence-based urge-specific coping skills (USCS) and CBT. Bilingual UI (Spanish default,
+English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built with Python + PySide6.
 
 ![Exposure screen](docs/screenshots/05_exposure_session.png)
 
@@ -40,6 +40,9 @@ built with Python + PySide6.
   per-cue reactivity, coping responses, clinician notes) and cross-session progress;
   export to **CSV** and **landscape PDF** with optional clinic logo and a comments toggle.
 - **In-app Help** (F1) documenting every feature and its scientific basis with citations.
+- **Bilingual UI** — Spanish (default) and English, switchable live from the login screen and
+  Settings (persisted, no restart). Adding a language is a drop-in JSON file — see
+  [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md).
 
 See more screenshots in [`docs/screenshots/`](docs/screenshots/).
 

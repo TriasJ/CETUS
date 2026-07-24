@@ -31,8 +31,9 @@ def ctx(tmp_path, qapp):
 def test_settings_logo_picker_wired(ctx, qtbot, tmp_path, monkeypatch):
     """Regression: SettingsScreen used QFileDialog without importing it (would crash on
     'Elegir logo…'). Exercise the picker end-to-end with a stubbed file dialog."""
-    from PySide6.QtGui import QImage
     from PySide6.QtCore import Qt as _Qt
+    from PySide6.QtGui import QImage
+
     from cravingcrave.ui.screens import settings_screen as ss_mod
     from cravingcrave.ui.screens.settings_screen import SettingsScreen
 

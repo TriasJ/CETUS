@@ -15,13 +15,13 @@ from PySide6.QtWidgets import (
 )
 
 from ...services.help import load_help
-from ...services.i18n import tr
+from ...services.i18n import current_locale, tr
 
 
 class HelpDialog(QDialog):
-    def __init__(self, parent: QWidget | None = None, locale: str = "es") -> None:
+    def __init__(self, parent: QWidget | None = None, locale: str | None = None) -> None:
         super().__init__(parent)
-        data = load_help(locale)
+        data = load_help(locale or current_locale())
         self._sections = data.get("sections", [])
         self.setWindowTitle(data.get("title", tr("dashboard.help")))
         self.resize(940, 660)

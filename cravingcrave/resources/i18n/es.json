@@ -1,7 +1,9 @@
 {
+  "_language.name": "Español",
   "app.title": "CETUS",
   "app.subtitle": "Terapia de Exposición a Señales (CET) con habilidades de afrontamiento",
   "app.fullscreen_hint": "Pantalla completa: F11",
+  "app.language": "Idioma",
 
   "common.ok": "Aceptar",
   "common.cancel": "Cancelar",

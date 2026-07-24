@@ -11,7 +11,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QStackedWidget, QWidget
 
-from ..services.i18n import tr
+from ..services.i18n import current_locale, set_locale, tr
 from .context import AppContext
 from .screens.calm_screen import CalmScreen
 from .screens.cue_config_screen import CueConfigScreen
@@ -98,6 +98,21 @@ class MainWindow(QMainWindow):
 
     def show_help(self) -> None:
         HelpDialog(self).exec()
+
+    def change_language(self, locale: str, redisplay=None) -> None:
+        """Switch the UI language live: persist the choice, reload i18n, refresh the
+        window title, and re-render the current screen so every ``tr()`` re-evaluates.
+
+        ``redisplay`` is the caller's own show_* method (e.g. ``self.window.show_settings``)
+        so the active screen rebuilds in place in the new language without a restart."""
+        if not locale or locale == current_locale():
+            return
+        self.context.repos.settings.set("locale", locale)
+        self.context.config.locale = locale
+        set_locale(locale)
+        self.setWindowTitle(tr("app.title"))
+        if redisplay is not None:
+            redisplay()
 
     def _toggle_fullscreen(self) -> None:
         """F11: toggle fullscreen. The panic overlay re-anchors via resizeEvent, so no

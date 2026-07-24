@@ -2,6 +2,29 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.3.0 — localization (2026-07)
+
+Bilingual UI with a drop-in mechanism for adding more languages.
+
+### Added
+- **Localization / i18n** — the UI is now bilingual: **Spanish (default)** and **English**.
+  Every string resolves through `tr()` against `resources/i18n/<code>.json`; the in-app manual
+  is translated per locale (`resources/help/<code>.json`, 18 topics) with citations preserved.
+- **Live language switcher** — a selector on the **login screen** and in **Settings → Idioma /
+  Language**. Changing language re-renders the current screen immediately (no restart) and
+  persists the choice (`app_setting` key `locale`) for the next launch.
+- **Auto-discovery** — `available_locales()` scans the locale files and reads each one's native
+  name (`_language.name`), so a new language appears in both switchers with **no code changes**.
+  New `docs/LOCALIZATION.md` documents how to add a language.
+- Graceful fallbacks: a missing UI key returns the key; a missing translated manual falls back
+  to the default-locale Help (never an empty window).
+- Tests: locale key-parity across all languages, help-topic parity, auto-discovery, and the
+  live switcher (Settings + login).
+
+### Changed
+- Startup applies the DB-persisted locale after the context loads, so the clinic's saved choice
+  wins over the bootstrap default. Version → 0.3.0.
+
 ## 0.2.0 — hardening, fullscreen, references (2026-06)
 
 Optimization, professionalization, and documentation pass.

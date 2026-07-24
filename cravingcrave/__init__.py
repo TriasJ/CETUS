@@ -1,8 +1,9 @@
 """CETUS — non-VR Cue Exposure Therapy (CET-USCS) desktop application.
 
 Clinician-supervised craving habituation tool. Adjunct to therapy, local-only,
-Spanish UI. See docs/plan for the clinical rationale (Mellentin CET-USCS,
-Monti cue-exposure-with-coping-skills).
+bilingual UI (Spanish default, English; drop-in for more — see docs/LOCALIZATION.md).
+See docs/plan for the clinical rationale (Mellentin CET-USCS, Monti
+cue-exposure-with-coping-skills).
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

@@ -60,11 +60,14 @@ def main() -> int:
 
     config = AppConfig()
     configure_logging(config.data_dir)
-    _log.info("Starting CETUS (locale=%s).", config.locale)
-    i18n.set_locale(config.locale)
     apply_theme(app)
 
+    # Build the context first: AppContext.create() reads the clinic's saved UI
+    # language from the DB into config.locale, so applying i18n afterwards lets the
+    # persisted choice win over the bootstrap default.
     context = AppContext.create(config)
+    _log.info("Starting CETUS (locale=%s).", config.locale)
+    i18n.set_locale(config.locale)
     window = MainWindow(context)
     window.show()
     return app.exec()

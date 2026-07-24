@@ -61,3 +61,8 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.periodic_vas_seconds = as_int("periodic_vas_seconds", config.periodic_vas_seconds)
     config.habituation_threshold = as_int("habituation_threshold", config.habituation_threshold)
     config.habituation_consecutive = as_int("habituation_consecutive", config.habituation_consecutive)
+    # The clinic-selected UI language (persisted by the language switcher) overrides
+    # the bootstrap default. app.main() applies it to i18n after the context is built.
+    locale = s.get("locale")
+    if locale:
+        config.locale = locale

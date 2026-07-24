@@ -5,6 +5,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
+    QComboBox,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -15,7 +16,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from ...services.i18n import tr
+from ...services.i18n import available_locales, current_locale, tr
 from ..context import AppContext
 from .admin_dialog import AdminDialog
 
@@ -86,7 +87,24 @@ class LoginScreen(QWidget):
         fs_hint.setObjectName("Muted")
         fs_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        # Language selector: lets the clinician switch UI language before logging in.
+        # It re-renders the login screen in place (persisted for next launch).
+        self.lang_combo = QComboBox()
+        for code, name in available_locales():
+            self.lang_combo.addItem(name, code)
+        idx = self.lang_combo.findData(current_locale())
+        if idx >= 0:
+            self.lang_combo.setCurrentIndex(idx)
+        self.lang_combo.activated.connect(self._on_language_changed)
+        lang_row = QHBoxLayout()
+        lang_row.addStretch(1)
+        lang_label = QLabel(tr("app.language")); lang_label.setObjectName("Muted")
+        lang_row.addWidget(lang_label)
+        lang_row.addWidget(self.lang_combo)
+        lang_row.addStretch(1)
+
         layout = QVBoxLayout(self)
+        layout.addLayout(lang_row)
         layout.addStretch(1)
         row = QHBoxLayout()
         row.addStretch(1); row.addWidget(card); row.addStretch(1)
@@ -98,6 +116,10 @@ class LoginScreen(QWidget):
         # Admin/debug recovery shortcut (gated by the admin key inside the dialog).
         self._admin_shortcut = QShortcut(QKeySequence("Ctrl+Shift+A"), self)
         self._admin_shortcut.activated.connect(self._open_admin)
+
+    def _on_language_changed(self, index: int) -> None:
+        code = self.lang_combo.itemData(index)
+        self.window.change_language(code, redisplay=self.window.show_login)
 
     def _open_admin(self) -> None:
         AdminDialog(self.context, self).exec()
