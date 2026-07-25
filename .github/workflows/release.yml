@@ -50,11 +50,15 @@ jobs:
         run: pyinstaller --noconfirm cravingcrave.spec
 
       # ---- Windows: Inno Setup installer + portable exe ----
+      - name: Install Inno Setup (Windows)
+        if: runner.os == 'Windows'
+        run: choco install innosetup --no-progress -y
+
       - name: Package Windows installer
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          iscc /DAppVersion=%APP_VERSION% packaging\windows\cetus.iss
+          "%ProgramFiles(x86)%\Inno Setup 6\ISCC.exe" /DAppVersion=%APP_VERSION% packaging\windows\cetus.iss || exit /b 1
           copy dist\CETUS.exe dist\CETUS-%APP_VERSION%-portable.exe
 
       # ---- macOS: .dmg from the .app bundle ----
@@ -66,10 +70,10 @@ jobs:
       - name: Package Linux AppImage
         if: runner.os == 'Linux'
         run: |
-          curl -L -o /usr/local/bin/appimagetool \
+          sudo curl -L -o /usr/local/bin/appimagetool \
             https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-          chmod +x /usr/local/bin/appimagetool
-          # AppImages need FUSE or --appimage-extract-and-run on CI.
+          sudo chmod +x /usr/local/bin/appimagetool
+          # AppImages need FUSE or --appimage-extract-and-run on CI runners.
           export APPIMAGE_EXTRACT_AND_RUN=1
           bash packaging/linux/make_appimage.sh "$APP_VERSION"
 
