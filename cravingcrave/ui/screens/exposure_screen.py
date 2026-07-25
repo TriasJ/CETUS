@@ -120,8 +120,10 @@ class ExposureScreen(QWidget):
         self.vas_prompt = VasPrompt(self, context.config.vas_max)
         self.vas_prompt.submitted.connect(self._on_vas_submitted)
         self.coping_panel = UscsPanel(self)
+        # Keep the raw text (even empty) so "skill used, no text" is distinguishable
+        # from "skill skipped" in qualitative exports.
         self.coping_panel.copingRecorded.connect(
-            lambda skill, detail: controller.record_coping(skill, detail or None))
+            lambda skill, detail: controller.record_coping(skill, detail))
         self.gallery = GalleryPanel(self)
         self.gallery.closed.connect(self._on_gallery_closed)
 
@@ -130,6 +132,12 @@ class ExposureScreen(QWidget):
         self._timer.setInterval(max(1, context.config.periodic_vas_seconds) * 1000)
         self._timer.timeout.connect(self._on_periodic)
         controller.habituationReached.connect(self._on_habituation)
+
+        # Optional timed auto-scroll: advance the cue every N seconds, hands-free.
+        self._autoscroll_timer = QTimer(self)
+        if context.config.autoscroll_timed_seconds > 0:
+            self._autoscroll_timer.setInterval(context.config.autoscroll_timed_seconds * 1000)
+            self._autoscroll_timer.timeout.connect(self._on_autoscroll_tick)
 
         # Arrow keys change the stimulus: Right = next cue, Left = previous cue.
         self._next_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Right), self)
@@ -172,6 +180,8 @@ class ExposureScreen(QWidget):
         self._load_cue()
         self.cue_view.set_intensity(100, 0, 0, False)
         self._timer.start()
+        if self.context.config.autoscroll_timed_seconds > 0:
+            self._autoscroll_timer.start()
 
     def _on_ambient_mute(self, muted: bool) -> None:
         self.cue_view.set_ambient_muted(muted)
@@ -253,6 +263,16 @@ class ExposureScreen(QWidget):
             self._begin_exposure()
         elif kind is RatingKind.ENDPOINT:
             self._finish(value)
+        elif self.context.config.autoscroll_on_grading:
+            # After a periodic/peak rating, advance the cue automatically (hands-free).
+            self._next_cue()
+
+    def _on_autoscroll_tick(self) -> None:
+        # Timed auto-advance; skip while a prompt or a patient panel is up (same guard
+        # as the periodic VAS timer) so we never change the cue mid-interaction.
+        if self._prompt_open or self.coping_panel.isVisible() or self.gallery.isVisible():
+            return
+        self._next_cue()
 
     # --- coping & gallery ---------------------------------------------------
     def _open_coping(self) -> None:
@@ -279,6 +299,7 @@ class ExposureScreen(QWidget):
             return
         self._pending_end_reason = reason
         self._timer.stop()
+        self._autoscroll_timer.stop()
         self.controller.go_to_endpoint()
         self._vas_mode = RatingKind.ENDPOINT
         self._prompt_open = True
@@ -292,6 +313,7 @@ class ExposureScreen(QWidget):
     # --- panic / teardown ---------------------------------------------------
     def stop_timers(self) -> None:
         self._timer.stop()
+        self._autoscroll_timer.stop()
         self.cue_view.fade_to_black()
 
     def _on_media_error(self, path: str) -> None:

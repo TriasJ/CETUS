@@ -63,20 +63,62 @@ def export_session_timeline(
     coping: Sequence[CopingEvent],
     intensity: Sequence[IntensityEvent],
 ) -> Path:
-    """Long-format event timeline for a single session (craving + coping + intensity)."""
+    """Long-format event timeline for a single session (craving + coping + intensity).
+
+    Carries the absolute ISO ``ts`` alongside ``elapsed_sec`` so the file is usable for
+    qualitative coding (the coping ``detail`` is the patient's free-text response)."""
     rows = []
     for r in ratings:
-        rows.append((r.elapsed_sec, "craving", r.kind, str(r.value), ""))
+        rows.append((r.elapsed_sec, r.ts, "craving", r.kind, str(r.value), ""))
     for e in coping:
-        rows.append((e.elapsed_sec, "coping", e.skill, "", e.detail or ""))
+        rows.append((e.elapsed_sec, e.ts, "coping", e.skill, "", e.detail or ""))
     for e in intensity:
         detail = f"scale={e.scale_pct} blur={e.blur_pct} dim={e.dim_pct} muted={e.muted}"
-        rows.append((e.elapsed_sec, "intensity", e.action, "", detail))
+        rows.append((e.elapsed_sec, e.ts, "intensity", e.action, "", detail))
     rows.sort(key=lambda x: x[0])
 
     with open(path, "w", newline="", encoding="utf-8-sig") as fh:
         writer = csv.writer(fh)
-        writer.writerow(["patient_code", "session_id", "elapsed_sec", "event_type", "label", "value", "detail"])
-        for elapsed, etype, label, value, detail in rows:
-            writer.writerow([patient_code, session.id, elapsed, etype, label, value, detail])
+        writer.writerow(["patient_code", "session_id", "elapsed_sec", "ts",
+                         "event_type", "label", "value", "detail"])
+        for elapsed, ts, etype, label, value, detail in rows:
+            writer.writerow([patient_code, session.id, elapsed, ts, etype, label, value, detail])
+    return path
+
+
+# One row per USCS coping response. `skill` is the stable language-neutral key;
+# `skill_label` is a localized human-readable label supplied by the caller.
+COPING_COLUMNS = [
+    "patient_code", "session_id", "substance", "session_started_at", "ts",
+    "elapsed_sec", "skill", "skill_label", "response_text",
+]
+
+
+def export_coping_responses(
+    path: Path,
+    patient_code: str,
+    sessions_coping: Sequence[tuple[Session, Sequence[CopingEvent]]],
+    skill_labels: dict[str, str] | None = None,
+) -> Path:
+    """Analysis-ready export of the four USCS ("afrontamiento") free-text responses.
+
+    One row per response across every session, timestamped and linked to the
+    pseudonymous patient code — for qualitative study. No PII beyond ``code``."""
+    labels = skill_labels or {}
+    with open(path, "w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=COPING_COLUMNS)
+        writer.writeheader()
+        for session, events in sessions_coping:
+            for e in events:
+                writer.writerow({
+                    "patient_code": patient_code,
+                    "session_id": session.id,
+                    "substance": session.substance,
+                    "session_started_at": session.started_at,
+                    "ts": e.ts,
+                    "elapsed_sec": e.elapsed_sec,
+                    "skill": e.skill,
+                    "skill_label": labels.get(e.skill, e.skill),
+                    "response_text": e.detail or "",
+                })
     return path

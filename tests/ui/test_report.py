@@ -83,6 +83,43 @@ def test_export_pdf_writes_a_real_file(ctx, qtbot, tmp_path, monkeypatch):
     assert f.read_bytes()[:4] == b"%PDF"             # valid PDF magic
 
 
+def test_coping_responses_appear_in_pdf_html(ctx, qtbot):
+    p = _seed(ctx)  # seeds two coping events with detail="ejemplo"
+    window = MainWindow(ctx); qtbot.addWidget(window); window.show()
+    screen = ReportScreen(window, ctx, p); qtbot.addWidget(screen)
+    # Single-session PDF HTML now carries the coping responses (was dropped before 0.4.0).
+    assert "ejemplo" in screen._build_html()
+    # Localized skill label present too.
+    assert "afronta" in screen._build_html().lower() or "coping" in screen._build_html().lower()
+    # Full-patient PDF HTML also includes them.
+    sessions = [s for s in ctx.repos.sessions.list_for_patient(p.id) if s.baseline_vas is not None]
+    assert "ejemplo" in screen._build_full_html(sessions, screen._patient_cue_index())
+
+
+def test_export_coping_csv_writes_file(ctx, qtbot, tmp_path, monkeypatch):
+    monkeypatch.setattr(rs_mod, "QMessageBox", _FakeMessageBox)
+    out = str(tmp_path / "coping.csv")
+    monkeypatch.setattr(rs_mod, "QFileDialog",
+                        type("QFD", (),
+                             {"getSaveFileName": staticmethod(lambda *a, **k: (out, "CSV (*.csv)"))}))
+    p = _seed(ctx)
+    window = MainWindow(ctx); qtbot.addWidget(window); window.show()
+    screen = ReportScreen(window, ctx, p); qtbot.addWidget(screen)
+    screen._export_coping_csv()
+    f = Path(out)
+    assert f.exists()
+    text = f.read_text(encoding="utf-8-sig")
+    assert "response_text" in text and "ejemplo" in text and "PT-R1" in text
+
+
+def test_coping_repo_list_for_patient(ctx):
+    p = _seed(ctx)
+    _seed_extra(ctx, p, n=1)  # extra session has no coping
+    events = ctx.repos.coping.list_for_patient(p.id)
+    assert len(events) == 2  # only the seeded session had coping
+    assert {e.skill for e in events} == {"recall_negative", "alternative_action"}
+
+
 def test_clinician_notes_save_reload_and_appear_in_pdf(ctx, qtbot, monkeypatch):
     monkeypatch.setattr(rs_mod, "QMessageBox", _FakeMessageBox)
     p = _seed(ctx)

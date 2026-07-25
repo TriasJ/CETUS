@@ -132,6 +132,8 @@ class ReportScreen(QWidget):
         self.include_notes.setChecked(True)
         export_png = QPushButton(tr("report.export_png"))
         export_png.clicked.connect(self._export_png)
+        export_coping = QPushButton(tr("report.export_coping"))
+        export_coping.clicked.connect(self._export_coping_csv)
         export_pdf = QPushButton(tr("report.export_pdf_session"))
         export_pdf.clicked.connect(self._export_pdf)
         export_pdf_full = QPushButton(tr("report.export_pdf_full"))
@@ -139,7 +141,8 @@ class ReportScreen(QWidget):
         export_pdf_full.clicked.connect(self._export_pdf_full)
         actions = QHBoxLayout()
         actions.addWidget(self.include_notes); actions.addStretch(1)
-        actions.addWidget(export_png); actions.addWidget(export_pdf); actions.addWidget(export_pdf_full)
+        actions.addWidget(export_png); actions.addWidget(export_coping)
+        actions.addWidget(export_pdf); actions.addWidget(export_pdf_full)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(36, 24, 36, 24)
@@ -461,6 +464,29 @@ class ReportScreen(QWidget):
             _log.exception("PNG export failed: %s", exc)
         self._notify_export(ok)
 
+    @staticmethod
+    def _skill_label_map() -> dict[str, str]:
+        """skill key -> localized label, from the shared SKILL_LABELS table."""
+        return {skill: tr(label_key) for skill, (label_key, _color) in SKILL_LABELS.items()}
+
+    def _export_coping_csv(self) -> None:
+        """Analysis-ready CSV of every USCS coping free-text response, for qualitative study."""
+        default = str(Path(self.context.config.data_dir) /
+                      export.safe_filename(self.patient.code, "coping"))
+        path, _ = QFileDialog.getSaveFileName(self, tr("report.export_coping"), default, "CSV (*.csv)")
+        if not path:
+            return
+        sessions = self._finished_sessions()
+        sessions_coping = [(s, self.context.repos.coping.list_for_session(s.id)) for s in sessions]
+        try:
+            export.export_coping_responses(Path(path), self.patient.code, sessions_coping,
+                                           self._skill_label_map())
+            ok = Path(path).exists() and Path(path).stat().st_size > 0
+        except OSError as exc:
+            ok = False
+            _log.exception("Coping CSV export failed: %s", exc)
+        self._notify_export(ok)
+
     def _notify_export(self, ok: bool) -> None:
         """Show a success or failure dialog for an export instead of always claiming success."""
         if ok:
@@ -683,6 +709,7 @@ class ReportScreen(QWidget):
                 f"<th>{tr('report.col_peak')}</th><th>{tr('report.col_reactivity')}</th>"
                 f"<th>{tr('report.col_count')}</th></tr>"
                 f"{per_cue_rows}</table>"
+                f"{self._coping_html(s.id)}"
                 f"{notes_html}"
             )
 
@@ -699,6 +726,28 @@ class ReportScreen(QWidget):
             f"{summary_table}"
             f"<h2>{tr('report.full_per_session')}</h2>"
             f"{''.join(blocks)}"
+        )
+
+    def _coping_html(self, session_id: int) -> str:
+        """A table of the session's USCS coping free-text responses for the PDF.
+
+        Returns '' when the session has no coping events."""
+        events = self.context.repos.coping.list_for_session(session_id)
+        if not events:
+            return ""
+        labels = self._skill_label_map()
+        rows = ""
+        for e in events:
+            skill = labels.get(e.skill, e.skill)
+            text = _html_escape(e.detail) if e.detail else "—"
+            rows += (f"<tr><td>{e.elapsed_sec}s</td><td>{skill}</td>"
+                     f"<td style='white-space:pre-wrap'>{text}</td></tr>")
+        return (
+            f"<h3>{tr('report.coping_text')}</h3>"
+            f"<table border='1' cellpadding='4' cellspacing='0'>"
+            f"<tr><th>{tr('report.col_time')}</th><th>{tr('report.col_skill')}</th>"
+            f"<th>{tr('report.col_response')}</th></tr>"
+            f"{rows}</table>"
         )
 
     def _build_html(self) -> str:
@@ -743,6 +792,7 @@ class ReportScreen(QWidget):
                 f"<th>{tr('report.col_peak')}</th><th>{tr('report.col_reactivity')}</th>"
                 f"<th>{tr('report.col_count')}</th></tr>"
                 f"{rows_per_cue}</table>"
+                f"{self._coping_html(sel.id)}"
                 f"{notes_html}"
             )
         return (

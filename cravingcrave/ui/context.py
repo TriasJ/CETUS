@@ -57,10 +57,17 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
         except ValueError:
             return current
 
+    def as_bool(key: str, current: bool) -> bool:
+        val = s.get(key)
+        return val == "1" if val is not None else current
+
     config.session_time_cap_seconds = as_int("time_cap_seconds", config.session_time_cap_seconds)
     config.periodic_vas_seconds = as_int("periodic_vas_seconds", config.periodic_vas_seconds)
     config.habituation_threshold = as_int("habituation_threshold", config.habituation_threshold)
     config.habituation_consecutive = as_int("habituation_consecutive", config.habituation_consecutive)
+    config.autoscroll_on_grading = as_bool("autoscroll_on_grading", config.autoscroll_on_grading)
+    config.autoscroll_timed_seconds = as_int("autoscroll_timed_seconds", config.autoscroll_timed_seconds)
+    config.accessibility_kbmode = as_bool("accessibility_kbmode", config.accessibility_kbmode)
     # The clinic-selected UI language (persisted by the language switcher) overrides
     # the bootstrap default. app.main() applies it to i18n after the context is built.
     locale = s.get("locale")

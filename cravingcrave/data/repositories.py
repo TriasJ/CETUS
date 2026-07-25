@@ -278,6 +278,21 @@ class CopingEventRepo:
             for r in rows
         ]
 
+    def list_for_patient(self, patient_id: int) -> list[CopingEvent]:
+        """Every coping response for a patient across all sessions (for export)."""
+        rows = self.db.conn.execute(
+            "SELECT c.* FROM coping_event c JOIN session s ON c.session_id = s.id "
+            "WHERE s.patient_id = ? ORDER BY c.session_id, c.elapsed_sec, c.id",
+            (patient_id,),
+        ).fetchall()
+        return [
+            CopingEvent(
+                id=r["id"], session_id=r["session_id"], ts=r["ts"],
+                elapsed_sec=r["elapsed_sec"], skill=r["skill"], detail=r["detail"],
+            )
+            for r in rows
+        ]
+
 
 class IntensityEventRepo:
     def __init__(self, db: Database) -> None:

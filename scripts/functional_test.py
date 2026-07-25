@@ -200,7 +200,14 @@ def main() -> int:
         fname = export.safe_filename(p.code, "summary")
         assert "/" not in fname and "\\" not in fname
         assert "display_name" not in export.SESSION_COLUMNS
-        return f"{sm.name}, {tl.name}"
+        # Coping CSV carries the patient's free-text responses (for qualitative study).
+        cp = export.export_coping_responses(
+            tmp / "coping.csv", p.code,
+            [(s, ctx.repos.coping.list_for_session(s.id))])
+        cp_txt = cp.read_text(encoding="utf-8-sig")
+        assert "response_text" in cp_txt and "respuesta" in cp_txt
+        assert "display_name" not in export.COPING_COLUMNS
+        return f"{sm.name}, {tl.name}, {cp.name}"
 
     # ---- 7. cross-session progress ----
     @check("cross-session progress (2nd session persists, trend data present)")

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QFileDialog,
     QFormLayout,
@@ -89,6 +90,7 @@ class SettingsScreen(QWidget):
         form.addRow(save)
 
         language_card = self._build_language_card()
+        autoscroll_card = self._build_autoscroll_card()
         substances_card = self._build_substances_card()
         branding_card = self._build_branding_card()
 
@@ -97,7 +99,7 @@ class SettingsScreen(QWidget):
         col = QVBoxLayout(content)
         col.setContentsMargins(0, 0, 0, 0)
         col.setSpacing(20)
-        for c in (card, language_card, branding_card, substances_card):
+        for c in (card, language_card, autoscroll_card, branding_card, substances_card):
             row = QHBoxLayout(); row.addStretch(1); row.addWidget(c); row.addStretch(1)
             col.addLayout(row)
         col.addStretch(1)
@@ -140,6 +142,29 @@ class SettingsScreen(QWidget):
     def _on_language_changed(self, index: int) -> None:
         code = self.lang_combo.itemData(index)
         self.window.change_language(code, redisplay=self.window.show_settings)
+
+    # --- auto-scroll cues ---------------------------------------------------
+    def _build_autoscroll_card(self) -> QFrame:
+        cfg = self.context.config
+        card = QFrame(); card.setObjectName("Card"); card.setMaximumWidth(760)
+        card.setStyleSheet(_CARD_STYLE)
+        v = QVBoxLayout(card)
+        v.setContentsMargins(28, 24, 28, 24); v.setSpacing(12)
+
+        title = QLabel(tr("settings.autoscroll_title")); title.setObjectName("H2")
+        intro = QLabel(tr("settings.autoscroll_hint")); intro.setObjectName("Muted"); intro.setWordWrap(True)
+        v.addWidget(title); v.addWidget(intro)
+
+        self.autoscroll_on_grading = QCheckBox(tr("settings.autoscroll_on_grading"))
+        self.autoscroll_on_grading.setChecked(cfg.autoscroll_on_grading)
+        self.autoscroll_timed = QSpinBox(); self.autoscroll_timed.setRange(0, 600)
+        self.autoscroll_timed.setValue(cfg.autoscroll_timed_seconds)
+
+        form = QFormLayout(); form.setSpacing(12)
+        form.addRow("", self.autoscroll_on_grading)
+        form.addRow(tr("settings.autoscroll_timed"), self.autoscroll_timed)
+        v.addLayout(form)
+        return card
 
     # --- clinic branding for PDF reports ------------------------------------
     def _build_branding_card(self) -> QFrame:
@@ -269,6 +294,11 @@ class SettingsScreen(QWidget):
         s.set("periodic_vas_seconds", str(cfg.periodic_vas_seconds))
         s.set("habituation_threshold", str(cfg.habituation_threshold))
         s.set("habituation_consecutive", str(cfg.habituation_consecutive))
+        if hasattr(self, "autoscroll_on_grading"):
+            cfg.autoscroll_on_grading = self.autoscroll_on_grading.isChecked()
+            cfg.autoscroll_timed_seconds = self.autoscroll_timed.value()
+            s.set("autoscroll_on_grading", "1" if cfg.autoscroll_on_grading else "0")
+            s.set("autoscroll_timed_seconds", str(cfg.autoscroll_timed_seconds))
         if hasattr(self, "clinic_name"):
             s.set("clinic_name", self.clinic_name.text().strip())
         QMessageBox.information(self, tr("app.title"), tr("settings.saved"))

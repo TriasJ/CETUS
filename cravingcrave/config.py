@@ -49,6 +49,13 @@ class AppConfig:
     periodic_vas_seconds: int = DEFAULT_PERIODIC_VAS_SECONDS
     session_time_cap_seconds: int = DEFAULT_SESSION_TIME_CAP_SECONDS
 
+    # Auto-scroll: advance the shown cue automatically. Both off by default.
+    autoscroll_on_grading: bool = False       # advance after a periodic/peak VAS rating
+    autoscroll_timed_seconds: int = 0          # 0 = off, else advance every N seconds
+
+    # Accessibility: keyboard-only exposure input (disability keyboard). Off by default.
+    accessibility_kbmode: bool = False
+
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)
