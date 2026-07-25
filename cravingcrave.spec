@@ -1,14 +1,16 @@
-# PyInstaller spec for CETUS — single-file Windows .exe.
-# Build:  pyinstaller cravingcrave.spec
+# PyInstaller spec for CETUS — one-file exe (Windows/Linux) or .app bundle (macOS).
+# Build:  pyinstaller cravingcrave.spec   (run on the OS you are targeting; no cross-compile)
 #
 # Notes:
 # * collect_all('PySide6') pulls in the Qt multimedia + platform plugins that a
 #   bare build often misses (cause of black video / "no Qt platform plugin" crashes).
-# * collect_data_files('cravingcrave') bundles resources/ (i18n, qss, icons) and
-#   data/schema.sql; paths.resource_path() resolves them under sys._MEIPASS.
-# * media/ and data/ are NOT bundled — they live next to the .exe so clinicians
-#   add cues and the DB persists without rebuilding.
+# * resources/ (i18n, qss, icons) and data/schema.sql are bundled explicitly;
+#   paths.resource_path() resolves them under sys._MEIPASS.
+# * media/ and data/ are NOT bundled. Portable builds keep them next to the binary
+#   (drop a portable.txt beside the exe); installed builds use the per-OS user data
+#   dir (see cravingcrave/paths.py).
 
+import sys
 from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_all
@@ -35,6 +37,12 @@ app_datas = (
     _collect("cravingcrave/resources", "cravingcrave/resources")
     + [(str(_ROOT / "cravingcrave" / "data" / "schema.sql"), "cravingcrave/data")]
 )
+
+# Per-OS app icon (falls back to None if the icon file is missing).
+_ICON_DIR = _ROOT / "cravingcrave" / "resources" / "icons"
+_icon_name = "cetus.icns" if sys.platform == "darwin" else "cetus.ico"
+_icon_path = _ICON_DIR / _icon_name
+APP_ICON = str(_icon_path) if _icon_path.exists() else None
 
 a = Analysis(
     ["run.py"],
@@ -68,5 +76,19 @@ exe = EXE(
     runtime_tmpdir=None,
     console=False,            # set True temporarily to debug codec issues
     disable_windowed_traceback=False,
-    icon=None,
+    icon=APP_ICON,
 )
+
+# macOS: wrap the exe in a proper .app bundle (installer-friendly, dock icon).
+if sys.platform == "darwin":
+    app = BUNDLE(
+        exe,
+        name="CETUS.app",
+        icon=APP_ICON,
+        bundle_identifier="org.cetus.app",
+        info_plist={
+            "CFBundleName": "CETUS",
+            "CFBundleDisplayName": "CETUS",
+            "NSHighResolutionCapable": True,
+        },
+    )

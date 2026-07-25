@@ -55,7 +55,7 @@ def main() -> None:
 
     def grab(name: str) -> None:
         app.processEvents()
-        ctx  # keep ref
+        _ = ctx  # keep ref
         window.grab().save(str(out / f"{name}.png"))
 
     # 1) Login / first-run

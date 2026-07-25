@@ -21,8 +21,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from cravingcrave.services.auth import hash_password, verify_password  # noqa: E402
 from cravingcrave.domain.models import utc_now_iso  # noqa: E402
+from cravingcrave.services.auth import hash_password, verify_password  # noqa: E402
 
 
 def _connect(db: str) -> sqlite3.Connection:

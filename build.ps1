@@ -19,5 +19,16 @@ $env:QT_QPA_PLATFORM = "offscreen"
 Write-Host "==> Building one-file .exe with PyInstaller"
 & ".\.venv\Scripts\pyinstaller.exe" --noconfirm cravingcrave.spec
 
+# Optional: build the Windows installer if Inno Setup (iscc) is available.
+$version = (Select-String -Path pyproject.toml -Pattern '^version = "(.+)"').Matches.Groups[1].Value
+$iscc = Get-Command iscc -ErrorAction SilentlyContinue
+if ($iscc) {
+    Write-Host "==> Building Windows installer (Inno Setup) for v$version"
+    & iscc "/DAppVersion=$version" packaging\windows\cetus.iss
+    Write-Host "Installer: packaging\windows\Output\CETUS-Setup-$version.exe"
+} else {
+    Write-Host "(Inno Setup 'iscc' not found; skipping installer. See packaging\README.md.)"
+}
+
 Write-Host ""
-Write-Host "Done. dist\CETUS.exe is ready (ship it alongside the media\ folder)."
+Write-Host "Done. dist\CETUS.exe is the portable build; the installer targets Program Files."
