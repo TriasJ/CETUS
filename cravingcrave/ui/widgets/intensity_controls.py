@@ -42,11 +42,22 @@ class IntensityControls(QFrame):
         self._mute_btn.setCheckable(True)
         self._mute_btn.toggled.connect(self._on_mute)
 
+        # Keep label handles per axis so the keyboard-only mode can highlight the
+        # axis that +/- will currently move.
+        self._size_label = QLabel(tr("intensity.size"))
+        self._blur_label = QLabel(tr("intensity.blur"))
+        self._dim_label = QLabel(tr("intensity.dim"))
+        self._axis = {
+            "size": (self._size_label, self._size),
+            "blur": (self._blur_label, self._blur),
+            "dim": (self._dim_label, self._dim),
+        }
+
         form = QFormLayout()
         form.setSpacing(12)
-        form.addRow(tr("intensity.size"), self._size)
-        form.addRow(tr("intensity.blur"), self._blur)
-        form.addRow(tr("intensity.dim"), self._dim)
+        form.addRow(self._size_label, self._size)
+        form.addRow(self._blur_label, self._blur)
+        form.addRow(self._dim_label, self._dim)
         form.addRow("", self._mute_btn)
 
         layout = QVBoxLayout(self)
@@ -95,3 +106,15 @@ class IntensityControls(QFrame):
     def step_blur(self, delta: int) -> None: self._step(self._blur, delta)
     def step_dim(self,  delta: int) -> None: self._step(self._dim,  delta)
     def toggle_mute(self) -> None: self._mute_btn.setChecked(not self._muted)
+
+    def highlight_axis(self, axis: str | None) -> None:
+        """Visually mark the axis that keyboard +/- will move (accessibility mode).
+
+        Sets an ``activeAxis`` dynamic property on the axis label + slider so the theme
+        QSS can style it; ``None`` clears all highlights."""
+        for name, (lbl, sld) in self._axis.items():
+            active = name == axis
+            for w in (lbl, sld):
+                w.setProperty("activeAxis", active)
+                w.style().unpolish(w)
+                w.style().polish(w)

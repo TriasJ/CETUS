@@ -7,11 +7,11 @@ Esc triggers it too.
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QStackedWidget, QWidget
 
 from ..services.i18n import current_locale, set_locale, tr
+from . import hotkeys
 from .context import AppContext
 from .screens.calm_screen import CalmScreen
 from .screens.cue_config_screen import CueConfigScreen
@@ -42,12 +42,9 @@ class MainWindow(QMainWindow):
 
         self.panic = PanicButton(self)
         self.panic.clicked.connect(self._on_panic)
-        self._panic_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
-        self._panic_shortcut.activated.connect(self._on_panic)
-        self._help_shortcut = QShortcut(QKeySequence(Qt.Key.Key_F1), self)
-        self._help_shortcut.activated.connect(self.show_help)
-        self._fullscreen_shortcut = QShortcut(QKeySequence(Qt.Key.Key_F11), self)
-        self._fullscreen_shortcut.activated.connect(self._toggle_fullscreen)
+        # Global shortcuts are built from the (rebindable) hotkey registry.
+        self._global_shortcuts: dict[str, QShortcut] = {}
+        self.reload_global_hotkeys()
 
         self._active_controller = None
         self._active_exposure: ExposureScreen | None = None
@@ -98,6 +95,28 @@ class MainWindow(QMainWindow):
 
     def show_help(self) -> None:
         HelpDialog(self).exec()
+
+    def reload_global_hotkeys(self) -> None:
+        """(Re)build the window-level shortcuts from the resolved registry bindings, so a
+        rebind in Settings applies live without a restart. Panic (Esc) stays bound here so
+        it always fires, even over the exposure overlays and in accessibility mode."""
+        for sc in self._global_shortcuts.values():
+            sc.setParent(None)
+        self._global_shortcuts.clear()
+        resolved = hotkeys.resolve_bindings(self.context.repos.settings)
+        slots = {
+            "global.panic": self._on_panic,
+            "global.help": self.show_help,
+            "global.fullscreen": self._toggle_fullscreen,
+        }
+        for act in hotkeys.actions_in(hotkeys.Scope.GLOBAL):
+            sc = QShortcut(QKeySequence(resolved[act.id]), self)
+            sc.activated.connect(slots[act.id])
+            self._global_shortcuts[act.id] = sc
+        # Keep named handles for tests / clarity.
+        self._panic_shortcut = self._global_shortcuts["global.panic"]
+        self._help_shortcut = self._global_shortcuts["global.help"]
+        self._fullscreen_shortcut = self._global_shortcuts["global.fullscreen"]
 
     def change_language(self, locale: str, redisplay=None) -> None:
         """Switch the UI language live: persist the choice, reload i18n, refresh the

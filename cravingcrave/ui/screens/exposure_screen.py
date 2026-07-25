@@ -10,9 +10,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QTimer
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
+    QApplication,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -24,7 +25,9 @@ from PySide6.QtWidgets import (
 from ...domain.models import EndReason, IntensityAction, RatingKind
 from ...services.i18n import tr
 from ...session.session_controller import SessionController
+from .. import hotkeys
 from ..context import AppContext
+from ..hotkeys import AccessibilityInput
 from ..widgets.craving_chart import CravingChart
 from ..widgets.cue_view import CueView
 from ..widgets.gallery_panel import GalleryPanel
@@ -62,6 +65,12 @@ class ExposureScreen(QWidget):
         self.banner.setStyleSheet("background:#e0f2ef; color:#14303a; border-radius:8px; padding:8px;")
         self.banner.setVisible(False)
 
+        # Keyboard-only legend (shown only in accessibility mode).
+        self.legend = QLabel(tr("exposure.legend"))
+        self.legend.setObjectName("Muted")
+        self.legend.setWordWrap(True)
+        self.legend.setVisible(False)
+
         self.chart = CravingChart(context.config.vas_max)
         self.chart.setMinimumHeight(220)
         self.intensity = IntensityControls()
@@ -86,6 +95,7 @@ class ExposureScreen(QWidget):
         center.addWidget(self.cue_counter)
         center.addWidget(self.cue_view, 1)
         center.addWidget(self.hint)
+        center.addWidget(self.legend)
         center.addWidget(self.banner)
 
         body = QHBoxLayout()
@@ -139,33 +149,61 @@ class ExposureScreen(QWidget):
             self._autoscroll_timer.setInterval(context.config.autoscroll_timed_seconds * 1000)
             self._autoscroll_timer.timeout.connect(self._on_autoscroll_tick)
 
-        # Arrow keys change the stimulus: Right = next cue, Left = previous cue.
-        self._next_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Right), self)
-        self._next_shortcut.activated.connect(self._next_cue)
-        self._prev_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Left), self)
-        self._prev_shortcut.activated.connect(self._prev_cue)
-
-        # Intensity / playback shortcuts (10% step). Spanish-mnemonic letters:
-        # T = Tamaño, D = Desenfoque, O = Oscurecer, M = Silenciar, R = Restablecer, L = bucLe.
-        self._shortcuts = []
-        for keyseq, slot in (
-            ("T",       lambda: self.intensity.step_size(-10)),
-            ("Shift+T", lambda: self.intensity.step_size(+10)),
-            ("D",       lambda: self.intensity.step_blur(+10)),
-            ("Shift+D", lambda: self.intensity.step_blur(-10)),
-            ("O",       lambda: self.intensity.step_dim(+10)),
-            ("Shift+O", lambda: self.intensity.step_dim(-10)),
-            ("M",       lambda: self.intensity.toggle_mute()),
-            ("R",       self._reset_intensity),
-            ("L",       self._toggle_loop),
-        ):
-            sc = QShortcut(QKeySequence(keyseq), self)
-            sc.activated.connect(slot)
-            self._shortcuts.append(sc)
+        # --- input: standard shortcuts OR keyboard-only accessibility mode --
+        self._shortcuts: list[QShortcut] = []
+        self._access_input: AccessibilityInput | None = None
+        self._install_hotkeys()
 
         # --- start ----------------------------------------------------------
         controller.begin()
         QTimer.singleShot(0, self._ask_baseline)
+
+    # --- hotkeys / accessibility -------------------------------------------
+    def _install_hotkeys(self) -> None:
+        """Build exposure input from the resolved hotkey registry. In accessibility
+        mode a single application-level key filter drives everything; otherwise the
+        standard per-key QShortcuts are installed (identical to the pre-0.4.0 keys)."""
+        resolved = hotkeys.resolve_bindings(self.context.repos.settings)
+        if self.context.config.accessibility_kbmode:
+            self._access_input = AccessibilityInput(self, resolved)
+            QApplication.instance().installEventFilter(self._access_input)
+            self.legend.setVisible(True)
+        else:
+            self._install_standard_shortcuts(resolved)
+
+    def _install_standard_shortcuts(self, resolved: dict) -> None:
+        slots = {
+            "exposure.prev_cue": self._prev_cue,
+            "exposure.next_cue": self._next_cue,
+            "exposure.size_down": lambda: self.intensity.step_size(-10),
+            "exposure.size_up": lambda: self.intensity.step_size(+10),
+            "exposure.blur_up": lambda: self.intensity.step_blur(+10),
+            "exposure.blur_down": lambda: self.intensity.step_blur(-10),
+            "exposure.dim_up": lambda: self.intensity.step_dim(+10),
+            "exposure.dim_down": lambda: self.intensity.step_dim(-10),
+            "exposure.mute": self.intensity.toggle_mute,
+            "exposure.reset": self._reset_intensity,
+            "exposure.loop": self._toggle_loop,
+        }
+        for act in hotkeys.actions_in(hotkeys.Scope.EXPOSURE):
+            sc = QShortcut(QKeySequence(resolved[act.id]), self)
+            sc.activated.connect(slots[act.id])
+            self._shortcuts.append(sc)
+
+    def flash_axis_hint(self) -> None:
+        """Prompt the patient (accessibility mode) to pick an axis before +/-."""
+        self.hint.setText(tr("exposure.legend_pick_axis"))
+
+    def remove_access_filter(self) -> None:
+        if self._access_input is not None:
+            QApplication.instance().removeEventFilter(self._access_input)
+            self._access_input = None
+
+    def hideEvent(self, event) -> None:
+        # Uninstall the application-level key filter when the screen leaves view (stack
+        # swap / teardown) so it never lingers on QApplication past this session.
+        self.remove_access_filter()
+        super().hideEvent(event)
 
     # --- baseline -----------------------------------------------------------
     def _ask_baseline(self) -> None:
@@ -306,6 +344,7 @@ class ExposureScreen(QWidget):
         self.vas_prompt.ask(tr("vas.endpoint_title"))
 
     def _finish(self, endpoint_value: int) -> None:
+        self.remove_access_filter()
         self.cue_view.stop()
         session = self.controller.finalize(self._pending_end_reason, endpoint_value)
         self.window.show_summary(session, self.controller)
@@ -314,6 +353,7 @@ class ExposureScreen(QWidget):
     def stop_timers(self) -> None:
         self._timer.stop()
         self._autoscroll_timer.stop()
+        self.remove_access_filter()
         self.cue_view.fade_to_black()
 
     def _on_media_error(self, path: str) -> None:

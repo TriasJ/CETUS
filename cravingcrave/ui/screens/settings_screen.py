@@ -29,7 +29,9 @@ from PySide6.QtWidgets import (
 from ...services import substances as subs
 from ...services.crisis import CrisisInfo
 from ...services.i18n import available_locales, current_locale, tr
+from .. import hotkeys
 from ..context import AppContext
+from ..widgets.key_capture_button import KeyCaptureButton
 
 _CARD_STYLE = (
     "QLabel { font-size: 16px; }"
@@ -91,6 +93,8 @@ class SettingsScreen(QWidget):
 
         language_card = self._build_language_card()
         autoscroll_card = self._build_autoscroll_card()
+        accessibility_card = self._build_accessibility_card()
+        hotkeys_card = self._build_hotkeys_card()
         substances_card = self._build_substances_card()
         branding_card = self._build_branding_card()
 
@@ -99,7 +103,8 @@ class SettingsScreen(QWidget):
         col = QVBoxLayout(content)
         col.setContentsMargins(0, 0, 0, 0)
         col.setSpacing(20)
-        for c in (card, language_card, autoscroll_card, branding_card, substances_card):
+        for c in (card, language_card, autoscroll_card, accessibility_card,
+                  hotkeys_card, branding_card, substances_card):
             row = QHBoxLayout(); row.addStretch(1); row.addWidget(c); row.addStretch(1)
             col.addLayout(row)
         col.addStretch(1)
@@ -165,6 +170,77 @@ class SettingsScreen(QWidget):
         form.addRow(tr("settings.autoscroll_timed"), self.autoscroll_timed)
         v.addLayout(form)
         return card
+
+    # --- accessibility (keyboard-only exposure mode) ------------------------
+    def _build_accessibility_card(self) -> QFrame:
+        cfg = self.context.config
+        card = QFrame(); card.setObjectName("Card"); card.setMaximumWidth(760)
+        card.setStyleSheet(_CARD_STYLE)
+        v = QVBoxLayout(card)
+        v.setContentsMargins(28, 24, 28, 24); v.setSpacing(12)
+
+        title = QLabel(tr("settings.accessibility_title")); title.setObjectName("H2")
+        intro = QLabel(tr("settings.accessibility_hint")); intro.setObjectName("Muted"); intro.setWordWrap(True)
+        self.accessibility_kbmode = QCheckBox(tr("settings.accessibility_kbmode"))
+        self.accessibility_kbmode.setChecked(cfg.accessibility_kbmode)
+        v.addWidget(title); v.addWidget(intro); v.addWidget(self.accessibility_kbmode)
+        return card
+
+    # --- hotkey rebinding ---------------------------------------------------
+    def _build_hotkeys_card(self) -> QFrame:
+        card = QFrame(); card.setObjectName("Card"); card.setMaximumWidth(760)
+        card.setStyleSheet(_CARD_STYLE)
+        v = QVBoxLayout(card)
+        v.setContentsMargins(28, 24, 28, 24); v.setSpacing(12)
+
+        title = QLabel(tr("settings.hotkeys_title")); title.setObjectName("H2")
+        intro = QLabel(tr("settings.hotkeys_intro")); intro.setObjectName("Muted"); intro.setWordWrap(True)
+        note = QLabel(tr("settings.hotkeys_apply_note")); note.setObjectName("Muted"); note.setWordWrap(True)
+        v.addWidget(title); v.addWidget(intro)
+
+        resolved = hotkeys.resolve_bindings(self.context.repos.settings)
+        self._hotkey_buttons: dict[str, KeyCaptureButton] = {}
+        form = QFormLayout(); form.setSpacing(10)
+        for act in hotkeys.ACTIONS:
+            if not act.rebindable:
+                locked = QLabel(f"{resolved[act.id]}  ·  {tr('settings.hotkey_locked')}")
+                locked.setObjectName("Muted")
+                form.addRow(tr(act.label_key), locked)
+                continue
+            btn = KeyCaptureButton(act.id, resolved[act.id])
+            btn.captured.connect(self._on_hotkey_captured)
+            self._hotkey_buttons[act.id] = btn
+            form.addRow(tr(act.label_key), btn)
+        v.addLayout(form)
+
+        reset = QPushButton(tr("settings.hotkey_reset"))
+        reset.clicked.connect(self._reset_hotkeys)
+        v.addWidget(reset)
+        v.addWidget(note)
+        return card
+
+    def _on_hotkey_captured(self, action_id: str, keyseq: str) -> None:
+        act = next(a for a in hotkeys.ACTIONS if a.id == action_id)
+        # ACCESS actions are restricted to the disability keyset.
+        if act.scope is hotkeys.Scope.ACCESS and keyseq not in hotkeys.ACCESSIBILITY_KEYSET:
+            QMessageBox.warning(self, tr("app.title"), tr("settings.hotkey_not_in_keyset"))
+            return
+        # Reject a duplicate within the same scope.
+        resolved = hotkeys.resolve_bindings(self.context.repos.settings)
+        for other in hotkeys.actions_in(act.scope):
+            if other.id != action_id and resolved[other.id] == keyseq:
+                QMessageBox.warning(self, tr("app.title"), tr("settings.hotkey_conflict"))
+                return
+        hotkeys.save_binding(self.context.repos.settings, action_id, keyseq)
+        self._hotkey_buttons[action_id].set_keyseq(keyseq)
+        self.window.reload_global_hotkeys()  # GLOBAL rebinds apply live
+
+    def _reset_hotkeys(self) -> None:
+        hotkeys.reset_bindings(self.context.repos.settings)
+        defaults = hotkeys.default_bindings()
+        for aid, btn in self._hotkey_buttons.items():
+            btn.set_keyseq(defaults[aid])
+        self.window.reload_global_hotkeys()
 
     # --- clinic branding for PDF reports ------------------------------------
     def _build_branding_card(self) -> QFrame:
@@ -299,6 +375,9 @@ class SettingsScreen(QWidget):
             cfg.autoscroll_timed_seconds = self.autoscroll_timed.value()
             s.set("autoscroll_on_grading", "1" if cfg.autoscroll_on_grading else "0")
             s.set("autoscroll_timed_seconds", str(cfg.autoscroll_timed_seconds))
+        if hasattr(self, "accessibility_kbmode"):
+            cfg.accessibility_kbmode = self.accessibility_kbmode.isChecked()
+            s.set("accessibility_kbmode", "1" if cfg.accessibility_kbmode else "0")
         if hasattr(self, "clinic_name"):
             s.set("clinic_name", self.clinic_name.text().strip())
         QMessageBox.information(self, tr("app.title"), tr("settings.saved"))

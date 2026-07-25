@@ -86,3 +86,10 @@ QHeaderView::section {
     background-color: #eef2f5; padding: 6px; border: none; font-weight: 600;
 }
 QCheckBox { spacing: 8px; }
+
+/* Keyboard-only mode: highlight the intensity axis that +/- will move. */
+QLabel[activeAxis="true"] { color: #21867a; font-weight: 700; }
+QSlider[activeAxis="true"]::groove:horizontal {
+    background: #cdece7; border: 1px solid #2a9d8f; border-radius: 3px;
+}
+QSlider[activeAxis="true"]::handle:horizontal { background: #21867a; }

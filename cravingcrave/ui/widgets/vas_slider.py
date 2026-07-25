@@ -55,6 +55,13 @@ class VasSlider(QWidget):
     def value(self) -> int:
         return self.slider.value()
 
+    def set_value(self, v: int) -> None:
+        """Set the rating, clamped to 0..max (used by keyboard-only entry)."""
+        self.slider.setValue(max(0, min(self.vas_max, v)))
+
+    def nudge(self, delta: int) -> None:
+        self.set_value(self.slider.value() + delta)
+
     def reset(self) -> None:
         self.slider.setValue(0)
         self.value_label.setText("0")
@@ -106,6 +113,17 @@ class VasPrompt(Overlay):
         self.title.setText(title)
         self.slider.reset()
         self.show_overlay()
+
+    def set_value(self, v: int) -> None:
+        """Keyboard-only entry: set the rating directly (digit keys / max)."""
+        self.slider.set_value(v)
+
+    def nudge(self, delta: int) -> None:
+        self.slider.nudge(delta)
+
+    def submit(self) -> None:
+        """Public submit (keyboard Enter) — same path as the button."""
+        self._submit()
 
     def _submit(self) -> None:
         value = self.slider.value()

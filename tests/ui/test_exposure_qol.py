@@ -48,8 +48,10 @@ def _start(ctx, qtbot):
 
 def test_arrow_shortcuts_registered(ctx, qtbot):
     _, screen = _start(ctx, qtbot)
-    assert screen._next_shortcut.key().toString() == "Right"
-    assert screen._prev_shortcut.key().toString() == "Left"
+    # Standard mode builds QShortcuts from the hotkey registry (default keys unchanged).
+    keys = {sc.key().toString() for sc in screen._shortcuts}
+    assert "Right" in keys and "Left" in keys
+    assert "T" in keys and "Shift+T" in keys and "M" in keys
 
 
 def test_cue_navigation_clamps(ctx, qtbot):
