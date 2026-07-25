@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/cetus-banner.jpg" alt="CETUS — Nuevas Conexiones" width="820">
+</p>
+
 # CETUS
 
 **Cue Exposure Therapy (CET) with Urge-Specific Coping Skills — a non-VR, clinician-supervised desktop app.**
@@ -18,6 +22,22 @@ English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built wi
 > obtain consent, keep the patient supervised, and have a safety plan. The always-visible
 > **ALTO** (STOP) button and configurable crisis contacts are mandatory safety features.
 > See [`docs/DISCLAIMER.md`](docs/DISCLAIMER.md).
+
+---
+
+## What's new in 0.4.0
+
+- ♿ **Keyboard-only accessibility mode** — run a whole exposure from an adaptive keyboard
+  (Enter, `+`, `−`, arrows, 0–9), with a full **remappable-hotkey** settings page.
+- ⏩ **Auto-scroll cues** — optional hands-free advance after each rating and/or every N seconds.
+- 📝 **Qualitative coping export** — the four USCS free-text responses now export to a dedicated
+  **CSV** and appear in the **PDF reports**, pseudonymised for research.
+- 📦 **Installers for Windows, macOS & Linux** — built per-OS in CI; patient data moves to the
+  standard per-OS user directory (portable mode still supported).
+- 🎨 New CETUS whale branding (app icon + default report logo) and ES/EN in-app Help for all of
+  the above.
+
+See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
 
 ---
 
@@ -44,7 +64,8 @@ English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built wi
   per-patient cue configuration, custom substances, and an in-app admin recovery.
 - **Clinical reports** — per-session detail (annotated curve, evidence-based metrics,
   per-cue reactivity, coping responses, clinician notes) and cross-session progress;
-  export to **CSV** and **landscape PDF** with optional clinic logo and a comments toggle.
+  export to **CSV** and **landscape PDF** (CETUS-branded header by default, overridable with a
+  clinic logo) plus a dedicated **coping-responses CSV** for qualitative study.
 - **In-app Help** (F1) documenting every feature and its scientific basis with citations.
 - **Bilingual UI** — Spanish (default) and English, switchable live from the login screen and
   Settings (persisted, no restart). Adding a language is a drop-in JSON file — see
@@ -138,8 +159,8 @@ tool logs attribution to a `_licenses.csv`. Review all media for clinical approp
 ## Tests
 
 ```bash
-pytest                       # ~70 unit/integration + offscreen GUI tests
-python scripts/functional_test.py    # end-to-end harness (PASS/FAIL report)
+pytest                       # 116 unit/integration + offscreen GUI tests
+python scripts/functional_test.py    # end-to-end harness (9/9 PASS/FAIL report)
 ```
 
 ---
