@@ -53,6 +53,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from ... import paths
 from ...domain import reports
 from ...services import export
 from ...services.i18n import tr
@@ -585,11 +586,20 @@ class ReportScreen(QWidget):
         self._notify_export(ok)
 
     # ---- PDF header (clinic logo + name) -----------------------------------
-    def _add_logo_resource(self, doc: QTextDocument) -> bool:
-        """Load the configured clinic logo into the doc as ``img://logo``. Returns
-        True if a usable logo was found."""
+    def _resolve_logo_path(self) -> str | None:
+        """The clinic's configured logo if set and valid, otherwise the bundled CETUS
+        brand mark (so reports carry CETUS branding by default, overridable per clinic)."""
         path = self.context.repos.settings.get("clinic_logo_path")
-        if not path or not Path(path).is_file():
+        if path and Path(path).is_file():
+            return path
+        default = paths.resource_path("icons", "cetus.png")
+        return str(default) if default.is_file() else None
+
+    def _add_logo_resource(self, doc: QTextDocument) -> bool:
+        """Load the header logo (clinic logo or bundled CETUS mark) as ``img://logo``.
+        Returns True if a usable logo was found."""
+        path = self._resolve_logo_path()
+        if not path:
             return False
         img = QImage(path)
         if img.isNull():
@@ -649,8 +659,7 @@ class ReportScreen(QWidget):
 
     def _build_full_html(self, sessions, cue_index) -> str:
         include_notes = self.include_notes.isChecked()
-        has_logo = bool(self.context.repos.settings.get("clinic_logo_path")
-                        and Path(self.context.repos.settings.get("clinic_logo_path")).is_file())
+        has_logo = bool(self._resolve_logo_path())
         gen = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
         # ----- summary table (changes between sessions) -----
         rows = []
@@ -752,8 +761,7 @@ class ReportScreen(QWidget):
 
     def _build_html(self) -> str:
         include_notes = self.include_notes.isChecked()
-        has_logo = bool(self.context.repos.settings.get("clinic_logo_path")
-                        and Path(self.context.repos.settings.get("clinic_logo_path")).is_file())
+        has_logo = bool(self._resolve_logo_path())
         sessions = self._finished_sessions()
         sid = self.session_combo.currentData()
         sel = next((s for s in sessions if s.id == sid), None)

@@ -83,6 +83,16 @@ def test_export_pdf_writes_a_real_file(ctx, qtbot, tmp_path, monkeypatch):
     assert f.read_bytes()[:4] == b"%PDF"             # valid PDF magic
 
 
+def test_default_cetus_logo_used_when_no_clinic_logo(ctx, qtbot):
+    p = _seed(ctx)
+    window = MainWindow(ctx); qtbot.addWidget(window); window.show()
+    screen = ReportScreen(window, ctx, p); qtbot.addWidget(screen)
+    # With no clinic logo set, the bundled CETUS mark is the default report logo.
+    resolved = screen._resolve_logo_path()
+    assert resolved is not None and resolved.endswith("cetus.png")
+    assert "img://logo" in screen._build_html()
+
+
 def test_coping_responses_appear_in_pdf_html(ctx, qtbot):
     p = _seed(ctx)  # seeds two coping events with detail="ejemplo"
     window = MainWindow(ctx); qtbot.addWidget(window); window.show()
@@ -270,7 +280,7 @@ def test_clinic_logo_embedded_in_pdf(ctx, qtbot, tmp_path):
     assert "img://logo" in screen._build_html()         # header references it
     assert "Clínica Demo" in screen._build_html()
 
-    # No logo configured -> header omits the logo gracefully.
+    # No clinic logo -> the bundled CETUS brand mark is used as the default header logo.
     ctx.repos.settings.set("clinic_logo_path", "")
-    assert screen._add_logo_resource(QTextDocument()) is False
-    assert "img://logo" not in screen._build_html()
+    assert screen._add_logo_resource(QTextDocument()) is True
+    assert "img://logo" in screen._build_html()

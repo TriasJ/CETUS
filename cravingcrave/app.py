@@ -44,8 +44,10 @@ def _ensure_media_backend() -> None:
 
 _ensure_media_backend()
 
+from PySide6.QtGui import QIcon  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
+from . import paths  # noqa: E402
 from .config import AppConfig  # noqa: E402
 from .logging_setup import configure_logging  # noqa: E402
 from .services import i18n  # noqa: E402
@@ -57,6 +59,9 @@ from .ui.theme import apply_theme  # noqa: E402
 def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName("CETUS")
+    _icon = paths.resource_path("icons", "cetus.png")
+    if _icon.is_file():
+        app.setWindowIcon(QIcon(str(_icon)))
 
     config = AppConfig()
     configure_logging(config.data_dir)
