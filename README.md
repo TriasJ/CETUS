@@ -27,10 +27,16 @@ English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built wi
   intensity; optional randomized order; ← → to change cues; loop mode.
 - **Patient-controlled intensity** — shrink, blur, dim, mute the cue (keyboard:
   `T`/`D`/`O`/`M`, `R` reset) so the patient down-regulates exposure themselves.
+- **Keyboard-only accessibility mode** — drive the whole exposure with an adaptive keyboard
+  (arrows switch cues; `1`/`2`/`3` pick the size/blur/dim axis and `+`/`−` adjust it; digits
+  set the craving rating, Enter confirms). Toggleable in Settings; every shortcut is
+  remappable (STOP stays locked).
+- **Auto-scroll cues** — optional hands-free advance after each rating and/or every N seconds.
 - **Craving VAS (0–10)** at baseline/peak/endpoint + periodic, with a live habituation
   curve; configurable habituation criterion.
 - **Guided USCS/CBT coping** (name the feeling → recall a consequence → recall a benefit
-  → choose an alternative) and an on-demand **positive counter-stimuli gallery**.
+  → choose an alternative) and an on-demand **positive counter-stimuli gallery**;
+  the four free-text responses export to CSV + PDF for qualitative study.
 - **Ambient sound bed** layered under the visual cue (boosts presence).
 - **Always-on ALTO panic button** (Esc) → calm screen with therapist/crisis numbers.
 - **Fullscreen / kiosk mode** — `F11` toggles fullscreen for distraction-free sessions.
@@ -81,21 +87,33 @@ you want to ship for. One-file, no Python required on the target machine.
 ```
 
 Both scripts create the venv, install dev deps, run the test suite, then build via the
-committed `cravingcrave.spec`.
+committed `cravingcrave.spec` — and, if the OS packaging tools are present, also produce an
+installer.
 
-### Distribution layout
-Ship the binary next to an external `media/` folder (and let it create `data/` on first
-run):
+### Installers (Windows · macOS · Linux)
+CETUS ships per-OS installers alongside the portable binary — Windows setup (Inno Setup),
+macOS `.dmg`, and Linux AppImage. Pushing a `v*` tag builds all three in CI and attaches
+them to the GitHub Release. See [`packaging/README.md`](packaging/README.md) for the build
+steps and the (unsigned-by-default) code-signing notes.
+
+### Where data lives
+- **Installed** builds keep patient `data/` and `media/` in the standard per-user directory:
+  `%APPDATA%\CETUS` (Windows), `~/Library/Application Support/CETUS` (macOS),
+  `~/.local/share/CETUS` (Linux) — created on first run.
+- **Portable** builds keep them next to the executable. Drop an empty `portable.txt` beside
+  the binary (or ship a `data/` folder) to force portable mode; existing deployments keep
+  working unchanged.
 
 ```
-CETUS/            # what you hand to the clinic
+CETUS/            # portable layout
 ├── CETUS(.exe)   # the built binary  (see GitHub Releases)
+├── portable.txt         # optional: force data/media next to the binary
 ├── media/               # cue library (drop in patient-specific cues)
-└── data/                # created on first run; local SQLite DB (PII — keep private)
+└── data/                # local SQLite DB (PII — keep private)
 ```
 
-**Binaries are distributed via [GitHub Releases](../../releases), not in the git repo**
-(the one-file build is ~200 MB, over GitHub's file limit).
+**Binaries/installers are distributed via [GitHub Releases](../../releases), not in the git
+repo** (the one-file build is ~200 MB, over GitHub's file limit).
 
 ---
 

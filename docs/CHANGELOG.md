@@ -2,6 +2,35 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.4.0 — auto-scroll, coping export, keyboard accessibility, installers (2026-07)
+
+### Added
+- **Auto-scroll cues** — optional hands-free advance of the shown cue, after each craving
+  rating and/or every N seconds; both off by default and configurable in Settings.
+- **Qualitative coping export** — the four USCS ("afrontamiento") free-text responses now
+  export to a dedicated **CSV** (one row per response: code, session, substance, time, skill,
+  text) and appear in the **PDF reports**; the timeline CSV gained an ISO timestamp column.
+  Uses only the pseudonymous patient code. Blank responses are preserved (used-but-empty vs
+  skipped is now distinguishable).
+- **Keyboard accessibility** — a toggleable **keyboard-only mode** for the exposure session,
+  built for an adaptive keyboard (Enter, +, −, arrows, 0–9): arrows switch cues; `1/2/3`
+  select the size/blur/dim axis and `+/−` adjust it; `0` mutes; the craving rating is typed
+  as a digit and confirmed with Enter. On-screen legend, active-axis highlight, works in
+  full screen, and STOP (Esc) always available. A central **hotkey registry** drives all
+  shortcuts and a **Settings → Keyboard shortcuts** page lets you remap any action (STOP
+  locked for safety; accessible-mode keys restricted to the adaptive set).
+- **Multi-OS installers** — Windows (Inno Setup), macOS (`.dmg` from an `.app` bundle) and
+  Linux (AppImage), built per-OS by a `Release` GitHub Actions workflow on a `v*` tag.
+  Placeholder app icon (PNG/ICO/ICNS). See `packaging/README.md`.
+- In-app **Help** updated (ES + EN) to document all of the above.
+
+### Changed
+- **Data location** — external `data/` and `media/` now resolve per build: portable builds
+  keep them next to the executable (`portable.txt` marker or an existing `data/` folder, so
+  every current deployment is preserved), while installed builds use the standard per-OS user
+  directory (`%APPDATA%\CETUS`, `~/Library/Application Support/CETUS`, `~/.local/share/CETUS`).
+- Version → 0.4.0.
+
 ## 0.3.0 — localization (2026-07)
 
 Bilingual UI with a drop-in mechanism for adding more languages.

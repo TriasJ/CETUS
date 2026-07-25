@@ -31,6 +31,25 @@ def test_help_content_loads_with_citations():
     assert "Pavloviano" in mech or "pavloviano" in mech
     assert "Carter" in mech and "Kiyak" in mech and "extinción" in mech.lower()
 
+    # 0.4.0 features are documented: keyboard-only mode, auto-scroll, coping export,
+    # and where data is stored.
+    assert "solo teclado" in sc.lower()                       # accessibility in shortcuts
+    graded = next(s for s in sections if s["id"] == "graded")["html"]
+    assert "autom" in graded.lower()                          # auto-scroll
+    rep = next(s for s in sections if s["id"] == "report_metrics")["html"]
+    assert "afrontamiento" in rep.lower()                     # coping export
+    mgmt = next(s for s in sections if s["id"] == "management")["html"]
+    assert "%APPDATA%" in mgmt and "portable" in mgmt.lower()  # data location
+
+
+def test_help_english_documents_new_features():
+    data = load_help("en")
+    sections = {s["id"]: s["html"] for s in data["sections"]}
+    assert "keyboard-only mode" in sections["shortcuts"].lower()
+    assert "automatic advance" in sections["graded"].lower()
+    assert "coping" in sections["report_metrics"].lower()
+    assert "%APPDATA%" in sections["management"]
+
 
 def test_help_dialog_renders_and_navigates(qtbot):
     dlg = HelpDialog()
