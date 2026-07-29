@@ -25,19 +25,20 @@ English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built wi
 
 ---
 
-## What's new in 0.4.0
+## What's new in 0.5.0
 
-- ♿ **Keyboard-only accessibility mode** — run a whole exposure from an adaptive keyboard
-  (Enter, `+`, `−`, arrows, 0–9), with a full **remappable-hotkey** settings page.
-- ⏩ **Auto-scroll cues** — optional hands-free advance after each rating and/or every N seconds.
-- 📝 **Qualitative coping export** — the four USCS free-text responses now export to a dedicated
-  **CSV** and appear in the **PDF reports**, pseudonymised for research.
-- 📦 **Installers for Windows, macOS & Linux** — built per-OS in CI; patient data moves to the
-  standard per-OS user directory (portable mode still supported).
-- 🎨 New CETUS whale branding (app icon + default report logo) and ES/EN in-app Help for all of
-  the above.
+- 🗂️ **Tabbed Options** — Settings reorganised into **Session / User / Hotkeys / Substances**,
+  with clinic-wide items marked *"shared with all users"*.
+- 🔢 **Number keys in fullscreen** — `1/2/3` pick the size/blur/dim axis and `+/−` adjust it in
+  normal exposure too (not just keyboard-only mode); new **`4`** = coping, **`5`** = positive
+  images, with a fading on-screen hint.
+- 🔁 **Adaptive craving prompts** — optionally re-check craving after each coping or every N cues.
+- 🎛️ **Pre-session Parameters popup** — per-session overrides (auto-advance, keyboard-only, time
+  limit, **start in fullscreen**) that leave the global defaults untouched.
+- 📁 **Recursive folder import** and a new **"Session workflow"** Help topic (ES + EN).
 
-See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
+Earlier: 0.4.0 added keyboard-only accessibility, auto-scroll, qualitative coping export, and
+multi-OS installers. See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
 
 ---
 

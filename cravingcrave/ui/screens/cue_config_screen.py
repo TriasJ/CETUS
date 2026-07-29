@@ -111,6 +111,7 @@ class CueConfigScreen(QWidget):
         add_files = QPushButton(tr("cueconfig.add_files"))
         add_files.clicked.connect(self._add_files)
         add_folder = QPushButton(tr("cueconfig.add_folder"))
+        add_folder.setToolTip(tr("cueconfig.add_folder_tip"))
         add_folder.clicked.connect(self._add_folder)
 
         up = QPushButton(tr("cueconfig.move_up")); up.clicked.connect(lambda: self._move(-1))
@@ -233,7 +234,9 @@ class CueConfigScreen(QWidget):
         folder = QFileDialog.getExistingDirectory(self, tr("cueconfig.add_folder"))
         if not folder:
             return
-        files = sorted(p for p in Path(folder).iterdir() if p.is_file())
+        # Recurse into subfolders so a whole nested media tree imports in one action;
+        # non-media files are filtered out by _import_paths.
+        files = sorted(p for p in Path(folder).rglob("*") if p.is_file())
         self._import_paths(files)
 
     def _set_all_enabled(self, enabled: bool) -> None:

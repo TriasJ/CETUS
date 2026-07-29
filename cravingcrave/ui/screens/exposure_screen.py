@@ -10,11 +10,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QPropertyAnimation, Qt, QTimer
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
     QFrame,
+    QGraphicsOpacityEffect,
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -50,6 +51,7 @@ class ExposureScreen(QWidget):
         self._habituated = False
         self._pending_end_reason = EndReason.CLINICIAN_STOP
         self._vas_mode = RatingKind.BASELINE
+        self._cue_advances = 0   # counts forward cue changes (for "prompt every N cues")
 
         # --- widgets --------------------------------------------------------
         self.cue_view = CueView()
@@ -70,6 +72,24 @@ class ExposureScreen(QWidget):
         self.legend.setObjectName("Muted")
         self.legend.setWordWrap(True)
         self.legend.setVisible(False)
+
+        # Fading, non-interactive number-key hint shown in fullscreen (where the persistent
+        # legend is not). It grabs no focus and consumes no keys, so it never interferes with
+        # the input filter or the Esc/panic path.
+        self._fs_hint = QLabel(tr("exposure.fullscreen_hint"), self)
+        self._fs_hint.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self._fs_hint.setStyleSheet(
+            "background:rgba(13,27,42,0.86); color:#e6edf3; padding:9px 16px; border-radius:10px;")
+        self._fs_hint.setVisible(False)
+        self._fs_opacity = QGraphicsOpacityEffect(self._fs_hint)
+        self._fs_opacity.setOpacity(0.0)
+        self._fs_hint.setGraphicsEffect(self._fs_opacity)
+        self._fs_anim = QPropertyAnimation(self._fs_opacity, b"opacity", self)
+        self._fs_fading_out = False
+        self._fs_anim.finished.connect(self._on_fs_anim_finished)
+        self._fs_hide_timer = QTimer(self)
+        self._fs_hide_timer.setSingleShot(True)
+        self._fs_hide_timer.timeout.connect(self._fade_out_fs_hint)
 
         self.chart = CravingChart(context.config.vas_max)
         self.chart.setMinimumHeight(220)
@@ -134,6 +154,8 @@ class ExposureScreen(QWidget):
         # from "skill skipped" in qualitative exports.
         self.coping_panel.copingRecorded.connect(
             lambda skill, detail: controller.record_coping(skill, detail))
+        # Optionally re-check craving right after the coping (afrontamiento) interaction.
+        self.coping_panel.finished.connect(self._after_coping)
         self.gallery = GalleryPanel(self)
         self.gallery.closed.connect(self._on_gallery_closed)
 
@@ -160,16 +182,33 @@ class ExposureScreen(QWidget):
 
     # --- hotkeys / accessibility -------------------------------------------
     def _install_hotkeys(self) -> None:
-        """Build exposure input from the resolved hotkey registry. In accessibility
-        mode a single application-level key filter drives everything; otherwise the
-        standard per-key QShortcuts are installed (identical to the pre-0.4.0 keys)."""
+        """Build exposure input from the resolved hotkey registry. Accessibility mode uses a
+        single application-level key filter for the full keyboard-only preset; normal mode
+        keeps the standard per-key QShortcuts AND installs a reduced digit/± filter so number
+        keys (1/2/3 axes, 4 coping, 5 positive, ± adjust) work in fullscreen too."""
         resolved = hotkeys.resolve_bindings(self.context.repos.settings)
+        self._apply_key_reminders(resolved)
         if self.context.config.accessibility_kbmode:
-            self._access_input = AccessibilityInput(self, resolved)
+            self._access_input = AccessibilityInput(self, resolved)   # full preset, vas_entry=True
             QApplication.instance().installEventFilter(self._access_input)
             self.legend.setVisible(True)
         else:
             self._install_standard_shortcuts(resolved)
+            self._access_input = AccessibilityInput(
+                self, resolved, owned=hotkeys.STANDARD_DIGIT_ACTIONS, vas_entry=False)
+            QApplication.instance().installEventFilter(self._access_input)
+
+    def _apply_key_reminders(self, resolved: dict) -> None:
+        """Show the number keys on the always-visible controls (the windowed-mode aid)."""
+        self.intensity.set_axis_hints({
+            "size": resolved["access.axis_size"],
+            "blur": resolved["access.axis_blur"],
+            "dim": resolved["access.axis_dim"],
+        })
+        self.coping_btn.setText(
+            f'{tr("exposure.coping")}  ({resolved["access.action_coping"]})')
+        self.gallery_btn.setText(
+            f'{tr("exposure.positive_gallery")}  ({resolved["access.positive_signal"]})')
 
     def _install_standard_shortcuts(self, resolved: dict) -> None:
         slots = {
@@ -193,6 +232,51 @@ class ExposureScreen(QWidget):
     def flash_axis_hint(self) -> None:
         """Prompt the patient (accessibility mode) to pick an axis before +/-."""
         self.hint.setText(tr("exposure.legend_pick_axis"))
+
+    # --- fading fullscreen number-key hint ---------------------------------
+    def notify_fullscreen(self, is_full: bool) -> None:
+        """Called by MainWindow when fullscreen toggles; flash the hint on entering."""
+        if is_full:
+            self._show_fs_hint()
+
+    def bump_key_hint(self) -> None:
+        """Re-show the fading hint on a number-key press (no-op unless fullscreen)."""
+        if self.window.isFullScreen():
+            self._show_fs_hint()
+
+    def _show_fs_hint(self) -> None:
+        self._fs_hint.adjustSize()
+        self._position_fs_hint()
+        self._fs_hint.setVisible(True)
+        self._fs_hint.raise_()
+        self._fs_fading_out = False
+        self._fs_anim.stop()
+        self._fs_anim.setDuration(220)
+        self._fs_anim.setStartValue(self._fs_opacity.opacity())
+        self._fs_anim.setEndValue(1.0)
+        self._fs_anim.start()
+        self._fs_hide_timer.start(4500)   # hold, then fade out
+
+    def _fade_out_fs_hint(self) -> None:
+        self._fs_fading_out = True
+        self._fs_anim.stop()
+        self._fs_anim.setDuration(650)
+        self._fs_anim.setStartValue(self._fs_opacity.opacity())
+        self._fs_anim.setEndValue(0.0)
+        self._fs_anim.start()
+
+    def _on_fs_anim_finished(self) -> None:
+        if self._fs_fading_out:
+            self._fs_hint.setVisible(False)
+
+    def _position_fs_hint(self) -> None:
+        self._fs_hint.move(max(0, (self.width() - self._fs_hint.width()) // 2),
+                           max(0, self.height() - self._fs_hint.height() - 28))
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        if self._fs_hint.isVisible():
+            self._position_fs_hint()
 
     def remove_access_filter(self) -> None:
         if self._access_input is not None:
@@ -247,6 +331,16 @@ class ExposureScreen(QWidget):
     def _next_cue(self) -> None:
         self.controller.advance_cue()
         self._load_cue()
+        self._maybe_prompt_after_n_cues()
+
+    def _maybe_prompt_after_n_cues(self) -> None:
+        """If configured, ask for a craving score after every N forward cue changes."""
+        n = self.context.config.vas_prompt_every_n_cues
+        if n <= 0:
+            return
+        self._cue_advances += 1
+        if self._cue_advances % n == 0:
+            self._open_periodic_vas()
 
     def _prev_cue(self) -> None:
         self.controller.previous_cue()
@@ -279,10 +373,22 @@ class ExposureScreen(QWidget):
         if self.controller.check_time_cap():
             self._request_end(EndReason.TIME_CAP)
             return
+        self._open_periodic_vas()
+
+    def _open_periodic_vas(self) -> None:
+        """Open a periodic craving VAS on demand — from the timer, after coping, or after
+        N cues. No-op if a prompt/overlay is already up so prompts never stack."""
+        if self._prompt_open or self.coping_panel.isVisible() or self.gallery.isVisible():
+            return
         self.controller.mark_due_periodic()
         self._vas_mode = RatingKind.PERIODIC
         self._prompt_open = True
         self.vas_prompt.ask(tr("vas.periodic_title"))
+
+    def _after_coping(self) -> None:
+        """Coping (afrontamiento) panel closed — optionally re-check craving."""
+        if self.context.config.vas_prompt_after_coping:
+            self._open_periodic_vas()
 
     def _mark_peak(self) -> None:
         if self._prompt_open:

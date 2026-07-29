@@ -1,0 +1,90 @@
+"""Per-session run parameters popup.
+
+Lets the clinician tweak run-time exposure behaviour for a single session without
+touching the global (clinic-wide) defaults: automatic cue advancement, keyboard-only
+mode, the safety time limit, and whether to start in fullscreen. Every control is seeded
+from the current ``AppConfig`` so leaving it untouched reproduces the global behaviour.
+"""
+
+from __future__ import annotations
+
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QSpinBox,
+    QVBoxLayout,
+)
+
+from ...services.i18n import tr
+
+
+class SessionParamsDialog(QDialog):
+    def __init__(self, parent, config, random_order: bool = False, loop: bool = False) -> None:
+        super().__init__(parent)
+        self.setWindowTitle(tr("setup.params_title"))
+        self.setModal(True)
+        self.setMinimumWidth(540)   # wide enough for the full-length toggle labels
+
+        # Cue-ordering flags (per-session, not AppConfig fields).
+        self.random_order = QCheckBox(tr("setup.random_order"))
+        self.random_order.setChecked(random_order)
+        self.loop_cues = QCheckBox(tr("setup.loop_cues"))
+        self.loop_cues.setChecked(loop)
+
+        self.autoscroll_on_grading = QCheckBox(tr("settings.autoscroll_on_grading"))
+        self.autoscroll_on_grading.setChecked(config.autoscroll_on_grading)
+        self.autoscroll_timed = QSpinBox(); self.autoscroll_timed.setRange(0, 600)
+        self.autoscroll_timed.setSuffix(" s"); self.autoscroll_timed.setMinimumWidth(120)
+        self.autoscroll_timed.setValue(config.autoscroll_timed_seconds)
+        self.accessibility = QCheckBox(tr("settings.accessibility_kbmode"))
+        self.accessibility.setChecked(config.accessibility_kbmode)
+        self.time_cap = QSpinBox(); self.time_cap.setRange(1, 120)
+        self.time_cap.setSuffix(" min"); self.time_cap.setMinimumWidth(120)
+        self.time_cap.setValue(config.session_time_cap_seconds // 60)
+        self.start_fullscreen = QCheckBox(tr("setup.start_fullscreen"))
+
+        # Full-width rows for the checkboxes so their (long) labels never clip; the two
+        # spinboxes keep a right-aligned label column.
+        form = QFormLayout(); form.setSpacing(12)
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.DontWrapRows)
+        form.addRow(self.random_order)
+        form.addRow(self.loop_cues)
+        form.addRow(self.autoscroll_on_grading)
+        form.addRow(tr("settings.autoscroll_timed"), self.autoscroll_timed)
+        form.addRow(self.accessibility)
+        form.addRow(tr("settings.time_cap_min"), self.time_cap)
+        form.addRow(self.start_fullscreen)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+
+        intro = QLabel(tr("setup.params_intro")); intro.setWordWrap(True)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(24, 20, 24, 20); v.setSpacing(14)
+        v.addWidget(intro)
+        v.addLayout(form)
+        v.addWidget(buttons)
+
+    def overrides(self) -> dict:
+        """The chosen values as an ``AppConfig`` field override map (per-run only)."""
+        return {
+            "autoscroll_on_grading": self.autoscroll_on_grading.isChecked(),
+            "autoscroll_timed_seconds": self.autoscroll_timed.value(),
+            "accessibility_kbmode": self.accessibility.isChecked(),
+            "session_time_cap_seconds": self.time_cap.value() * 60,
+        }
+
+    def wants_fullscreen(self) -> bool:
+        return self.start_fullscreen.isChecked()
+
+    def wants_random(self) -> bool:
+        return self.random_order.isChecked()
+
+    def wants_loop(self) -> bool:
+        return self.loop_cues.isChecked()

@@ -42,6 +42,21 @@ def test_help_content_loads_with_citations():
     assert "%APPDATA%" in mgmt and "portable" in mgmt.lower()  # data location
 
 
+def test_help_has_session_workflow_topic():
+    # 0.5.0: an end-to-end session-workflow narrative in both locales.
+    es = {s["id"]: s["html"] for s in load_help("es")["sections"]}
+    assert "workflow" in es
+    wf_es = es["workflow"]
+    assert "línea base" in wf_es.lower() and "habituación" in wf_es.lower()
+    assert "afrontamiento" in wf_es.lower() and "poco a poco" in wf_es.lower()
+
+    en = {s["id"]: s["html"] for s in load_help("en")["sections"]}
+    assert "workflow" in en
+    wf_en = en["workflow"]
+    assert "baseline" in wf_en.lower() and "habituation" in wf_en.lower()
+    assert "coping" in wf_en.lower() and "little by little" in wf_en.lower()
+
+
 def test_help_english_documents_new_features():
     data = load_help("en")
     sections = {s["id"]: s["html"] for s in data["sections"]}
@@ -49,6 +64,8 @@ def test_help_english_documents_new_features():
     assert "automatic advance" in sections["graded"].lower()
     assert "coping" in sections["report_metrics"].lower()
     assert "%APPDATA%" in sections["management"]
+    # Numbers-in-fullscreen + keys 4/5 documented in shortcuts.
+    assert "4/5" in sections["shortcuts"] or "4 / 5" in sections["shortcuts"]
 
 
 def test_help_dialog_renders_and_navigates(qtbot):

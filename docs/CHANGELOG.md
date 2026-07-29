@@ -2,6 +2,32 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.5.0 — UX polish: tabbed Options, number keys in fullscreen, adaptive prompts (2026-07)
+
+### Added
+- **Redesigned Options** — a master-detail layout: an **icon navigation list** (Session /
+  User / Hotkeys / Substances) drives grouped **QGroupBox** pages with a persistent Save bar;
+  keybindings use a compact two-column grid. Clinic-wide items (substances, logo, clinic name)
+  are marked *"Shared with all users"*. Settings remain global/clinic-wide.
+- **Number keys during exposure (all modes)** — the `1/2/3` axis + `+/−` scheme now works in
+  normal exposure and **fullscreen**, not only keyboard-only mode. New keys **`4`** (open
+  Afrontamiento) and **`5`** (open Positive Images). The controls also show their number as a
+  reminder in windowed mode, and a **fading, non-interactive hint** lists the keys on entering
+  fullscreen.
+- **Adaptive craving prompts** — optional *"measure craving after each afrontamiento"* and
+  *"measure craving every N cues"*, in addition to the fixed periodic timer. Both off by
+  default (Settings → Session → Advanced).
+- **Pre-session Parameters popup** — a *Parameters…* button on the setup screen opens a dialog
+  for per-session run options: **random order, loop, auto-advance, keyboard-only, time limit,
+  start in fullscreen**. Every option also has a **default in Ajustes** (Session → run options);
+  the popup seeds from those defaults, remembers the **last config used per patient**, and
+  applies to that run only (clinic-wide defaults untouched).
+- **Recursive folder import** — *Add folder…* in cue configuration now imports every media
+  file in the chosen folder **and its subfolders**.
+- In-app **Help** (ES + EN): a new **"Session workflow"** topic walks through a session end to
+  end (baseline → graded cues → down-regulation + coping → periodic craving → habituation →
+  close) and the shortcuts topic documents keys 4/5 and numbers-in-fullscreen.
+
 ## 0.4.0 — auto-scroll, coping export, keyboard accessibility, installers (2026-07)
 
 ### Added

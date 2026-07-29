@@ -6,11 +6,14 @@ Two things live here:
   helpers to resolve per-action overrides from the ``app_setting`` store. Screens build
   their ``QShortcut`` objects from the *resolved* bindings instead of hard-coding keys, so
   a clinic can remap them in Settings.
-* ``AccessibilityInput`` — an application-level event filter that implements the
-  keyboard-only exposure scheme for a disability keyboard (Enter, +, −, arrows, 0–9):
-  arrows switch cues, digits ``1/2/3`` select the size/blur/dim axis, ``+``/``−`` adjust
-  the selected axis, ``0`` toggles mute, and while the VAS prompt is open digits set the
-  rating and Enter submits. It is installed only while accessibility mode is ON.
+* ``AccessibilityInput`` — an application-level event filter that implements the digit/±
+  exposure scheme for a disability keyboard (Enter, +, −, arrows, 0–9): digits ``1/2/3``
+  select the size/blur/dim axis, ``+``/``−`` adjust the selected axis, ``4`` opens the
+  coping (afrontamiento) panel, ``5`` opens the Positive Images gallery. In the full
+  keyboard-only preset it also switches cues with the arrows, toggles mute with ``0``, and
+  while the VAS prompt is open digits set the rating and Enter submits. The full preset runs
+  while accessibility mode is ON; a reduced digit-only preset (``STANDARD_DIGIT_ACTIONS``,
+  ``vas_entry=False``) runs during normal exposure so numbers work in fullscreen too.
 
 Adding an action = add one ``HotkeyAction`` to ``ACTIONS`` (and its i18n label). Keys are
 stored/compared as ``QKeySequence`` *PortableText* so defaults, settings and captured keys
@@ -74,6 +77,8 @@ ACTIONS: tuple[HotkeyAction, ...] = (
     HotkeyAction("access.mute", "0", "hotkey.access_mute", Scope.ACCESS),
     HotkeyAction("access.intensity_inc", "+", "hotkey.intensity_inc", Scope.ACCESS),
     HotkeyAction("access.intensity_dec", "-", "hotkey.intensity_dec", Scope.ACCESS),
+    HotkeyAction("access.action_coping", "4", "hotkey.action_coping", Scope.ACCESS),
+    HotkeyAction("access.positive_signal", "5", "hotkey.positive_signal", Scope.ACCESS),
     HotkeyAction("access.vas_submit", "Return", "hotkey.vas_submit", Scope.ACCESS),
 )
 
@@ -148,6 +153,22 @@ _AXIS_FOR_ACTION = {
 }
 _STEP = 10  # percent per +/- press, matching the standard shortcuts
 
+# Full keyboard-only preset (accessibility mode): the filter owns navigation, axes,
+# mute, ± and the coping/positive actions, and drives the VAS prompt from the keypad.
+FULL_ACCESS_ACTIONS = [
+    "exposure.prev_cue", "exposure.next_cue",
+    "access.axis_size", "access.axis_blur", "access.axis_dim",
+    "access.mute", "access.intensity_inc", "access.intensity_dec",
+    "access.action_coping", "access.positive_signal",
+]
+# Normal-mode digit preset: only the digit/± actions, so arrows and letters stay on the
+# standard QShortcuts and the mouse/slider still drive the VAS prompt (vas_entry=False).
+STANDARD_DIGIT_ACTIONS = [
+    "access.axis_size", "access.axis_blur", "access.axis_dim",
+    "access.intensity_inc", "access.intensity_dec",
+    "access.action_coping", "access.positive_signal",
+]
+
 
 class AccessibilityInput(QObject):
     """Application-level key filter implementing the keyboard-only exposure scheme.
@@ -158,28 +179,26 @@ class AccessibilityInput(QObject):
     F1, F11) always fire.
     """
 
-    def __init__(self, screen, resolved: dict[str, str]) -> None:
+    def __init__(self, screen, resolved: dict[str, str], *,
+                 owned: list[str] | None = None, vas_entry: bool = True) -> None:
         super().__init__(screen)
         self.screen = screen
         self._active_axis: str | None = None
-        # Cue nav (from EXPOSURE scope) + the ACCESS actions handled outside the VAS prompt.
-        nav_and_axes = [
-            "exposure.prev_cue", "exposure.next_cue",
-            "access.axis_size", "access.axis_blur", "access.axis_dim",
-            "access.mute", "access.intensity_inc", "access.intensity_dec",
-        ]
-        self._index = build_key_index(resolved, nav_and_axes)
+        self._vas_entry = vas_entry
+        # Which actions this filter claims. Accessibility mode owns the full preset (and
+        # drives the VAS from the keypad); normal mode owns only the digit/± actions.
+        self._index = build_key_index(resolved, owned if owned is not None else FULL_ACCESS_ACTIONS)
         self._vas_submit = resolved["access.vas_submit"]
 
     def eventFilter(self, obj, event) -> bool:
         if event.type() != QEvent.Type.KeyPress:
             return False
         scr = self.screen
-        # 1) A VAS prompt is open -> digits/±/Enter drive the rating (digits mean
-        #    "rating" here). `_prompt_open` is the screen's authoritative flag for any
-        #    baseline/periodic/peak/endpoint prompt.
+        # 1) A VAS prompt is open. In accessibility mode digits/±/Enter drive the rating;
+        #    in normal mode the mouse/slider drive it, so pass keys through untouched.
+        #    `_prompt_open` is the screen's authoritative flag for any prompt.
         if scr._prompt_open:
-            return self._handle_vas(event)
+            return self._handle_vas(event) if self._vas_entry else False
         # 2) Coping/gallery open -> let the panel handle keys (mirrors the periodic-VAS guard).
         if scr.coping_panel.isVisible() or scr.gallery.isVisible():
             return False
@@ -191,10 +210,15 @@ class AccessibilityInput(QObject):
 
     def _dispatch(self, action: str, event) -> bool:
         scr = self.screen
+        scr.bump_key_hint()     # re-show the fullscreen hint on any owned key (no-op otherwise)
         if action == "exposure.prev_cue":
             scr._prev_cue(); return True
         if action == "exposure.next_cue":
             scr._next_cue(); return True
+        if action == "access.action_coping":
+            scr._open_coping(); return True
+        if action == "access.positive_signal":
+            scr._open_gallery(); return True
         if action in _AXIS_FOR_ACTION:
             self._active_axis = _AXIS_FOR_ACTION[action]
             scr.intensity.highlight_axis(self._active_axis)

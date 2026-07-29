@@ -87,6 +87,27 @@ QHeaderView::section {
 }
 QCheckBox { spacing: 8px; }
 
+/* Settings: left navigation list (icon + label rows). */
+QListWidget#SettingsNav {
+    background-color: #ffffff; border: 1px solid #e1e6eb; border-radius: 10px; padding: 6px;
+    font-size: 15px; outline: 0;
+}
+QListWidget#SettingsNav::item {
+    padding: 11px 12px; border-radius: 8px; margin: 2px; color: #1f2933;
+}
+QListWidget#SettingsNav::item:hover { background-color: #eef2f5; }
+QListWidget#SettingsNav::item:selected { background-color: #2a9d8f; color: #ffffff; }
+
+/* Settings: grouped sections on the right pane. */
+QGroupBox {
+    background-color: #ffffff; border: 1px solid #e1e6eb; border-radius: 12px;
+    margin-top: 16px; padding: 16px 16px 14px 16px; font-weight: 600;
+}
+QGroupBox::title {
+    subcontrol-origin: margin; subcontrol-position: top left;
+    left: 14px; padding: 2px 8px; color: #14303a; font-size: 16px;
+}
+
 /* Keyboard-only mode: highlight the intensity axis that +/- will move. */
 QLabel[activeAxis="true"] { color: #21867a; font-weight: 700; }
 QSlider[activeAxis="true"]::groove:horizontal {

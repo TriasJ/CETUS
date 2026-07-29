@@ -56,6 +56,15 @@ class AppConfig:
     # Accessibility: keyboard-only exposure input (disability keyboard). Off by default.
     accessibility_kbmode: bool = False
 
+    # Adaptive craving prompts (beyond the fixed periodic timer). Both off by default.
+    vas_prompt_after_coping: bool = False      # ask craving after each coping (afrontamiento)
+    vas_prompt_every_n_cues: int = 0           # 0 = off, else ask craving every N cue advances
+
+    # Per-session run defaults (also overridable per session in the Parameters popup).
+    default_random_order: bool = False         # randomize the cue order
+    default_loop: bool = False                 # loop the cue list at the ends
+    default_start_fullscreen: bool = False     # begin the exposure in fullscreen
+
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)

@@ -68,6 +68,11 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.autoscroll_on_grading = as_bool("autoscroll_on_grading", config.autoscroll_on_grading)
     config.autoscroll_timed_seconds = as_int("autoscroll_timed_seconds", config.autoscroll_timed_seconds)
     config.accessibility_kbmode = as_bool("accessibility_kbmode", config.accessibility_kbmode)
+    config.vas_prompt_after_coping = as_bool("vas_prompt_after_coping", config.vas_prompt_after_coping)
+    config.vas_prompt_every_n_cues = as_int("vas_prompt_every_n_cues", config.vas_prompt_every_n_cues)
+    config.default_random_order = as_bool("default_random_order", config.default_random_order)
+    config.default_loop = as_bool("default_loop", config.default_loop)
+    config.default_start_fullscreen = as_bool("default_start_fullscreen", config.default_start_fullscreen)
     # The clinic-selected UI language (persisted by the language switcher) overrides
     # the bootstrap default. app.main() applies it to i18n after the context is built.
     locale = s.get("locale")

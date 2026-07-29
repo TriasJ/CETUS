@@ -107,6 +107,15 @@ class IntensityControls(QFrame):
     def step_dim(self,  delta: int) -> None: self._step(self._dim,  delta)
     def toggle_mute(self) -> None: self._mute_btn.setChecked(not self._muted)
 
+    def set_axis_hints(self, hints: dict[str, str]) -> None:
+        """Prefix each axis label with its number key (e.g. "1 · Tamaño"), so the keys are
+        discoverable in windowed mode. ``hints`` maps ``size``/``blur``/``dim`` -> key text."""
+        bases = {"size": tr("intensity.size"), "blur": tr("intensity.blur"),
+                 "dim": tr("intensity.dim")}
+        for name, (lbl, _sld) in self._axis.items():
+            key = hints.get(name)
+            lbl.setText(f"{key} · {bases[name]}" if key else bases[name])
+
     def highlight_axis(self, axis: str | None) -> None:
         """Visually mark the axis that keyboard +/- will move (accessibility mode).
 

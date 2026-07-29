@@ -152,6 +152,31 @@ def test_keyboard_mode_works_after_fullscreen_toggle(tmp_path, qtbot):
     assert controller.current_cue_index() == 2
 
 
+def test_keys_4_5_open_coping_and_gallery(tmp_path, qtbot):
+    ctx = _ctx(tmp_path, accessibility_kbmode=True)
+    _, screen, _ = _exposure(ctx, qtbot)
+    QTest.keyClick(screen, Qt.Key.Key_4)
+    assert not screen.coping_panel.isHidden()       # 4 opens the coping panel
+    screen.coping_panel._cancel()
+    QTest.keyClick(screen, Qt.Key.Key_5)
+    assert not screen.gallery.isHidden()            # 5 opens the positive gallery
+
+
+def test_number_keys_work_in_normal_mode(tmp_path, qtbot):
+    # Accessibility OFF: the reduced digit/± filter is still installed so numbers work in
+    # normal exposure/fullscreen, alongside the standard letter/arrow QShortcuts.
+    ctx = _ctx(tmp_path)   # accessibility_kbmode defaults False
+    _, screen, _ = _exposure(ctx, qtbot)
+    assert screen._access_input is not None
+    assert screen._shortcuts != []                  # standard shortcuts also present
+    QTest.keyClick(screen, Qt.Key.Key_2)            # select blur axis
+    before = screen.intensity.state()[1]
+    QTest.keyClick(screen, Qt.Key.Key_Plus)
+    assert screen.intensity.state()[1] > before     # + adjusts the selected axis
+    QTest.keyClick(screen, Qt.Key.Key_4)
+    assert not screen.coping_panel.isHidden()       # 4 opens coping in normal mode too
+
+
 def test_escape_not_consumed_by_filter(tmp_path, qtbot):
     ctx = _ctx(tmp_path, accessibility_kbmode=True)
     _, screen, _ = _exposure(ctx, qtbot)

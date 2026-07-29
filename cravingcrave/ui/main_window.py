@@ -7,6 +7,8 @@ Esc triggers it too.
 
 from __future__ import annotations
 
+import dataclasses
+
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QStackedWidget, QWidget
 
@@ -138,26 +140,40 @@ class MainWindow(QMainWindow):
         extra repositioning is needed. Esc remains dedicated to the ALTO panic button."""
         if self.isFullScreen():
             self.showNormal()
+            full = False
         else:
             self.showFullScreen()
+            full = True
+        if self._active_exposure is not None:
+            self._active_exposure.notify_fullscreen(full)
 
     def show_report(self, patient) -> None:
         self._set_panic_active(False)
         self._swap(ReportScreen(self, self.context, patient))
 
     def start_exposure(self, patient, substance: str, exposure_cues, positive_paths,
-                       ambient_path=None, loop: bool = False) -> None:
+                       ambient_path=None, loop: bool = False, overrides: dict | None = None,
+                       start_fullscreen: bool = False) -> None:
         # Defense-in-depth: never enter EXPOSURE against a blank cue surface, even if a
         # caller bypasses the session-setup gate.
         if not exposure_cues:
             QMessageBox.warning(self, tr("app.title"), tr("setup.no_cues"))
             return
-        controller = build_controller(self.context, patient, substance, exposure_cues, loop=loop)
-        screen = ExposureScreen(self, self.context, controller, positive_paths, ambient_path)
+        # Per-session parameter overrides apply to a run-only copy of the context, so the
+        # clinic-wide (global) config is never mutated.
+        run_ctx = self.context
+        if overrides:
+            run_ctx = dataclasses.replace(
+                self.context, config=dataclasses.replace(self.context.config, **overrides))
+        controller = build_controller(run_ctx, patient, substance, exposure_cues, loop=loop)
+        screen = ExposureScreen(self, run_ctx, controller, positive_paths, ambient_path)
         self._active_controller = controller
         self._active_exposure = screen
         self._set_panic_active(True)
         self._swap(screen)
+        if start_fullscreen and not self.isFullScreen():
+            self.showFullScreen()
+            screen.notify_fullscreen(True)
 
     def show_summary(self, session, controller) -> None:
         self._active_controller = None
