@@ -191,7 +191,14 @@ class AccessibilityInput(QObject):
         self._vas_submit = resolved["access.vas_submit"]
 
     def eventFilter(self, obj, event) -> bool:
-        if event.type() != QEvent.Type.KeyPress:
+        et = event.type()
+        # Any mouse move / key / click counts as user activity — reveal the auto-hiding
+        # fullscreen chrome (no-op unless the screen is in immersive mode).
+        if et in (QEvent.Type.MouseMove, QEvent.Type.KeyPress, QEvent.Type.MouseButtonPress):
+            activity = getattr(self.screen, "on_user_activity", None)
+            if activity is not None:
+                activity()
+        if et != QEvent.Type.KeyPress:
             return False
         scr = self.screen
         # 1) A VAS prompt is open. In accessibility mode digits/±/Enter drive the rating;

@@ -58,6 +58,28 @@ def _exposure(ctx, qtbot):
     return screen, controller
 
 
+# ---------- immersive fullscreen -------------------------------------------
+
+def test_immersive_mode_enter_exit(tmp_path, qtbot):
+    ctx = _ctx(tmp_path)
+    screen, _ = _exposure(ctx, qtbot)
+    assert screen._immersive is False and not screen._right_box.isHidden()
+    # Entering fullscreen hides the chart/sliders + top labels and floats the action bar.
+    screen.notify_fullscreen(True)
+    assert screen._immersive is True
+    assert screen._right_box.isHidden()
+    assert not screen._bar_counter.isHidden()           # counter moves into the bar
+    assert screen._actionbar.property("immersive") is True
+    screen.on_user_activity()                            # reveal the auto-hiding bar
+    assert not screen._actionbar.isHidden()
+    # Leaving fullscreen restores the normal layout.
+    screen.notify_fullscreen(False)
+    assert screen._immersive is False
+    assert not screen._right_box.isHidden()
+    assert screen._bar_counter.isHidden()
+    assert screen._actionbar.property("immersive") is False
+
+
 # ---------- §1 tabbed Options ----------------------------------------------
 
 def test_settings_builds_four_nav_pages(tmp_path, qtbot):

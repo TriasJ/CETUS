@@ -87,6 +87,13 @@ QHeaderView::section {
 }
 QCheckBox { spacing: 8px; }
 
+/* Exposure action bar: invisible frame windowed; translucent floating bar in fullscreen. */
+QFrame#ActionBar { background: transparent; }
+QFrame#ActionBar[immersive="true"] {
+    background-color: rgba(13, 27, 42, 0.86); border-radius: 14px;
+}
+QFrame#ActionBar QLabel#BarCounter { color: #e6edf3; font-weight: 600; padding: 0 6px; }
+
 /* Settings: left navigation list (icon + label rows). */
 QListWidget#SettingsNav {
     background-color: #ffffff; border: 1px solid #e1e6eb; border-radius: 10px; padding: 6px;

@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import QPropertyAnimation, Qt, QTimer
-from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtGui import QColor, QKeySequence, QPalette, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
     QFrame,
@@ -106,9 +106,9 @@ class ExposureScreen(QWidget):
         right.addWidget(self.chart)
         right.addWidget(self.intensity)
         right.addWidget(self.ambient_btn)
-        right_box = QFrame()
-        right_box.setLayout(right)
-        right_box.setMaximumWidth(380)
+        self._right_box = QFrame()
+        self._right_box.setLayout(right)
+        self._right_box.setMaximumWidth(380)
 
         # --- center ---------------------------------------------------------
         center = QVBoxLayout()
@@ -120,9 +120,9 @@ class ExposureScreen(QWidget):
 
         body = QHBoxLayout()
         body.addLayout(center, 1)
-        body.addWidget(right_box)
+        body.addWidget(self._right_box)
 
-        # --- bottom action bar ---------------------------------------------
+        # --- action bar (a frame so it can float over the cue in fullscreen) -
         self.peak_btn = QPushButton(tr("exposure.peak_button"))
         self.peak_btn.clicked.connect(self._mark_peak)
         self.coping_btn = QPushButton(tr("exposure.coping"))
@@ -134,17 +134,34 @@ class ExposureScreen(QWidget):
         self.end_btn = QPushButton(tr("exposure.end"))
         self.end_btn.setObjectName("Primary")
         self.end_btn.clicked.connect(self._end_clicked)
+        # Compact counter shown inside the bar only in immersive (fullscreen) mode.
+        self._bar_counter = QLabel(""); self._bar_counter.setObjectName("BarCounter")
+        self._bar_counter.hide()
 
-        actions = QHBoxLayout()
+        self._actionbar = QFrame(); self._actionbar.setObjectName("ActionBar")
+        abl = QHBoxLayout(self._actionbar)
+        abl.setContentsMargins(12, 8, 12, 8); abl.setSpacing(10)
+        abl.addWidget(self._bar_counter)
         for b in (self.peak_btn, self.coping_btn, self.gallery_btn, self.next_btn):
-            actions.addWidget(b)
-        actions.addStretch(1)
-        actions.addWidget(self.end_btn)
+            abl.addWidget(b)
+        abl.addStretch(1)
+        abl.addWidget(self.end_btn)
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(20, 14, 20, 14)
-        layout.addLayout(body, 1)
-        layout.addLayout(actions)
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(20, 14, 20, 14)
+        self.main_layout.addLayout(body, 1)
+        self.main_layout.addWidget(self._actionbar)
+
+        # --- immersive (fullscreen) auto-hiding chrome ---------------------
+        self._immersive = False
+        self._bar_opacity = QGraphicsOpacityEffect(self._actionbar)
+        self._bar_opacity.setOpacity(1.0)
+        self._actionbar.setGraphicsEffect(self._bar_opacity)
+        self._bar_anim = QPropertyAnimation(self._bar_opacity, b"opacity", self)
+        self._bar_fading_out = False
+        self._bar_anim.finished.connect(self._on_bar_anim_finished)
+        self._chrome_timer = QTimer(self); self._chrome_timer.setSingleShot(True)
+        self._chrome_timer.timeout.connect(self._hide_chrome)
 
         # --- overlays (children of this screen; panic button stays above) ---
         self.vas_prompt = VasPrompt(self, context.config.vas_max)
@@ -233,11 +250,93 @@ class ExposureScreen(QWidget):
         """Prompt the patient (accessibility mode) to pick an axis before +/-."""
         self.hint.setText(tr("exposure.legend_pick_axis"))
 
-    # --- fading fullscreen number-key hint ---------------------------------
+    # --- immersive fullscreen + fading chrome ------------------------------
     def notify_fullscreen(self, is_full: bool) -> None:
-        """Called by MainWindow when fullscreen toggles; flash the hint on entering."""
+        """MainWindow calls this on a fullscreen toggle: enter/leave immersive mode."""
         if is_full:
+            self._enter_immersive()
             self._show_fs_hint()
+        else:
+            self._exit_immersive()
+
+    def _enter_immersive(self) -> None:
+        """Full-bleed cue: hide the chart/sliders and the top labels, float the action bar,
+        and let it (plus the key hint) auto-hide. The ALTO panic button stays visible."""
+        if self._immersive:
+            return
+        self._immersive = True
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        pal = self.palette(); pal.setColor(QPalette.ColorRole.Window, QColor("#000000"))
+        self.setPalette(pal); self.setAutoFillBackground(True)
+        self._right_box.hide()
+        self.cue_counter.hide(); self.hint.hide(); self.legend.hide(); self.banner.hide()
+        self._bar_counter.show()
+        self._actionbar.setProperty("immersive", True)
+        self._repolish(self._actionbar)
+        # Float the action bar over the cue (out of the layout, so showing/hiding it does
+        # not reflow the full-bleed cue).
+        self.main_layout.removeWidget(self._actionbar)
+        self._actionbar.setParent(self)
+        self._reveal_chrome()
+
+    def _exit_immersive(self) -> None:
+        if not self._immersive:
+            return
+        self._immersive = False
+        self._chrome_timer.stop(); self._bar_anim.stop()
+        self._bar_opacity.setOpacity(1.0)
+        self.setAutoFillBackground(False)
+        self.main_layout.setContentsMargins(20, 14, 20, 14)
+        self._right_box.show()
+        self.cue_counter.show(); self.hint.show()
+        self.legend.setVisible(self.context.config.accessibility_kbmode)
+        self._bar_counter.hide()
+        self._actionbar.setProperty("immersive", False)
+        self._repolish(self._actionbar)
+        self.main_layout.addWidget(self._actionbar)
+        self._actionbar.show()
+        self._fs_hint.setVisible(False)
+
+    @staticmethod
+    def _repolish(w) -> None:
+        w.style().unpolish(w); w.style().polish(w)
+
+    def on_user_activity(self) -> None:
+        """Mouse move / key press: reveal the auto-hiding chrome (immersive only)."""
+        if self._immersive:
+            self._reveal_chrome()
+
+    def _reveal_chrome(self) -> None:
+        self._position_chrome()
+        self._actionbar.show(); self._actionbar.raise_()
+        self._bar_fading_out = False
+        self._bar_anim.stop()
+        self._bar_anim.setDuration(160)
+        self._bar_anim.setStartValue(self._bar_opacity.opacity())
+        self._bar_anim.setEndValue(1.0)
+        self._bar_anim.start()
+        self._chrome_timer.start(3500)   # idle timeout, then fade out
+
+    def _hide_chrome(self) -> None:
+        if not self._immersive:
+            return
+        self._bar_fading_out = True
+        self._bar_anim.stop()
+        self._bar_anim.setDuration(600)
+        self._bar_anim.setStartValue(self._bar_opacity.opacity())
+        self._bar_anim.setEndValue(0.0)
+        self._bar_anim.start()
+
+    def _on_bar_anim_finished(self) -> None:
+        if self._bar_fading_out and self._immersive:
+            self._actionbar.hide()
+
+    def _position_chrome(self) -> None:
+        self._actionbar.adjustSize()
+        bw = min(self._actionbar.sizeHint().width(), self.width() - 40)
+        bh = self._actionbar.sizeHint().height()
+        self._actionbar.resize(bw, bh)
+        self._actionbar.move((self.width() - bw) // 2, self.height() - bh - 22)
 
     def bump_key_hint(self) -> None:
         """Re-show the fading hint on a number-key press (no-op unless fullscreen)."""
@@ -270,13 +369,17 @@ class ExposureScreen(QWidget):
             self._fs_hint.setVisible(False)
 
     def _position_fs_hint(self) -> None:
-        self._fs_hint.move(max(0, (self.width() - self._fs_hint.width()) // 2),
-                           max(0, self.height() - self._fs_hint.height() - 28))
+        x = max(0, (self.width() - self._fs_hint.width()) // 2)
+        # Top in immersive mode (the floating action bar owns the bottom), else bottom.
+        y = 24 if self._immersive else max(0, self.height() - self._fs_hint.height() - 28)
+        self._fs_hint.move(x, y)
 
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         if self._fs_hint.isVisible():
             self._position_fs_hint()
+        if self._immersive and not self._actionbar.isHidden():
+            self._position_chrome()
 
     def remove_access_filter(self) -> None:
         if self._access_input is not None:
@@ -324,9 +427,11 @@ class ExposureScreen(QWidget):
             self.cue_view.show_image(abs_path)
         self.intensity.reset()
         self.cue_view.set_intensity(100, 0, 0, False)
-        self.cue_counter.setText(tr("exposure.cue_counter",
-                                    current=self.controller.current_cue_index() + 1,
-                                    total=self.controller.cue_count))
+        counter = tr("exposure.cue_counter",
+                     current=self.controller.current_cue_index() + 1,
+                     total=self.controller.cue_count)
+        self.cue_counter.setText(counter)
+        self._bar_counter.setText(counter)
 
     def _next_cue(self) -> None:
         self.controller.advance_cue()
@@ -432,7 +537,7 @@ class ExposureScreen(QWidget):
     # --- habituation & ending ----------------------------------------------
     def _on_habituation(self) -> None:
         self._habituated = True
-        self.banner.setVisible(True)
+        self.banner.setVisible(not self._immersive)   # immersive keeps the cue full-bleed
         self.end_btn.setText(tr("endreason.habituated"))
 
     def _end_clicked(self) -> None:
@@ -459,6 +564,7 @@ class ExposureScreen(QWidget):
     def stop_timers(self) -> None:
         self._timer.stop()
         self._autoscroll_timer.stop()
+        self._chrome_timer.stop()
         self.remove_access_filter()
         self.cue_view.fade_to_black()
 

@@ -2,7 +2,16 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
-## 0.5.0 — UX polish: tabbed Options, number keys in fullscreen, adaptive prompts (2026-07)
+## 0.5.1 — immersive fullscreen exposure (2026-07)
+
+### Added
+- **Immersive fullscreen** — in fullscreen the cue image/video fills the screen (full-bleed,
+  on black) and the interface auto-hides: the chart and intensity sliders are hidden (intensity
+  stays on the number keys `1/2/3` + `+/−`), and a **translucent bottom action bar** (counter +
+  Peak / Cope / Positive / Next / End) **fades in on mouse-move or key-press and out after ~3s
+  idle**. The red **ALTO** button stays visible at all times. Windowed mode is unchanged.
+
+## 0.5.0 — UX polish: redesigned Options, number keys in fullscreen, adaptive prompts (2026-07)
 
 ### Added
 - **Redesigned Options** — a master-detail layout: an **icon navigation list** (Session /
