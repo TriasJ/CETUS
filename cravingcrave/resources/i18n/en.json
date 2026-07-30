@@ -4,6 +4,13 @@
   "app.subtitle": "Cue Exposure Therapy (CET) with urge-specific coping skills",
   "app.fullscreen_hint": "Fullscreen: F11",
   "app.language": "Language",
+  "settings.appearance_title": "Appearance",
+  "settings.theme": "Visual theme",
+  "theme.light": "Light (default)",
+  "theme.dark": "Dark",
+  "theme.high_contrast": "High contrast",
+  "theme.impaired": "Low vision (large text)",
+  "theme.classic": "Classic Windows",
 
   "common.ok": "OK",
   "common.cancel": "Cancel",

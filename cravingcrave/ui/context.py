@@ -78,3 +78,6 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     locale = s.get("locale")
     if locale:
         config.locale = locale
+    theme = s.get("theme")
+    if theme:
+        config.theme = theme

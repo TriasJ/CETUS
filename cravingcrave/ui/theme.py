@@ -17,10 +17,32 @@ SURFACE = "#ffffff"
 BG = "#f4f6f8"
 
 
-def apply_theme(app: QApplication) -> None:
-    app.setFont(QFont("Segoe UI", 10))
-    qss_path = paths.resource_path("styles", "app.qss")
+# Selectable themes. "light" (default) is the base app.qss on its own; the others append a
+# small override on top of the base so they only restyle colours/sizes, not every rule.
+THEME_OVERRIDES = {
+    "light": None,
+    "dark": "app_dark.qss",
+    "high_contrast": "app_high_contrast.qss",
+    "impaired": "app_impaired.qss",
+    "classic": "app_classic.qss",
+}
+
+
+def available_themes() -> list[str]:
+    return list(THEME_OVERRIDES.keys())
+
+
+def _read_qss(name: str) -> str:
     try:
-        app.setStyleSheet(qss_path.read_text(encoding="utf-8"))
+        return paths.resource_path("styles", name).read_text(encoding="utf-8")
     except OSError:
-        pass  # styling is non-essential; app still runs unstyled
+        return ""
+
+
+def apply_theme(app: QApplication, theme: str = "light") -> None:
+    app.setFont(QFont("Segoe UI", 10))
+    qss = _read_qss("app.qss")
+    override = THEME_OVERRIDES.get(theme)
+    if override:
+        qss = f"{qss}\n\n/* ---- theme: {theme} ---- */\n{_read_qss(override)}"
+    app.setStyleSheet(qss)  # styling is non-essential; empty string just runs unstyled

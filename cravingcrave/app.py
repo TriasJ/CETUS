@@ -65,13 +65,14 @@ def main() -> int:
 
     config = AppConfig()
     configure_logging(config.data_dir)
-    apply_theme(app)
+    apply_theme(app)   # base light theme immediately; re-applied with the saved theme below
 
-    # Build the context first: AppContext.create() reads the clinic's saved UI
-    # language from the DB into config.locale, so applying i18n afterwards lets the
-    # persisted choice win over the bootstrap default.
+    # Build the context first: AppContext.create() reads the clinic's saved UI language and
+    # theme from the DB into config, so applying them afterwards lets the persisted choices
+    # win over the bootstrap defaults.
     context = AppContext.create(config)
-    _log.info("Starting CETUS (locale=%s).", config.locale)
+    _log.info("Starting CETUS (locale=%s, theme=%s).", config.locale, config.theme)
+    apply_theme(app, config.theme)
     i18n.set_locale(config.locale)
     window = MainWindow(context)
     window.show()

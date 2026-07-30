@@ -6,4 +6,4 @@ See docs/plan for the clinical rationale (Mellentin CET-USCS, Monti
 cue-exposure-with-coping-skills).
 """
 
-__version__ = "0.5.2"
+__version__ = "0.6.0"

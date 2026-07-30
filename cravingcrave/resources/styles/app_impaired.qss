@@ -1,0 +1,26 @@
+/* CETUS — Visually-impaired theme: same calm light palette, much larger text and targets. */
+
+QWidget { font-size: 19px; }
+
+QLabel#H1 { font-size: 34px; }
+QLabel#H2 { font-size: 25px; }
+QLabel#Big { font-size: 48px; }
+
+QPushButton { font-size: 19px; padding: 12px 20px; min-height: 30px; }
+QPushButton#Primary { font-size: 20px; padding: 14px 24px; }
+QPushButton#Panic { font-size: 26px; padding: 16px 32px; }
+
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
+    font-size: 19px; min-height: 34px; padding: 9px 12px;
+}
+QSpinBox::up-button, QSpinBox::down-button,
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width: 26px; }
+QComboBox::drop-down { width: 30px; }
+
+QListWidget, QTableWidget { font-size: 19px; }
+QListWidget::item { padding: 14px; }
+QListWidget#SettingsNav { font-size: 18px; }
+QListWidget#SettingsNav::item { padding: 14px 14px; }
+
+QGroupBox::title { font-size: 20px; }
+QCheckBox { font-size: 19px; spacing: 12px; }

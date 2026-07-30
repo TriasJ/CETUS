@@ -13,6 +13,7 @@ from pathlib import Path
 from PySide6.QtCore import QPoint, QRectF, QSize, Qt
 from PySide6.QtGui import QBrush, QColor, QIcon, QPainter, QPen, QPixmap, QPolygon
 from PySide6.QtWidgets import (
+    QApplication,
     QCheckBox,
     QComboBox,
     QFileDialog,
@@ -38,7 +39,7 @@ from PySide6.QtWidgets import (
 from ...services import substances as subs
 from ...services.crisis import CrisisInfo
 from ...services.i18n import available_locales, current_locale, tr
-from .. import hotkeys
+from .. import hotkeys, theme
 from ..context import AppContext
 from ..widgets.key_capture_button import KeyCaptureButton
 
@@ -282,9 +283,9 @@ class SettingsScreen(QWidget):
         v.addLayout(form)
         return box
 
-    # --- UI language (User) -------------------------------------------------
+    # --- appearance: language + theme (User) --------------------------------
     def _build_language_card(self) -> QGroupBox:
-        box, v = self._card("app.language")
+        box, v = self._card("settings.appearance_title")
         self.lang_combo = QComboBox()
         for code, name in available_locales():
             self.lang_combo.addItem(name, code)
@@ -293,14 +294,30 @@ class SettingsScreen(QWidget):
             self.lang_combo.setCurrentIndex(idx)
         # Live re-render: changing the language rebuilds this screen in the new language.
         self.lang_combo.activated.connect(self._on_language_changed)
+
+        self.theme_combo = QComboBox()
+        for code in theme.available_themes():
+            self.theme_combo.addItem(tr(f"theme.{code}"), code)
+        tidx = self.theme_combo.findData(self.context.config.theme)
+        if tidx >= 0:
+            self.theme_combo.setCurrentIndex(tidx)
+        self.theme_combo.activated.connect(self._on_theme_changed)
+
         form = QFormLayout(); form.setSpacing(12)
         form.addRow(tr("app.language"), self.lang_combo)
+        form.addRow(tr("settings.theme"), self.theme_combo)
         v.addLayout(form)
         return box
 
     def _on_language_changed(self, index: int) -> None:
         code = self.lang_combo.itemData(index)
         self.window.change_language(code, redisplay=self.window.show_settings)
+
+    def _on_theme_changed(self, index: int) -> None:
+        code = self.theme_combo.itemData(index)
+        self.context.repos.settings.set("theme", code)
+        self.context.config.theme = code
+        theme.apply_theme(QApplication.instance(), code)   # live, no restart
 
     # --- auto-scroll cues (Session) -----------------------------------------
     def _build_autoscroll_card(self) -> QGroupBox:

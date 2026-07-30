@@ -1,0 +1,39 @@
+/* CETUS — Dark theme (override appended to app.qss). Keeps the teal accent + red panic. */
+
+QWidget { background-color: #12181f; color: #e6edf3; }
+
+QLabel#H1 { color: #eaf1f6; }
+QLabel#H2 { color: #eaf1f6; }
+QLabel#Muted { color: #9fb0bd; }
+
+QFrame#Card { background-color: #1b2430; border: 1px solid #2b3644; }
+QFrame#OverlayCard { background-color: #1b2430; }
+
+QGroupBox { background-color: #1b2430; border: 1px solid #2b3644; }
+QGroupBox::title { color: #eaf1f6; }
+
+QPushButton {
+    background-color: #232f3d; color: #e6edf3; border: 1px solid #3a4757;
+}
+QPushButton:hover { background-color: #2b3a4b; }
+QPushButton:disabled { color: #6b7681; background-color: #1b2430; }
+
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
+    background-color: #0f1620; color: #e6edf3; border: 1px solid #3a4757;
+}
+QSpinBox::up-button, QSpinBox::down-button,
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
+QComboBox::drop-down { border-left: 1px solid #3a4757; }
+QSpinBox::up-button:hover, QSpinBox::down-button:hover { background-color: #2b3a4b; }
+
+QListWidget, QTableWidget { background-color: #1b2430; border: 1px solid #2b3644; }
+QListWidget::item:selected { background-color: #204b45; color: #eafaf6; }
+QHeaderView::section { background-color: #232f3d; color: #e6edf3; }
+
+QListWidget#SettingsNav { background-color: #1b2430; border: 1px solid #2b3644; }
+QListWidget#SettingsNav::item { color: #e6edf3; }
+QListWidget#SettingsNav::item:hover { background-color: #232f3d; }
+/* selected keeps the base teal fill + white text */
+
+QSlider::groove:horizontal { background: #2b3644; }
+QCheckBox { color: #e6edf3; }

@@ -25,20 +25,19 @@ English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built wi
 
 ---
 
-## What's new in 0.5.0
+## What's new in 0.6.0
 
-- 🗂️ **Tabbed Options** — Settings reorganised into **Session / User / Hotkeys / Substances**,
-  with clinic-wide items marked *"shared with all users"*.
-- 🔢 **Number keys in fullscreen** — `1/2/3` pick the size/blur/dim axis and `+/−` adjust it in
-  normal exposure too (not just keyboard-only mode); new **`4`** = coping, **`5`** = positive
-  images, with a fading on-screen hint.
-- 🔁 **Adaptive craving prompts** — optionally re-check craving after each coping or every N cues.
-- 🎛️ **Pre-session Parameters popup** — per-session overrides (auto-advance, keyboard-only, time
-  limit, **start in fullscreen**) that leave the global defaults untouched.
-- 📁 **Recursive folder import** and a new **"Session workflow"** Help topic (ES + EN).
+- 🛠️ **Admin Center** (key-gated, from the dashboard) — a hub for clinic administration.
+- 💾 **Backup & restore** the whole dataset (DB + media) to a zip, with a pre-restore safety copy.
+- 🗃️ **Patient data handling** — export a full per-patient bundle, **anonymize**, or **hard-delete**
+  (code-confirmed, audit-logged).
+- 👥 **Clinician & clinic management** — rename / disable / delete accounts, **transfer patients**,
+  and clinic contact details on report headers.
+- 📊 **Cohort & per-clinician reports** — cohort summary CSV, clinician-activity CSV, and a cohort PDF.
+- 🎨 **Themes** — Light, **Dark**, **High-contrast**, **Low-vision (large text)**, **Classic Windows**.
 
-Earlier: 0.4.0 added keyboard-only accessibility, auto-scroll, qualitative coping export, and
-multi-OS installers. See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
+Earlier (0.5.x): redesigned Options, number-key controls + immersive fullscreen, adaptive prompts,
+and contextual Help. See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
 
 ---
 

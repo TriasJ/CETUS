@@ -2,6 +2,32 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.6.0 — Admin Center + themes (2026-07)
+
+A key-gated **Admin Center** (dashboard → *Admin*, reuses the admin key; no per-clinician roles)
+plus selectable UI themes.
+
+### Added
+- **Backup & restore** — one-click backup of the whole dataset (SQLite DB via the online-backup
+  API + media) to a zip with a manifest; restore writes a **pre-restore safety copy** first, then
+  replaces the data and closes for a clean restart.
+- **Patient data handling** — export a full per-patient bundle (zip of CSVs, pseudonymous code
+  only), **anonymize** (clear name/birth-year/notes, keep sessions), and **hard delete** (DB
+  cascade + removal of media unique to that patient). Destructive actions require typing the
+  patient code, warn if no backup was made this session, and are audit-logged.
+- **Clinician & clinic management** — rename, **disable/enable** (disabled accounts can't log in),
+  delete (only when they own nothing), and **transfer patients** between clinicians (ownership
+  moves; past sessions keep their original clinician). Clinic **name/address/email/phone** now
+  appear in the PDF report header.
+- **Cross-patient & per-clinician reporting** — a **cohort summary CSV**, **clinician activity
+  CSV**, and a **cohort PDF** (totals, end-reason breakdown, per-patient table), with a
+  per-clinician filter.
+- **Storage** panel (data location, DB/media sizes, counts) and an **admin audit log**.
+- **Themes** — Light (default), **Dark**, **High contrast**, **Low vision (large text)**, and
+  **Classic Windows**, selectable in Settings → Appearance and applied live.
+- New DB migrations: **v3** `admin_audit`, **v4** `clinician.disabled`. In-app Help
+  (ES + EN) documents the Admin Center.
+
 ## 0.5.2 — readable inputs + contextual Help (2026-07)
 
 ### Added

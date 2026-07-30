@@ -4,6 +4,13 @@
   "app.subtitle": "Terapia de Exposición a Señales (CET) con habilidades de afrontamiento",
   "app.fullscreen_hint": "Pantalla completa: F11",
   "app.language": "Idioma",
+  "settings.appearance_title": "Apariencia",
+  "settings.theme": "Tema visual",
+  "theme.light": "Claro (predeterminado)",
+  "theme.dark": "Oscuro",
+  "theme.high_contrast": "Alto contraste",
+  "theme.impaired": "Baja visión (texto grande)",
+  "theme.classic": "Windows clásico",
 
   "common.ok": "Aceptar",
   "common.cancel": "Cancelar",

@@ -65,6 +65,9 @@ class AppConfig:
     default_loop: bool = False                 # loop the cue list at the ends
     default_start_fullscreen: bool = False     # begin the exposure in fullscreen
 
+    # UI theme: light (default) / dark / high_contrast / impaired / classic.
+    theme: str = "light"
+
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)

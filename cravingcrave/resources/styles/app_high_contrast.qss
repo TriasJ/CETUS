@@ -1,0 +1,41 @@
+/* CETUS — High-contrast theme: black background, white text, yellow emphasis, thick borders. */
+
+QWidget { background-color: #000000; color: #ffffff; font-weight: 600; }
+
+QLabel#H1 { color: #ffff00; }
+QLabel#H2 { color: #ffff00; }
+QLabel#Muted { color: #e6e6e6; }
+
+QFrame#Card { background-color: #000000; border: 2px solid #ffffff; }
+QFrame#OverlayCard { background-color: #000000; border: 2px solid #ffffff; }
+
+QGroupBox { background-color: #000000; border: 2px solid #ffffff; }
+QGroupBox::title { color: #ffff00; }
+
+QPushButton { background-color: #000000; color: #ffffff; border: 2px solid #ffffff; }
+QPushButton:hover { background-color: #333333; }
+QPushButton:disabled { color: #8a8a8a; border-color: #8a8a8a; }
+QPushButton#Primary { background-color: #ffff00; color: #000000; border: 2px solid #ffffff; }
+QPushButton#Primary:hover { background-color: #ffe000; }
+QPushButton#Danger { color: #ffffff; border-color: #ff5a5a; }
+
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
+    background-color: #000000; color: #ffffff; border: 2px solid #ffffff;
+    selection-background-color: #ffff00; selection-color: #000000;
+}
+QSpinBox::up-button, QSpinBox::down-button,
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
+QComboBox::drop-down { border-left: 2px solid #ffffff; }
+
+QListWidget, QTableWidget { background-color: #000000; border: 2px solid #ffffff; }
+QListWidget::item:selected { background-color: #ffff00; color: #000000; }
+QHeaderView::section { background-color: #000000; color: #ffff00; border: 1px solid #ffffff; }
+
+QListWidget#SettingsNav { background-color: #000000; border: 2px solid #ffffff; }
+QListWidget#SettingsNav::item { color: #ffffff; }
+QListWidget#SettingsNav::item:hover { background-color: #333333; }
+QListWidget#SettingsNav::item:selected { background-color: #ffff00; color: #000000; }
+
+QCheckBox { color: #ffffff; }
+QSlider::sub-page:horizontal { background: #ffff00; }
+QSlider::groove:horizontal { background: #666666; }
