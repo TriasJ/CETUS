@@ -128,6 +128,12 @@ class PatientRepo:
         rows = self.db.conn.execute("SELECT * FROM patient ORDER BY code").fetchall()
         return [self._row(r) for r in rows]
 
+    def list_for_clinician(self, clinician_id: int) -> list[Patient]:
+        """Patients owned (created) by a clinician — for per-clinician cohort reports."""
+        rows = self.db.conn.execute(
+            "SELECT * FROM patient WHERE created_by = ? ORDER BY code", (clinician_id,)).fetchall()
+        return [self._row(r) for r in rows]
+
     def anonymize(self, patient_id: int) -> None:
         """Strip PII (name/birth year/notes), keeping the pseudonymous code + all sessions."""
         with self.db.transaction() as conn:
@@ -268,6 +274,12 @@ class SessionRepo:
 
     def count(self) -> int:
         return int(self.db.conn.execute("SELECT COUNT(*) FROM session").fetchone()[0])
+
+    def list_for_clinician(self, clinician_id: int) -> list[Session]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM session WHERE clinician_id = ? ORDER BY started_at",
+            (clinician_id,)).fetchall()
+        return [self._row(r) for r in rows]
 
     @staticmethod
     def _row(r: sqlite3.Row) -> Session:

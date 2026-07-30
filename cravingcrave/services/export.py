@@ -94,6 +94,35 @@ COPING_COLUMNS = [
 ]
 
 
+COHORT_COLUMNS = [
+    "patient_code", "primary_substance", "n_sessions",
+    "mean_pct_reduction", "mean_slope", "last_session_at",
+]
+
+
+def export_cohort_summary(path: Path, rows: Sequence[dict]) -> Path:
+    """One row per patient across a cohort/selection. Only pseudonymous ``code`` — no PII."""
+    with open(path, "w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=COHORT_COLUMNS)
+        writer.writeheader()
+        for r in rows:
+            writer.writerow({k: ("" if r.get(k) is None else r.get(k, "")) for k in COHORT_COLUMNS})
+    return path
+
+
+CLINICIAN_ACTIVITY_COLUMNS = ["clinician", "patients", "sessions"]
+
+
+def export_clinician_activity(path: Path, rows: Sequence[dict]) -> Path:
+    """Per-clinician oversight counts (staff info; carries no patient identity)."""
+    with open(path, "w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=CLINICIAN_ACTIVITY_COLUMNS)
+        writer.writeheader()
+        for r in rows:
+            writer.writerow({k: r.get(k, "") for k in CLINICIAN_ACTIVITY_COLUMNS})
+    return path
+
+
 def export_coping_responses(
     path: Path,
     patient_code: str,

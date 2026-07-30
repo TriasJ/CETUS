@@ -115,6 +115,44 @@ def spontaneous_recovery(sessions: Sequence) -> list[tuple[int, float | None]]:
     return out
 
 
+def cohort_summary(items) -> list[dict]:
+    """One row per patient for a cohort export (uses only denormalized Session fields).
+
+    ``items``: iterable of ``(patient_code, primary_substance, sessions)``. Per-session
+    within-session reduction = (peak − endpoint) / peak · 100. No PII beyond ``code``.
+    """
+    rows = []
+    for code, substance, sessions in items:
+        finished = [s for s in sessions if s.baseline_vas is not None]
+        reductions = [
+            (s.peak_vas - s.endpoint_vas) / s.peak_vas * 100.0
+            for s in finished
+            if s.peak_vas and s.endpoint_vas is not None and s.peak_vas > 0
+        ]
+        slopes = [float(s.habituation_slope) for s in finished if s.habituation_slope is not None]
+        rows.append({
+            "patient_code": code,
+            "primary_substance": substance or "",
+            "n_sessions": len(finished),
+            "mean_pct_reduction": round(sum(reductions) / len(reductions), 1) if reductions else None,
+            "mean_slope": round(sum(slopes) / len(slopes), 5) if slopes else None,
+            "last_session_at": max((s.started_at for s in finished), default=""),
+        })
+    return rows
+
+
+def cohort_totals(rows: Sequence[dict]) -> dict:
+    """Roll-up of ``cohort_summary`` rows for the aggregate cohort report."""
+    reds = [r["mean_pct_reduction"] for r in rows if r["mean_pct_reduction"] is not None]
+    slopes = [r["mean_slope"] for r in rows if r["mean_slope"] is not None]
+    return {
+        "patients": len(rows),
+        "sessions": sum(r["n_sessions"] for r in rows),
+        "mean_pct_reduction": round(sum(reds) / len(reds), 1) if reds else None,
+        "mean_slope": round(sum(slopes) / len(slopes), 5) if slopes else None,
+    }
+
+
 def metric_trends(sessions: Sequence) -> dict:
     """Cross-session series (1-indexed) for the progress view.
 

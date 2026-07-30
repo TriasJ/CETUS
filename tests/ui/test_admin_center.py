@@ -27,8 +27,8 @@ def test_admin_center_builds_three_pages(tmp_path, qtbot):
                                       created_by=ctx.clinician.id))
     window = MainWindow(ctx); qtbot.addWidget(window)
     screen = AdminCenterScreen(window, ctx); qtbot.addWidget(screen)
-    assert screen.nav.count() == 6          # Backup / Data / Clinicians / Clinic / Storage / Audit
-    assert screen.stack.count() == 6
+    assert screen.nav.count() == 7          # Backup / Data / Clinicians / Clinic / Reports / Storage / Audit
+    assert screen.stack.count() == 7
     assert screen.patient_combo.count() == 1   # Data page lists the seeded patient
     assert screen.clinician_list.count() == 1  # Clinicians page lists the seeded clinician
     # Storage counts reflect the seeded DB.

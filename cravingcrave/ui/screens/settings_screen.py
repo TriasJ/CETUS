@@ -106,6 +106,11 @@ def _draw_nav_icon(kind: str, ink: str = _NAV_INK) -> QIcon:
             for cy in (9, 13):
                 p.drawRect(int(cx) - 1, int(cy) - 1, 2, 2)
         p.drawRect(11, 16, 2, 4)                  # door
+    elif kind == "reports":                       # bar chart
+        p.setBrush(QBrush(c)); p.setPen(Qt.PenStyle.NoPen)
+        p.drawRect(5, 12, 3, 7)
+        p.drawRect(10, 8, 3, 11)
+        p.drawRect(15, 5, 3, 14)
     p.end()
     return QIcon(pm)
 

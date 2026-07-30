@@ -33,8 +33,9 @@ from PySide6.QtWidgets import (
 )
 
 from ... import __version__
+from ...domain import reports
 from ...domain.uscs import USCS_STEPS
-from ...services import backup, patient_admin, patient_bundle
+from ...services import backup, export, patient_admin, patient_bundle
 from ...services.i18n import tr
 from ..context import AppContext
 from .settings_screen import _NAV_INK_SELECTED, _draw_nav_icon
@@ -70,6 +71,7 @@ class AdminCenterScreen(QWidget):
             ("data", "admin.tab_data", self._data_page()),
             ("clinicians", "admin.tab_clinicians", self._clinicians_page()),
             ("clinic", "admin.tab_clinic", self._clinic_page()),
+            ("reports", "admin.tab_reports", self._reports_page()),
             ("storage", "admin.tab_storage", self._storage_page()),
             ("audit", "admin.tab_audit", self._audit_page()),
         ]
@@ -411,6 +413,133 @@ class AdminCenterScreen(QWidget):
         s.set("clinic_phone", self.clinic_phone.text().strip())
         self.context.repos.audit.log("clinic_update", "", self._actor())
         QMessageBox.information(self, tr("admin.center_title"), tr("settings.saved"))
+
+    # --- Reports page (cohort / per-clinician) ------------------------------
+    def _reports_page(self) -> QScrollArea:
+        box, v = self._card("admin.tab_reports", "admin.reports_intro")
+        self.report_clinician = QComboBox()
+        self.report_clinician.addItem(tr("admin.reports_all"), None)
+        for c in self.context.repos.clinicians.list_all():
+            self.report_clinician.addItem(f"{c.username} — {c.display_name}", c.id)
+        v.addWidget(QLabel(tr("admin.reports_filter")))
+        v.addWidget(self.report_clinician)
+
+        cohort_csv = QPushButton(tr("admin.reports_cohort_csv")); cohort_csv.setObjectName("Primary")
+        cohort_csv.clicked.connect(self._export_cohort_csv)
+        cohort_pdf = QPushButton(tr("admin.reports_cohort_pdf"))
+        cohort_pdf.clicked.connect(self._export_cohort_pdf)
+        activity = QPushButton(tr("admin.reports_activity_csv"))
+        activity.clicked.connect(self._export_clinician_activity)
+        row = QHBoxLayout()
+        row.addWidget(cohort_csv); row.addWidget(cohort_pdf); row.addStretch(1); row.addWidget(activity)
+        v.addLayout(row)
+        return self._page([box])
+
+    def _cohort_items(self):
+        """(scope_label, [(code, substance, sessions), ...]) for the current filter."""
+        repos = self.context.repos
+        cid = self.report_clinician.currentData()
+        if cid is None:
+            patients = repos.patients.list_all()
+            scope = tr("admin.reports_all")
+        else:
+            patients = repos.patients.list_for_clinician(cid)
+            scope = self.report_clinician.currentText()
+        items = [(p.code, p.primary_substance, repos.sessions.list_for_patient(p.id))
+                 for p in patients]
+        return scope, items
+
+    def _export_cohort_csv(self) -> None:
+        from PySide6.QtWidgets import QFileDialog
+        _scope, items = self._cohort_items()
+        rows = reports.cohort_summary(items)
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default = str(Path(self.context.config.data_dir) / f"cetus_cohort_{stamp}.csv")
+        path, _ = QFileDialog.getSaveFileName(self, tr("admin.reports_cohort_csv"), default, "CSV (*.csv)")
+        if not path:
+            return
+        export.export_cohort_summary(Path(path), rows)
+        self.context.repos.audit.log("cohort_export_csv", f"{len(rows)} patients", self._actor())
+        QMessageBox.information(self, tr("admin.center_title"),
+                                tr("admin.reports_done", n=len(rows)))
+
+    def _export_clinician_activity(self) -> None:
+        from PySide6.QtWidgets import QFileDialog
+        repos = self.context.repos
+        rows = [{"clinician": c.username,
+                 "patients": repos.patients.count_for_owner(c.id),
+                 "sessions": len(repos.sessions.list_for_clinician(c.id))}
+                for c in repos.clinicians.list_all()]
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default = str(Path(self.context.config.data_dir) / f"cetus_activity_{stamp}.csv")
+        path, _ = QFileDialog.getSaveFileName(self, tr("admin.reports_activity_csv"), default, "CSV (*.csv)")
+        if not path:
+            return
+        export.export_clinician_activity(Path(path), rows)
+        repos.audit.log("clinician_activity_export", f"{len(rows)} clinicians", self._actor())
+        QMessageBox.information(self, tr("admin.center_title"),
+                                tr("admin.reports_done", n=len(rows)))
+
+    def _export_cohort_pdf(self) -> None:
+        from PySide6.QtWidgets import QFileDialog
+        scope, items = self._cohort_items()
+        rows = reports.cohort_summary(items)
+        totals = reports.cohort_totals(rows)
+        end_reasons = reports.end_reason_counts([s for _c, _s, ss in items for s in ss])
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default = str(Path(self.context.config.data_dir) / f"cetus_cohort_{stamp}.pdf")
+        path, _ = QFileDialog.getSaveFileName(self, tr("admin.reports_cohort_pdf"), default, "PDF (*.pdf)")
+        if not path:
+            return
+        self._write_cohort_pdf(path, scope, rows, totals, end_reasons)
+        self.context.repos.audit.log("cohort_export_pdf", f"{len(rows)} patients", self._actor())
+        QMessageBox.information(self, tr("admin.center_title"),
+                                tr("admin.reports_done", n=len(rows)))
+
+    def _write_cohort_pdf(self, path, scope, rows, totals, end_reasons) -> None:
+        from PySide6.QtCore import QMarginsF, QSizeF
+        from PySide6.QtGui import QPageLayout, QPageSize, QPdfWriter, QTextDocument
+        writer = QPdfWriter(str(path))
+        writer.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
+        writer.setPageOrientation(QPageLayout.Orientation.Landscape)
+        writer.setResolution(200)
+        writer.setPageMargins(QMarginsF(12, 12, 12, 12), QPageLayout.Unit.Millimeter)
+        paint = writer.pageLayout().paintRectPixels(writer.resolution())
+        doc = QTextDocument()
+        doc.setPageSize(QSizeF(paint.width(), paint.height()))
+        doc.setDocumentMargin(0)
+
+        def esc(x):
+            return str(x).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        clinic = (self.context.repos.settings.get("clinic_name") or "").strip()
+        head = f"<h1 style='margin:0'>{tr('admin.reports_pdf_title')}</h1>"
+        head += f"<div style='color:#555'>{esc(scope)}</div>"
+        if clinic:
+            head += f"<div style='color:#777;font-size:10pt'>{esc(clinic)}</div>"
+        red = "—" if totals["mean_pct_reduction"] is None else f"{totals['mean_pct_reduction']}%"
+        slope = "—" if totals["mean_slope"] is None else totals["mean_slope"]
+        summary = (
+            f"<p><b>{tr('admin.reports_patients')}:</b> {totals['patients']} &nbsp;·&nbsp; "
+            f"<b>{tr('admin.reports_sessions')}:</b> {totals['sessions']} &nbsp;·&nbsp; "
+            f"<b>{tr('admin.reports_mean_reduction')}:</b> {red} &nbsp;·&nbsp; "
+            f"<b>{tr('admin.reports_mean_slope')}:</b> {slope}</p>")
+        er = " &nbsp; ".join(f"{esc(k)}: {v}" for k, v in end_reasons.items()) or "—"
+        summary += f"<p style='color:#555'><b>{tr('admin.reports_end_reasons')}:</b> {er}</p>"
+
+        cells = ["patient_code", "primary_substance", "n_sessions",
+                 "mean_pct_reduction", "mean_slope", "last_session_at"]
+        hdr = "".join(f"<th align='left' style='padding:4px 8px'>{esc(c)}</th>" for c in cells)
+        body = ""
+        for r in rows:
+            tds = "".join(
+                f"<td style='padding:3px 8px'>{esc('' if r.get(c) is None else r.get(c))}</td>"
+                for c in cells)
+            body += f"<tr>{tds}</tr>"
+        table = (f"<table border='1' cellspacing='0' width='100%'><tr>{hdr}</tr>{body}</table>"
+                 if rows else f"<p>{tr('admin.reports_empty')}</p>")
+        doc.setHtml(f"{head}<hr>{summary}{table}")
+        doc.print_(writer)
 
     # --- Storage page -------------------------------------------------------
     def _storage_page(self) -> QScrollArea:
