@@ -13,9 +13,6 @@ QPushButton#Panic { font-size: 26px; padding: 16px 32px; }
 QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
     font-size: 19px; min-height: 34px; padding: 9px 12px;
 }
-QSpinBox::up-button, QSpinBox::down-button,
-QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width: 26px; }
-QComboBox::drop-down { width: 30px; }
 
 QListWidget, QTableWidget { font-size: 19px; }
 QListWidget::item { padding: 14px; }

@@ -23,9 +23,6 @@ QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
     background-color: #000000; color: #ffffff; border: 2px solid #ffffff;
     selection-background-color: #ffff00; selection-color: #000000;
 }
-QSpinBox::up-button, QSpinBox::down-button,
-QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
-QComboBox::drop-down { border-left: 2px solid #ffffff; }
 
 QListWidget, QTableWidget { background-color: #000000; border: 2px solid #ffffff; }
 QListWidget::item:selected { background-color: #ffff00; color: #000000; }

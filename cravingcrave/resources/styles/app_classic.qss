@@ -30,11 +30,6 @@ QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
 QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QPlainTextEdit:focus {
     border: 1px solid #0078d7;
 }
-QSpinBox::up-button, QSpinBox::down-button,
-QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
-    border-left: 1px solid #7a7a7a; border-radius: 0;
-}
-QComboBox::drop-down { border-left: 1px solid #7a7a7a; border-radius: 0; }
 
 QListWidget, QTableWidget { background-color: #ffffff; border: 1px solid #7a7a7a; border-radius: 0; }
 QListWidget::item:selected { background-color: #0078d7; color: #ffffff; }

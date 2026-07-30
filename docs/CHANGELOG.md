@@ -2,6 +2,15 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.6.1 — spin-box arrows fix (2026-07)
+
+### Fixed
+- **Spin-box up/down arrows were invisible** in every theme. Styling the `QSpinBox`
+  `::up-button`/`::down-button` sub-controls (added in the 0.5.2 clipping fix) makes Qt drop its
+  native arrows unless image assets are supplied. Removed that sub-control styling from the base
+  and all theme QSS; the value-text clipping stays fixed via `min-height` while the platform draws
+  visible arrows again.
+
 ## 0.6.0 — Admin Center + themes (2026-07)
 
 A key-gated **Admin Center** (dashboard → *Admin*, reuses the admin key; no per-clinician roles)

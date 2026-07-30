@@ -69,26 +69,10 @@ QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
 QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QPlainTextEdit:focus {
     border: 1px solid #2a9d8f;
 }
-
-/* Reserve room for the spin/combo controls so the value text never runs under them. */
-QSpinBox, QDoubleSpinBox { padding-right: 4px; }
-QSpinBox::up-button, QDoubleSpinBox::up-button {
-    subcontrol-origin: border; subcontrol-position: top right;
-    width: 20px; border-left: 1px solid #c5ced6; border-top-right-radius: 8px;
-}
-QSpinBox::down-button, QDoubleSpinBox::down-button {
-    subcontrol-origin: border; subcontrol-position: bottom right;
-    width: 20px; border-left: 1px solid #c5ced6; border-bottom-right-radius: 8px;
-}
-QSpinBox::up-button:hover, QSpinBox::down-button:hover,
-QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
-    background-color: #eef2f5;
-}
-QComboBox::drop-down {
-    subcontrol-origin: border; subcontrol-position: top right;
-    width: 24px; border-left: 1px solid #c5ced6;
-    border-top-right-radius: 8px; border-bottom-right-radius: 8px;
-}
+/* Do NOT style QSpinBox ::up-button/::down-button or QComboBox ::drop-down: once those
+   sub-controls are styled, Qt stops drawing its native arrows (which then need image assets).
+   min-height above already prevents the value text from clipping, so we leave the spin/combo
+   buttons to the platform style, keeping the arrows visible in every theme. */
 
 QSlider::groove:horizontal {
     height: 10px; border-radius: 5px; background: #d7dee4;

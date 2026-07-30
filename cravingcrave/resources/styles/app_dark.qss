@@ -21,10 +21,6 @@ QPushButton:disabled { color: #6b7681; background-color: #1b2430; }
 QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
     background-color: #0f1620; color: #e6edf3; border: 1px solid #3a4757;
 }
-QSpinBox::up-button, QSpinBox::down-button,
-QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
-QComboBox::drop-down { border-left: 1px solid #3a4757; }
-QSpinBox::up-button:hover, QSpinBox::down-button:hover { background-color: #2b3a4b; }
 
 QListWidget, QTableWidget { background-color: #1b2430; border: 1px solid #2b3644; }
 QListWidget::item:selected { background-color: #204b45; color: #eafaf6; }
