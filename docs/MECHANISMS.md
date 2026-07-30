@@ -109,4 +109,4 @@ with neuromodulation can watch for a blocked-habituation pattern.
   statistical inference is implied. Use them to inform clinical judgment, **not** as outcome measures.
 
 *Attribution: the mechanism claims above are based on articles retrieved from PubMed; see the linked
-DOIs. This summary complements `Research Basis/Repository.txt`.*
+DOIs. This summary complements `docs/research/Repository.txt`.*
