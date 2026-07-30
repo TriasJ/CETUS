@@ -87,8 +87,11 @@ class SettingsScreen(QWidget):
         back.clicked.connect(window.show_dashboard)
         title = QLabel(tr("settings.title"))
         title.setObjectName("H1")
+        help_btn = QPushButton(tr("common.help"))
+        help_btn.clicked.connect(lambda: self.window.show_help("settings_help"))
         header = QHBoxLayout()
-        header.addWidget(back); header.addSpacing(10); header.addWidget(title); header.addStretch(1)
+        header.addWidget(back); header.addSpacing(10); header.addWidget(title)
+        header.addStretch(1); header.addWidget(help_btn)
 
         # Contact + clinical widgets are created here so `_save` can read them regardless of
         # which page they end up on.

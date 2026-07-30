@@ -57,14 +57,37 @@ QPushButton#Panic:hover { background-color: #c92f3b; }
 
 QPushButton#Danger { color: #c92f3b; border-color: #e6a3a8; }
 
-QLineEdit, QComboBox, QSpinBox, QPlainTextEdit, QTextEdit {
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
     background-color: #ffffff;
     border: 1px solid #c5ced6;
     border-radius: 8px;
-    padding: 7px 9px;
+    padding: 6px 10px;
+    min-height: 26px;              /* enough interior height so text is never clipped */
+    selection-background-color: #2a9d8f;
+    selection-color: #ffffff;
 }
-QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QPlainTextEdit:focus {
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QPlainTextEdit:focus {
     border: 1px solid #2a9d8f;
+}
+
+/* Reserve room for the spin/combo controls so the value text never runs under them. */
+QSpinBox, QDoubleSpinBox { padding-right: 4px; }
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+    subcontrol-origin: border; subcontrol-position: top right;
+    width: 20px; border-left: 1px solid #c5ced6; border-top-right-radius: 8px;
+}
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    subcontrol-origin: border; subcontrol-position: bottom right;
+    width: 20px; border-left: 1px solid #c5ced6; border-bottom-right-radius: 8px;
+}
+QSpinBox::up-button:hover, QSpinBox::down-button:hover,
+QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+    background-color: #eef2f5;
+}
+QComboBox::drop-down {
+    subcontrol-origin: border; subcontrol-position: top right;
+    width: 24px; border-left: 1px solid #c5ced6;
+    border-top-right-radius: 8px; border-bottom-right-radius: 8px;
 }
 
 QSlider::groove:horizontal {

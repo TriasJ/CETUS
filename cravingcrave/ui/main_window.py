@@ -95,8 +95,11 @@ class MainWindow(QMainWindow):
     def show_settings(self) -> None:
         self._swap(SettingsScreen(self, self.context))
 
-    def show_help(self) -> None:
-        HelpDialog(self).exec()
+    def show_help(self, topic: str | None = None) -> None:
+        dlg = HelpDialog(self)
+        if topic:
+            dlg.show_topic(topic)
+        dlg.exec()
 
     def reload_global_hotkeys(self) -> None:
         """(Re)build the window-level shortcuts from the resolved registry bindings, so a

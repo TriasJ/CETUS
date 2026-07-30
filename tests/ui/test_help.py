@@ -57,6 +57,31 @@ def test_help_has_session_workflow_topic():
     assert "coping" in wf_en.lower() and "little by little" in wf_en.lower()
 
 
+def test_help_has_session_flowchart():
+    # 0.5.2: a visual step-by-step flowchart with per-step patient actions, both locales.
+    es = {s["id"]: s for s in load_help("es")["sections"]}
+    en = {s["id"]: s for s in load_help("en")["sections"]}
+    assert "flowchart" in es and "flowchart" in en
+    fes = es["flowchart"]["html"]
+    assert "<table" in fes and "&#8595;" in fes            # boxes + down-arrows
+    assert fes.count("Paciente:") >= 4                     # per-step patient actions
+    assert "tecla 4" in fes and "tecla 5" in fes           # intervention keys
+    fen = en["flowchart"]["html"]
+    assert "<table" in fen and fen.count("Patient:") >= 4
+    assert "key 4" in fen and "key 5" in fen
+
+
+def test_help_has_settings_reference():
+    # 0.5.2: a "what each setting does" topic reachable from the Help buttons.
+    es = {s["id"]: s["html"] for s in load_help("es")["sections"]}
+    en = {s["id"]: s["html"] for s in load_help("en")["sections"]}
+    assert "settings_help" in es and "settings_help" in en
+    assert "Umbral de deseo bajo" in es["settings_help"]
+    assert "habituación" in es["settings_help"].lower()
+    assert "Low-craving threshold" in en["settings_help"]
+    assert "habituation" in en["settings_help"].lower()
+
+
 def test_help_english_documents_new_features():
     data = load_help("en")
     sections = {s["id"]: s["html"] for s in data["sections"]}

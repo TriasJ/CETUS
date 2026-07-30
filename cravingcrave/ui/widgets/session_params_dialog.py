@@ -60,9 +60,12 @@ class SessionParamsDialog(QDialog):
         form.addRow(self.start_fullscreen)
 
         buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+            | QDialogButtonBox.StandardButton.Help)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
+        buttons.helpRequested.connect(self._open_help)
+        buttons.button(QDialogButtonBox.StandardButton.Help).setText(tr("common.help"))
 
         intro = QLabel(tr("setup.params_intro")); intro.setWordWrap(True)
         v = QVBoxLayout(self)
@@ -70,6 +73,13 @@ class SessionParamsDialog(QDialog):
         v.addWidget(intro)
         v.addLayout(form)
         v.addWidget(buttons)
+
+    def _open_help(self) -> None:
+        # Opened on top of this modal dialog; explains how each parameter changes the session.
+        from ..screens.help_dialog import HelpDialog
+        dlg = HelpDialog(self)
+        dlg.show_topic("settings_help")
+        dlg.exec()
 
     def overrides(self) -> dict:
         """The chosen values as an ``AppConfig`` field override map (per-run only)."""

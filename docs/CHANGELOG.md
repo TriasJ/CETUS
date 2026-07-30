@@ -2,6 +2,22 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.5.2 — readable inputs + contextual Help (2026-07)
+
+### Added
+- **Contextual Help buttons** — a *"How does it work?"* button on the **Settings** screen and
+  the **Parameters** popup opens a new **"Settings: what each option does"** topic explaining
+  how every setting/parameter changes the session (and Settings = defaults vs Parameters =
+  per-session override).
+- **Session flowchart** in Help (ES + EN) — a visual step-by-step diagram (setup → baseline →
+  present cue → craving rises → interventions → periodic check → habituation → close) with a
+  *"Patient:"* action on each step and the intervention keys.
+
+### Fixed
+- **Clipped input text** — spin boxes and dials in Settings and the Parameters popup no longer
+  clip their values; inputs get a proper min-height and the spin/combo buttons get reserved
+  space (regression from the 0.5.0 Options redesign).
+
 ## 0.5.1 — immersive fullscreen exposure (2026-07)
 
 ### Added
