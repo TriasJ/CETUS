@@ -313,14 +313,24 @@ class CravingRatingRepo:
             "SELECT * FROM craving_rating WHERE session_id = ? ORDER BY elapsed_sec, id",
             (session_id,),
         ).fetchall()
-        return [
-            CravingRating(
-                id=r["id"], session_id=r["session_id"], ts=r["ts"],
-                elapsed_sec=r["elapsed_sec"], value=r["value"], kind=r["kind"],
-                cue_config_id=r["cue_config_id"],
-            )
-            for r in rows
-        ]
+        return [self._row(r) for r in rows]
+
+    def list_for_patient(self, patient_id: int) -> list[CravingRating]:
+        """Every craving rating for a patient across all sessions (cross-session per-cue work)."""
+        rows = self.db.conn.execute(
+            "SELECT c.* FROM craving_rating c JOIN session s ON c.session_id = s.id "
+            "WHERE s.patient_id = ? ORDER BY c.session_id, c.elapsed_sec, c.id",
+            (patient_id,),
+        ).fetchall()
+        return [self._row(r) for r in rows]
+
+    @staticmethod
+    def _row(r: sqlite3.Row) -> CravingRating:
+        return CravingRating(
+            id=r["id"], session_id=r["session_id"], ts=r["ts"],
+            elapsed_sec=r["elapsed_sec"], value=r["value"], kind=r["kind"],
+            cue_config_id=r["cue_config_id"],
+        )
 
 
 class CopingEventRepo:

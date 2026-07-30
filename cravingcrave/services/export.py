@@ -110,6 +110,39 @@ def export_cohort_summary(path: Path, rows: Sequence[dict]) -> Path:
     return path
 
 
+CUE_ORDER_COLUMNS = [
+    "patient_code", "media_path", "media_type", "substance",
+    "current_rank", "suggested_position", "score", "n", "low_data",
+]
+
+
+def export_cue_order(path: Path, rows: Sequence[dict]) -> Path:
+    """The learned cue-order database (per cue: reactivity score, n, current + suggested rank).
+
+    Carries only the pseudonymous patient code and the media filename — no PII."""
+    with open(path, "w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=CUE_ORDER_COLUMNS)
+        writer.writeheader()
+        for r in rows:
+            writer.writerow({k: r.get(k, "") for k in CUE_ORDER_COLUMNS})
+    return path
+
+
+POPULATION_REACTIVITY_COLUMNS = [
+    "substance", "media_type", "mean_reactivity", "n_cues", "n_patients",
+]
+
+
+def export_population_reactivity(path: Path, rows: Sequence[dict]) -> Path:
+    """Cross-patient cue-reactivity baseline by substance × modality. No PII."""
+    with open(path, "w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=POPULATION_REACTIVITY_COLUMNS)
+        writer.writeheader()
+        for r in rows:
+            writer.writerow({k: r.get(k, "") for k in POPULATION_REACTIVITY_COLUMNS})
+    return path
+
+
 CLINICIAN_ACTIVITY_COLUMNS = ["clinician", "patients", "sessions"]
 
 

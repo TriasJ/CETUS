@@ -73,6 +73,7 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.default_random_order = as_bool("default_random_order", config.default_random_order)
     config.default_loop = as_bool("default_loop", config.default_loop)
     config.default_start_fullscreen = as_bool("default_start_fullscreen", config.default_start_fullscreen)
+    config.adaptive_ordering = as_bool("adaptive_ordering", config.adaptive_ordering)
     # The clinic-selected UI language (persisted by the language switcher) overrides
     # the bootstrap default. app.main() applies it to i18n after the context is built.
     locale = s.get("locale")

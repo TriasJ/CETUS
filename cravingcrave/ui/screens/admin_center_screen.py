@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (
 from ... import __version__
 from ...domain import reports
 from ...domain.uscs import USCS_STEPS
-from ...services import backup, export, patient_admin, patient_bundle
+from ...services import backup, cue_ranking, export, patient_admin, patient_bundle
 from ...services.i18n import tr
 from ..context import AppContext
 from .settings_screen import _NAV_INK_SELECTED, _draw_nav_icon
@@ -433,7 +433,39 @@ class AdminCenterScreen(QWidget):
         row = QHBoxLayout()
         row.addWidget(cohort_csv); row.addWidget(cohort_pdf); row.addStretch(1); row.addWidget(activity)
         v.addLayout(row)
+        population = QPushButton(tr("admin.reports_population_csv"))
+        population.clicked.connect(self._export_population)
+        cue_db = QPushButton(tr("admin.reports_cue_db_csv"))
+        cue_db.clicked.connect(self._export_cue_db)
+        prow = QHBoxLayout(); prow.addWidget(population); prow.addStretch(1); prow.addWidget(cue_db)
+        v.addLayout(prow)
         return self._page([box])
+
+    def _export_cue_db(self) -> None:
+        from PySide6.QtWidgets import QFileDialog
+        rows = cue_ranking.all_cue_order_rows(self.context.repos)
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default = str(Path(self.context.config.data_dir) / f"cetus_cue_order_db_{stamp}.csv")
+        path, _ = QFileDialog.getSaveFileName(
+            self, tr("admin.reports_cue_db_csv"), default, "CSV (*.csv)")
+        if not path:
+            return
+        export.export_cue_order(Path(path), rows)
+        self.context.repos.audit.log("cue_order_db_export", f"{len(rows)} rows", self._actor())
+        QMessageBox.information(self, tr("admin.center_title"), tr("admin.reports_done", n=len(rows)))
+
+    def _export_population(self) -> None:
+        from PySide6.QtWidgets import QFileDialog
+        rows = cue_ranking.population_reactivity(self.context.repos)
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default = str(Path(self.context.config.data_dir) / f"cetus_population_reactivity_{stamp}.csv")
+        path, _ = QFileDialog.getSaveFileName(
+            self, tr("admin.reports_population_csv"), default, "CSV (*.csv)")
+        if not path:
+            return
+        export.export_population_reactivity(Path(path), rows)
+        self.context.repos.audit.log("population_reactivity_export", f"{len(rows)} groups", self._actor())
+        QMessageBox.information(self, tr("admin.center_title"), tr("admin.reports_done", n=len(rows)))
 
     def _cohort_items(self):
         """(scope_label, [(code, substance, sessions), ...]) for the current filter."""

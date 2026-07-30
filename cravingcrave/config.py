@@ -68,6 +68,10 @@ class AppConfig:
     # UI theme: light (default) / dark / high_contrast / impaired / classic.
     theme: str = "light"
 
+    # Adaptive cue ordering: learn a per-patient low→high craving hierarchy and offer a
+    # clinician-reviewed suggested order in the cue library. Off by default.
+    adaptive_ordering: bool = False
+
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)

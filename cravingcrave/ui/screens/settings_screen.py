@@ -281,6 +281,13 @@ class SettingsScreen(QWidget):
         form.addRow("", self.vas_after_coping)
         form.addRow(tr("settings.vas_every_n_cues"), self.vas_every_n)
         v.addLayout(form)
+
+        self.adaptive_ordering = QCheckBox(tr("settings.adaptive_ordering"))
+        self.adaptive_ordering.setChecked(cfg.adaptive_ordering)
+        hint = QLabel(tr("settings.adaptive_ordering_hint"))
+        hint.setObjectName("Muted"); hint.setWordWrap(True)
+        v.addWidget(self.adaptive_ordering)
+        v.addWidget(hint)
         return box
 
     # --- appearance: language + theme (User) --------------------------------
@@ -533,6 +540,9 @@ class SettingsScreen(QWidget):
             cfg.vas_prompt_every_n_cues = self.vas_every_n.value()
             s.set("vas_prompt_after_coping", "1" if cfg.vas_prompt_after_coping else "0")
             s.set("vas_prompt_every_n_cues", str(cfg.vas_prompt_every_n_cues))
+        if hasattr(self, "adaptive_ordering"):
+            cfg.adaptive_ordering = self.adaptive_ordering.isChecked()
+            s.set("adaptive_ordering", "1" if cfg.adaptive_ordering else "0")
         if hasattr(self, "default_random_order"):
             cfg.default_random_order = self.default_random_order.isChecked()
             cfg.default_loop = self.default_loop.isChecked()

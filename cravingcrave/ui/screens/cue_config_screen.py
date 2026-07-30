@@ -122,9 +122,19 @@ class CueConfigScreen(QWidget):
         disable_all = QPushButton(tr("cueconfig.disable_all")); disable_all.clicked.connect(lambda: self._set_all_enabled(False))
         delete = QPushButton(tr("common.delete")); delete.setObjectName("Danger"); delete.clicked.connect(self._delete)
 
+        buttons = [add_lib, add_files, add_folder, up, down]
+        # Adaptive ordering (opt-in): suggest a low→high craving order the clinician reviews & applies.
+        if self.context.config.adaptive_ordering:
+            suggest = QPushButton(tr("cueconfig.suggest_order"))
+            suggest.setToolTip(tr("cueconfig.suggest_tip"))
+            suggest.clicked.connect(self._suggest_order)
+            export_order = QPushButton(tr("cueconfig.export_order"))
+            export_order.clicked.connect(self._export_order)
+            buttons += [suggest, export_order]
+        buttons += [toggle_en, toggle_pos, enable_all, disable_all, delete]
+
         side = QVBoxLayout()
-        for b in (add_lib, add_files, add_folder, up, down, toggle_en, toggle_pos,
-                  enable_all, disable_all, delete):
+        for b in buttons:
             side.addWidget(b)
         side.addStretch(1)
 
@@ -266,6 +276,61 @@ class CueConfigScreen(QWidget):
         if cue:
             self.context.repos.cues.delete(cue.id)
             self._refresh()
+
+    def _suggest_order(self) -> None:
+        """Preview a learned low→high craving order and let the clinician apply it (rewrites ranks)."""
+        from ...services import cue_ranking
+        order = cue_ranking.suggested_ranks(self.context.repos, self.patient.id)
+        scores = {r["cue_id"]: r for r in cue_ranking.patient_cue_scores(self.context.repos, self.patient.id)}
+        by_id = {c.id: c for c in self._cues()}
+        ordered = [by_id[cid] for cid in order if cid in by_id]
+        if not ordered:
+            QMessageBox.information(self, tr("app.title"), tr("cueconfig.suggest_none"))
+            return
+
+        dlg = QDialog(self); dlg.setWindowTitle(tr("cueconfig.suggest_order"))
+        dlg.setMinimumWidth(560)
+        v = QVBoxLayout(dlg)
+        intro = QLabel(tr("cueconfig.suggest_intro")); intro.setWordWrap(True)
+        v.addWidget(intro)
+        preview = QListWidget()
+        for pos, c in enumerate(ordered, start=1):
+            sc = scores.get(c.id, {})
+            flag = f"  ·  {tr('cueconfig.suggest_lowdata')}" if sc.get("low_data") else ""
+            preview.addItem(
+                f"{pos}. {Path(c.media_path).name}  ·  {tr('cueconfig.suggest_score')} "
+                f"{sc.get('score', 0):.1f}  (n={sc.get('n', 0)}){flag}")
+        preview.setMinimumHeight(320)
+        v.addWidget(preview)
+        bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        bb.button(QDialogButtonBox.StandardButton.Ok).setText(tr("cueconfig.suggest_apply"))
+        bb.accepted.connect(dlg.accept); bb.rejected.connect(dlg.reject)
+        v.addWidget(bb)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        for rank, c in enumerate(ordered):
+            if c.appetitive_rank != rank:
+                c.appetitive_rank = rank
+                self.context.repos.cues.update(c)
+        self._refresh()
+        QMessageBox.information(self, tr("app.title"), tr("cueconfig.suggest_applied"))
+
+    def _export_order(self) -> None:
+        """Export this patient's learned cue-order database (reactivity + ranks) as CSV."""
+        from ...services import cue_ranking, export
+        rows = cue_ranking.cue_order_rows(self.context.repos, self.patient.id)
+        if not rows:
+            QMessageBox.information(self, tr("app.title"), tr("cueconfig.suggest_none"))
+            return
+        default = str(Path(self.context.config.data_dir)
+                      / export.safe_filename(self.patient.code, "cue_order"))
+        path, _ = QFileDialog.getSaveFileName(self, tr("cueconfig.export_order"), default, "CSV (*.csv)")
+        if not path:
+            return
+        export.export_cue_order(Path(path), rows)
+        QMessageBox.information(self, tr("app.title"),
+                               tr("cueconfig.order_exported", n=len(rows)))
 
     def _move(self, direction: int) -> None:
         cues = self._cues()

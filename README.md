@@ -25,19 +25,18 @@ English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built wi
 
 ---
 
-## What's new in 0.6.0
+## What's new in 0.7.0
 
-- 🛠️ **Admin Center** (key-gated, from the dashboard) — a hub for clinic administration.
-- 💾 **Backup & restore** the whole dataset (DB + media) to a zip, with a pre-restore safety copy.
-- 🗃️ **Patient data handling** — export a full per-patient bundle, **anonymize**, or **hard-delete**
-  (code-confirmed, audit-logged).
-- 👥 **Clinician & clinic management** — rename / disable / delete accounts, **transfer patients**,
-  and clinic contact details on report headers.
-- 📊 **Cohort & per-clinician reports** — cohort summary CSV, clinician-activity CSV, and a cohort PDF.
-- 🎨 **Themes** — Light, **Dark**, **High-contrast**, **Low-vision (large text)**, **Classic Windows**.
+- 🧭 **Adaptive cue ordering** — CETUS learns which signals provoke more craving for each patient
+  (from the ratings it already records per cue) and **suggests a low→high graded order** the
+  clinician reviews and applies — never a live-session reorder. Small samples are smoothed toward a
+  cross-patient population prior. Export the **order database** + a **population baseline** (CSV).
 
-Earlier (0.5.x): redesigned Options, number-key controls + immersive fullscreen, adaptive prompts,
-and contextual Help. See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
+Earlier (0.6.x): a key-gated **Admin Center** — backup/restore (DB + media), patient data handling
+(export bundle / anonymize / hard-delete), clinician & clinic management (disable, transfer
+patients, clinic contact details on reports), cohort & per-clinician reports, storage info, and an
+audit log — plus five **themes** (Light, Dark, High-contrast, Low-vision, Classic Windows). See
+[`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
 
 ---
 
@@ -45,6 +44,10 @@ and contextual Help. See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full h
 
 - **Graded, personalized cue exposure** — images/video/sound ordered by appetitive
   intensity; optional randomized order; ← → to change cues; loop mode.
+- **Adaptive cue ordering (optional)** — learns per-patient cue reactivity from the recorded
+  ratings and **suggests a low→high graded order** the clinician reviews and applies (never a live
+  reorder); small samples smoothed toward a cross-patient prior. Exportable order database +
+  population baseline (CSV).
 - **Patient-controlled intensity** — shrink, blur, dim, mute the cue (keyboard:
   `T`/`D`/`O`/`M`, `R` reset) so the patient down-regulates exposure themselves.
 - **Keyboard-only accessibility mode** — drive the whole exposure with an adaptive keyboard
@@ -62,16 +65,37 @@ and contextual Help. See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full h
 - **Fullscreen / kiosk mode** — `F11` toggles fullscreen for distraction-free sessions.
 - **Multi-patient clinician dashboard** with local login, pseudonymous patient codes,
   per-patient cue configuration, custom substances, and an in-app admin recovery.
+- **Admin Center (key-gated)** — backup/restore (DB + media, pre-restore safety copy), patient
+  data handling (export bundle / anonymize / hard-delete, code-confirmed + audit-logged),
+  clinician & clinic management (rename / disable / delete, **transfer patients**, clinic contact
+  details on report headers), **cohort & per-clinician reports** (CSV + PDF), storage info, and an
+  admin audit log.
 - **Clinical reports** — per-session detail (annotated curve, evidence-based metrics,
   per-cue reactivity, coping responses, clinician notes) and cross-session progress;
   export to **CSV** and **landscape PDF** (CETUS-branded header by default, overridable with a
   clinic logo) plus a dedicated **coping-responses CSV** for qualitative study.
-- **In-app Help** (F1) documenting every feature and its scientific basis with citations.
+- **Selectable themes** — Light (default), Dark, High-contrast, Low-vision (large text), and
+  Classic Windows; switchable live from Settings.
+- **In-app Help** (F1) documenting every feature and its scientific basis with citations — also
+  published as an online manual ([English](docs/manual/en.md) · [Español](docs/manual/es.md)).
 - **Bilingual UI** — Spanish (default) and English, switchable live from the login screen and
   Settings (persisted, no restart). Adding a language is a drop-in JSON file — see
   [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md).
 
 See more screenshots in [`docs/screenshots/`](docs/screenshots/).
+
+---
+
+## Documentation
+
+- **User manual** — the complete in-app Help, published online:
+  [English](docs/manual/en.md) · [Español](docs/manual/es.md). Press **F1** in the app for the same
+  content; the pages are generated from the Help JSON with `python scripts/gen_help_docs.py`.
+- **Scientific basis & mechanisms** — [`docs/MECHANISMS.md`](docs/MECHANISMS.md)
+- **Clinical disclaimer** — [`docs/DISCLAIMER.md`](docs/DISCLAIMER.md)
+- **Localization (add a language)** — [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md)
+- **Packaging & installers** — [`packaging/README.md`](packaging/README.md)
+- **Version history** — [`docs/CHANGELOG.md`](docs/CHANGELOG.md)
 
 ---
 
@@ -159,7 +183,7 @@ tool logs attribution to a `_licenses.csv`. Review all media for clinical approp
 ## Tests
 
 ```bash
-pytest                       # 116 unit/integration + offscreen GUI tests
+pytest                       # 168 unit/integration + offscreen GUI tests
 python scripts/functional_test.py    # end-to-end harness (9/9 PASS/FAIL report)
 ```
 

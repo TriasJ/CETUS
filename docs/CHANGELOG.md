@@ -2,6 +2,21 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.7.0 — adaptive cue ordering (2026-07)
+
+### Added
+- **Adaptive cue ordering** — CETUS learns, from the craving ratings it already records per cue,
+  which signals provoke more craving for each patient, and offers a **suggested low→high order**
+  in the cue library. A cue's reactivity = peak-on-cue − session baseline, averaged across
+  sessions (baseline rows excluded), **shrunk toward a cross-patient population prior** (shared
+  media file → substance × modality → global) so small samples don't dominate. The order is a
+  **clinician-reviewed suggestion** (preview with score, n and a low-data flag → one-click Apply
+  rewrites `appetitive_rank`); it never reorders a live session. Toggleable in Settings → Session.
+- **Export the signal-order database** — per patient from the cue library, or all patients from
+  Admin Center → Reports, plus a **population cue-reactivity baseline (CSV)**. Pseudonymous.
+- A bilingual **"Adaptive cue ordering"** Help topic (with the honest confound caveat), and a
+  generated **online manual** (`docs/manual/{en,es}.md`) mirroring the in-app Help.
+
 ## 0.6.1 — spin-box arrows fix (2026-07)
 
 ### Fixed
