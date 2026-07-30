@@ -16,6 +16,7 @@ from ..domain.models import (
     IntensityEvent,
     Patient,
     Session,
+    utc_now_iso,
 )
 from .database import Database
 
@@ -90,11 +91,31 @@ class PatientRepo:
         ).fetchone()
         return self._row(row) if row else None
 
+    def count(self) -> int:
+        return int(self.db.conn.execute("SELECT COUNT(*) FROM patient").fetchone()[0])
+
     def list_active(self) -> list[Patient]:
         rows = self.db.conn.execute(
             "SELECT * FROM patient WHERE archived = 0 ORDER BY code"
         ).fetchall()
         return [self._row(r) for r in rows]
+
+    def list_all(self) -> list[Patient]:
+        """Every patient, including archived (for admin data-handling tools)."""
+        rows = self.db.conn.execute("SELECT * FROM patient ORDER BY code").fetchall()
+        return [self._row(r) for r in rows]
+
+    def anonymize(self, patient_id: int) -> None:
+        """Strip PII (name/birth year/notes), keeping the pseudonymous code + all sessions."""
+        with self.db.transaction() as conn:
+            conn.execute(
+                "UPDATE patient SET display_name = NULL, birth_year = NULL, notes = NULL "
+                "WHERE id = ?", (patient_id,))
+
+    def delete(self, patient_id: int) -> None:
+        """Hard delete a patient; ON DELETE CASCADE removes cues, sessions and their events."""
+        with self.db.transaction() as conn:
+            conn.execute("DELETE FROM patient WHERE id = ?", (patient_id,))
 
     def update(self, p: Patient) -> None:
         with self.db.transaction() as conn:
@@ -208,6 +229,9 @@ class SessionRepo:
             "SELECT * FROM session WHERE patient_id = ? ORDER BY started_at", (patient_id,)
         ).fetchall()
         return [self._row(r) for r in rows]
+
+    def count(self) -> int:
+        return int(self.db.conn.execute("SELECT COUNT(*) FROM session").fetchone()[0])
 
     @staticmethod
     def _row(r: sqlite3.Row) -> Session:
@@ -344,6 +368,30 @@ class SettingRepo:
             )
 
 
+class AuditRepo:
+    """Admin action log (key changes, backups, restores, deletes). Newest-first read."""
+
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def log(self, action: str, detail: str = "", actor: str = "") -> None:
+        with self.db.transaction() as conn:
+            conn.execute(
+                "INSERT INTO admin_audit (ts, actor, action, detail) VALUES (?,?,?,?)",
+                (utc_now_iso(), actor, action, detail),
+            )
+
+    def list_recent(self, limit: int = 200) -> list[dict]:
+        rows = self.db.conn.execute(
+            "SELECT ts, actor, action, detail FROM admin_audit ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+        return [
+            {"ts": r["ts"], "actor": r["actor"], "action": r["action"], "detail": r["detail"]}
+            for r in rows
+        ]
+
+
 class Repositories:
     """Convenience bundle wiring every repo to one Database."""
 
@@ -357,3 +405,4 @@ class Repositories:
         self.coping = CopingEventRepo(db)
         self.intensity = IntensityEventRepo(db)
         self.settings = SettingRepo(db)
+        self.audit = AuditRepo(db)

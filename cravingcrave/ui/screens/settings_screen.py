@@ -71,6 +71,27 @@ def _draw_nav_icon(kind: str, ink: str = _NAV_INK) -> QIcon:
     elif kind == "substances":                   # flask / beaker
         p.drawPolygon(QPolygon([QPoint(10, 3), QPoint(14, 3), QPoint(14, 9),
                                 QPoint(19, 20), QPoint(5, 20), QPoint(10, 9)]))
+    elif kind == "backup":                        # archive box + lid line
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(QRectF(4, 8, 16, 12), 2, 2)
+        p.drawLine(4, 12, 20, 12)
+        p.drawLine(10, 12, 10, 8); p.drawLine(14, 12, 14, 8)
+    elif kind == "storage":                       # disk cylinder
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawEllipse(QRectF(5, 4, 14, 5))
+        p.drawLine(5, 6, 5, 18); p.drawLine(19, 6, 19, 18)
+        p.drawArc(QRectF(5, 13, 14, 5), 0, -180 * 16)
+    elif kind == "audit":                         # log lines
+        p.setPen(QPen(c, 2))
+        for y in (7, 12, 17):
+            p.drawLine(5, y, 19, y)
+    elif kind == "data":                          # ID card: head + text lines
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(QRectF(3.5, 6, 17, 12), 2, 2)
+        p.setBrush(QBrush(c))
+        p.drawEllipse(QPoint(9, 11), 2, 2)
+        p.setPen(QPen(c, 1))
+        p.drawLine(13, 10, 18, 10); p.drawLine(13, 13, 18, 13)
     p.end()
     return QIcon(pm)
 

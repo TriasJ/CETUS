@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QMainWindow, QMessageBox, QStackedWidget, QWidget
 from ..services.i18n import current_locale, set_locale, tr
 from . import hotkeys
 from .context import AppContext
+from .screens.admin_center_screen import AdminCenterScreen
 from .screens.calm_screen import CalmScreen
 from .screens.cue_config_screen import CueConfigScreen
 from .screens.dashboard_screen import DashboardScreen
@@ -94,6 +95,14 @@ class MainWindow(QMainWindow):
 
     def show_settings(self) -> None:
         self._swap(SettingsScreen(self, self.context))
+
+    def show_admin_center(self, gated: bool = True) -> None:
+        """Open the key-gated Admin Center (backup/restore, storage, audit)."""
+        from .widgets.admin_gate import require_admin
+        if gated and not require_admin(self, self.context):
+            return
+        self._set_panic_active(False)
+        self._swap(AdminCenterScreen(self, self.context))
 
     def show_help(self, topic: str | None = None) -> None:
         dlg = HelpDialog(self)

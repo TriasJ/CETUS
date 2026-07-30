@@ -1,4 +1,5 @@
 from cravingcrave.data.database import Database
+from cravingcrave.data.migrations import CURRENT_VERSION
 from cravingcrave.data.repositories import Repositories
 from cravingcrave.domain.models import (
     Clinician,
@@ -18,7 +19,7 @@ def make_repos():
 def test_schema_version_set():
     db = Database(":memory:")
     ver = db.conn.execute("SELECT version FROM schema_version").fetchone()[0]
-    assert ver == 2
+    assert ver == CURRENT_VERSION
     # v2 column present (and migration is idempotent on fresh DBs).
     cols = [r[1] for r in db.conn.execute("PRAGMA table_info(session)").fetchall()]
     assert "clinician_notes" in cols

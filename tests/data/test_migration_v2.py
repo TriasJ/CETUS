@@ -3,7 +3,7 @@
 import sqlite3
 
 from cravingcrave.data.database import Database
-from cravingcrave.data.migrations import _load_schema_sql
+from cravingcrave.data.migrations import CURRENT_VERSION, _load_schema_sql
 
 
 def test_v1_to_v2_adds_column_and_preserves_data(tmp_path):
@@ -31,7 +31,7 @@ def test_v1_to_v2_adds_column_and_preserves_data(tmp_path):
 
     # Opening with the current Database runs the v1->v2 migration.
     db = Database(str(db_path))
-    assert db.conn.execute("SELECT version FROM schema_version").fetchone()[0] == 2
+    assert db.conn.execute("SELECT version FROM schema_version").fetchone()[0] == CURRENT_VERSION
     cols = [r[1] for r in db.conn.execute("PRAGMA table_info(session)").fetchall()]
     assert "clinician_notes" in cols
     assert db.conn.execute("SELECT COUNT(*) FROM session WHERE substance='alcohol'").fetchone()[0] == 1

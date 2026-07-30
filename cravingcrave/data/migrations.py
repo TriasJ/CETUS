@@ -11,7 +11,7 @@ import importlib.resources as resources
 import sqlite3
 from collections.abc import Callable
 
-CURRENT_VERSION = 2
+CURRENT_VERSION = 3
 
 
 def _load_schema_sql() -> str:
@@ -33,10 +33,20 @@ def _migrate_to_2(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE session ADD COLUMN clinician_notes TEXT")
 
 
+def _migrate_to_3(conn: sqlite3.Connection) -> None:
+    """v3: admin_audit log for the Admin Center (key changes, backups, restores, etc.)."""
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS admin_audit ("
+        "id INTEGER PRIMARY KEY, ts TEXT NOT NULL, actor TEXT, "
+        "action TEXT NOT NULL, detail TEXT)"
+    )
+
+
 # Ordered: index i upgrades the DB to version (i + 1).
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     _migrate_to_1,
     _migrate_to_2,
+    _migrate_to_3,
 ]
 
 

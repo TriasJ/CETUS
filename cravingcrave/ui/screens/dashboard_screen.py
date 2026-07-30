@@ -33,6 +33,8 @@ class DashboardScreen(QWidget):
 
         add_clinician_btn = QPushButton(tr("dashboard.add_clinician"))
         add_clinician_btn.clicked.connect(self._add_clinician)
+        admin_btn = QPushButton(tr("dashboard.admin"))
+        admin_btn.clicked.connect(window.show_admin_center)
         help_btn = QPushButton(tr("dashboard.help"))
         help_btn.clicked.connect(window.show_help)
         settings_btn = QPushButton(tr("dashboard.settings"))
@@ -47,6 +49,7 @@ class DashboardScreen(QWidget):
         header.addLayout(head_text)
         header.addStretch(1)
         header.addWidget(add_clinician_btn)
+        header.addWidget(admin_btn)
         header.addWidget(help_btn)
         header.addWidget(settings_btn)
         header.addWidget(logout_btn)
