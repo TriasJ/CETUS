@@ -69,6 +69,7 @@ class Clinician:
     display_name: str = ""
     password_hash: str = ""
     created_at: str = field(default_factory=utc_now_iso)
+    disabled: bool = False
 
 
 @dataclass

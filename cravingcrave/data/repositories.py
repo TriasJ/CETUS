@@ -57,6 +57,28 @@ class ClinicianRepo:
             conn.execute("UPDATE clinician SET password_hash = ? WHERE id = ?",
                          (password_hash, clinician_id))
 
+    def set_display_name(self, clinician_id: int, display_name: str) -> None:
+        with self.db.transaction() as conn:
+            conn.execute("UPDATE clinician SET display_name = ? WHERE id = ?",
+                         (display_name, clinician_id))
+
+    def set_disabled(self, clinician_id: int, disabled: bool) -> None:
+        with self.db.transaction() as conn:
+            conn.execute("UPDATE clinician SET disabled = ? WHERE id = ?",
+                         (int(disabled), clinician_id))
+
+    def delete(self, clinician_id: int) -> None:
+        with self.db.transaction() as conn:
+            conn.execute("DELETE FROM clinician WHERE id = ?", (clinician_id,))
+
+    def owns_counts(self, clinician_id: int) -> tuple[int, int]:
+        """(patients created by, sessions run by) — used to guard hard delete."""
+        pats = self.db.conn.execute(
+            "SELECT COUNT(*) FROM patient WHERE created_by = ?", (clinician_id,)).fetchone()[0]
+        sess = self.db.conn.execute(
+            "SELECT COUNT(*) FROM session WHERE clinician_id = ?", (clinician_id,)).fetchone()[0]
+        return int(pats), int(sess)
+
     @staticmethod
     def _row(r: sqlite3.Row) -> Clinician:
         return Clinician(
@@ -65,6 +87,7 @@ class ClinicianRepo:
             display_name=r["display_name"],
             password_hash=r["password_hash"],
             created_at=r["created_at"],
+            disabled=_b(r["disabled"]),
         )
 
 
@@ -116,6 +139,19 @@ class PatientRepo:
         """Hard delete a patient; ON DELETE CASCADE removes cues, sessions and their events."""
         with self.db.transaction() as conn:
             conn.execute("DELETE FROM patient WHERE id = ?", (patient_id,))
+
+    def reassign_owner(self, from_clinician_id: int, to_clinician_id: int) -> int:
+        """Transfer patient ownership (created_by) between clinicians. Returns rows moved.
+
+        Past ``session.clinician_id`` values are left intact as the historical record."""
+        with self.db.transaction() as conn:
+            cur = conn.execute("UPDATE patient SET created_by = ? WHERE created_by = ?",
+                               (to_clinician_id, from_clinician_id))
+            return cur.rowcount
+
+    def count_for_owner(self, clinician_id: int) -> int:
+        return int(self.db.conn.execute(
+            "SELECT COUNT(*) FROM patient WHERE created_by = ?", (clinician_id,)).fetchone()[0])
 
     def update(self, p: Patient) -> None:
         with self.db.transaction() as conn:

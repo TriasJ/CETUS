@@ -11,7 +11,7 @@ import importlib.resources as resources
 import sqlite3
 from collections.abc import Callable
 
-CURRENT_VERSION = 3
+CURRENT_VERSION = 4
 
 
 def _load_schema_sql() -> str:
@@ -42,11 +42,19 @@ def _migrate_to_3(conn: sqlite3.Connection) -> None:
     )
 
 
+def _migrate_to_4(conn: sqlite3.Connection) -> None:
+    """v4: clinician.disabled flag (disabled accounts can't log in). Idempotent."""
+    cols = [row[1] for row in conn.execute("PRAGMA table_info(clinician)").fetchall()]
+    if "disabled" not in cols:
+        conn.execute("ALTER TABLE clinician ADD COLUMN disabled INTEGER NOT NULL DEFAULT 0")
+
+
 # Ordered: index i upgrades the DB to version (i + 1).
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     _migrate_to_1,
     _migrate_to_2,
     _migrate_to_3,
+    _migrate_to_4,
 ]
 
 

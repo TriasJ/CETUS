@@ -57,7 +57,7 @@ class AuthService:
 
     def login(self, username: str, password: str) -> Clinician | None:
         clinician = self.clinicians.get_by_username(username.strip())
-        if clinician and verify_password(password, clinician.password_hash):
+        if clinician and not clinician.disabled and verify_password(password, clinician.password_hash):
             return clinician
         return None
 

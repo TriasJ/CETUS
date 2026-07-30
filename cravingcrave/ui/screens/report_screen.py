@@ -610,13 +610,22 @@ class ReportScreen(QWidget):
         return True
 
     def _header_html(self, title: str, has_logo: bool) -> str:
-        clinic = (self.context.repos.settings.get("clinic_name") or "").strip()
+        s = self.context.repos.settings
+        clinic = (s.get("clinic_name") or "").strip()
+        # Optional clinic contact line (address · email · phone), set in the Admin Center.
+        contact = "  ·  ".join(
+            x for x in ((s.get("clinic_address") or "").strip(),
+                        (s.get("clinic_email") or "").strip(),
+                        (s.get("clinic_phone") or "").strip()) if x)
         logo_cell = "<td><img src='img://logo' height='64'></td>" if has_logo else ""
         clinic_html = f"<div style='color:#555;font-size:12pt'>{_html_escape(clinic)}</div>" if clinic else ""
+        contact_html = (f"<div style='color:#777;font-size:9pt'>{_html_escape(contact)}</div>"
+                        if contact else "")
         return (
             "<table width='100%'><tr>"
             f"{logo_cell}"
-            f"<td align='right' valign='middle'><h1 style='margin:0'>{title}</h1>{clinic_html}</td>"
+            f"<td align='right' valign='middle'><h1 style='margin:0'>{title}</h1>"
+            f"{clinic_html}{contact_html}</td>"
             "</tr></table><hr>"
         )
 

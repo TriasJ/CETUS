@@ -92,6 +92,20 @@ def _draw_nav_icon(kind: str, ink: str = _NAV_INK) -> QIcon:
         p.drawEllipse(QPoint(9, 11), 2, 2)
         p.setPen(QPen(c, 1))
         p.drawLine(13, 10, 18, 10); p.drawLine(13, 13, 18, 13)
+    elif kind == "clinicians":                    # two people (group)
+        p.drawEllipse(QPoint(8, 8), 3, 3)
+        p.drawRoundedRect(QRectF(3, 13, 10, 6), 3, 3)
+        p.setBrush(QBrush(QColor(ink))); p.setPen(Qt.PenStyle.NoPen)
+        p.drawEllipse(QPoint(16, 9), 3, 3)
+        p.drawRoundedRect(QRectF(12, 14, 8, 5), 3, 3)
+    elif kind == "clinic":                        # building
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(QRectF(5, 6, 14, 14), 1, 1)
+        p.setBrush(QBrush(c)); p.setPen(Qt.PenStyle.NoPen)
+        for cx in (8, 12, 16):
+            for cy in (9, 13):
+                p.drawRect(int(cx) - 1, int(cy) - 1, 2, 2)
+        p.drawRect(11, 16, 2, 4)                  # door
     p.end()
     return QIcon(pm)
 

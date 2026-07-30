@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QDialog
 
 from cravingcrave.config import AppConfig
 from cravingcrave.data.database import Database
+from cravingcrave.data.migrations import CURRENT_VERSION
 from cravingcrave.domain.models import Patient
 from cravingcrave.ui.context import AppContext
 from cravingcrave.ui.main_window import MainWindow
@@ -26,9 +27,10 @@ def test_admin_center_builds_three_pages(tmp_path, qtbot):
                                       created_by=ctx.clinician.id))
     window = MainWindow(ctx); qtbot.addWidget(window)
     screen = AdminCenterScreen(window, ctx); qtbot.addWidget(screen)
-    assert screen.nav.count() == 4          # Backup / Data / Storage / Audit
-    assert screen.stack.count() == 4
+    assert screen.nav.count() == 6          # Backup / Data / Clinicians / Clinic / Storage / Audit
+    assert screen.stack.count() == 6
     assert screen.patient_combo.count() == 1   # Data page lists the seeded patient
+    assert screen.clinician_list.count() == 1  # Clinicians page lists the seeded clinician
     # Storage counts reflect the seeded DB.
     assert ctx.repos.patients.count() == 1
     assert ctx.repos.clinicians.count() == 1
@@ -76,7 +78,7 @@ def test_migration_v3_admin_audit_idempotent(tmp_path):
         ).fetchone()
         assert row is not None
         ver = db2.conn.execute("SELECT version FROM schema_version LIMIT 1").fetchone()[0]
-        assert int(ver) == 3
+        assert int(ver) == CURRENT_VERSION
     finally:
         db2.close()
 

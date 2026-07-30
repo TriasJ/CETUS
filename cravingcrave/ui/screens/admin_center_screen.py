@@ -68,6 +68,8 @@ class AdminCenterScreen(QWidget):
         specs = [
             ("backup", "admin.tab_backup", self._backup_page()),
             ("data", "admin.tab_data", self._data_page()),
+            ("clinicians", "admin.tab_clinicians", self._clinicians_page()),
+            ("clinic", "admin.tab_clinic", self._clinic_page()),
             ("storage", "admin.tab_storage", self._storage_page()),
             ("audit", "admin.tab_audit", self._audit_page()),
         ]
@@ -279,6 +281,136 @@ class AdminCenterScreen(QWidget):
         self._refresh_patients()
         QMessageBox.information(self, tr("admin.center_title"),
                                 tr("admin.data_delete_done", code=p.code))
+
+    # --- Clinicians page ----------------------------------------------------
+    def _clinicians_page(self) -> QScrollArea:
+        box, v = self._card("admin.tab_clinicians", "admin.clinicians_intro")
+        self.clinician_list = QListWidget(); self.clinician_list.setMinimumHeight(200)
+        self._refresh_clinicians()
+        v.addWidget(self.clinician_list)
+        rename = QPushButton(tr("admin.clinician_rename")); rename.clicked.connect(self._rename_clinician)
+        toggle = QPushButton(tr("admin.clinician_toggle")); toggle.clicked.connect(self._toggle_clinician)
+        transfer = QPushButton(tr("admin.clinician_transfer")); transfer.clicked.connect(self._transfer_patients)
+        delete = QPushButton(tr("admin.clinician_delete")); delete.setObjectName("Danger")
+        delete.clicked.connect(self._delete_clinician)
+        row = QHBoxLayout()
+        row.addWidget(rename); row.addWidget(toggle); row.addWidget(transfer)
+        row.addStretch(1); row.addWidget(delete)
+        v.addLayout(row)
+        return self._page([box])
+
+    def _refresh_clinicians(self) -> None:
+        self.clinician_list.clear()
+        for c in self.context.repos.clinicians.list_all():
+            tag = f"  ·  {tr('admin.clinician_disabled')}" if c.disabled else ""
+            item = QListWidgetItem(f"{c.username}  —  {c.display_name}{tag}")
+            item.setData(Qt.ItemDataRole.UserRole, c.id)
+            self.clinician_list.addItem(item)
+
+    def _selected_clinician(self):
+        item = self.clinician_list.currentItem()
+        cid = item.data(Qt.ItemDataRole.UserRole) if item else None
+        if cid is None:
+            return None
+        return next((c for c in self.context.repos.clinicians.list_all() if c.id == cid), None)
+
+    def _is_self(self, clinician) -> bool:
+        return bool(self.context.clinician and clinician.id == self.context.clinician.id)
+
+    def _rename_clinician(self) -> None:
+        c = self._selected_clinician()
+        if c is None:
+            return
+        name, ok = QInputDialog.getText(self, tr("admin.clinician_rename"),
+                                        tr("admin.clinician_new_name"), QLineEdit.EchoMode.Normal,
+                                        c.display_name)
+        if ok and name.strip():
+            self.context.repos.clinicians.set_display_name(c.id, name.strip())
+            self.context.repos.audit.log("clinician_rename", c.username, self._actor())
+            self._refresh_clinicians()
+
+    def _toggle_clinician(self) -> None:
+        c = self._selected_clinician()
+        if c is None:
+            return
+        if self._is_self(c) and not c.disabled:
+            QMessageBox.information(self, tr("admin.center_title"), tr("admin.clinician_not_self"))
+            return
+        self.context.repos.clinicians.set_disabled(c.id, not c.disabled)
+        self.context.repos.audit.log(
+            "clinician_enable" if c.disabled else "clinician_disable", c.username, self._actor())
+        self._refresh_clinicians()
+
+    def _transfer_patients(self) -> None:
+        c = self._selected_clinician()
+        if c is None:
+            return
+        others = [o for o in self.context.repos.clinicians.list_all() if o.id != c.id]
+        if not others:
+            QMessageBox.information(self, tr("admin.center_title"), tr("admin.clinician_no_target"))
+            return
+        n = self.context.repos.patients.count_for_owner(c.id)
+        labels = [f"{o.username} — {o.display_name}" for o in others]
+        choice, ok = QInputDialog.getItem(
+            self, tr("admin.clinician_transfer"),
+            tr("admin.clinician_transfer_prompt", n=n, who=c.display_name), labels, 0, False)
+        if not ok:
+            return
+        target = others[labels.index(choice)]
+        moved = self.context.repos.patients.reassign_owner(c.id, target.id)
+        self.context.repos.audit.log(
+            "patients_transfer", f"{c.username} -> {target.username} ({moved})", self._actor())
+        QMessageBox.information(self, tr("admin.center_title"),
+                                tr("admin.clinician_transfer_done", n=moved, who=target.display_name))
+
+    def _delete_clinician(self) -> None:
+        c = self._selected_clinician()
+        if c is None:
+            return
+        if self._is_self(c):
+            QMessageBox.information(self, tr("admin.center_title"), tr("admin.clinician_not_self"))
+            return
+        pats, sess = self.context.repos.clinicians.owns_counts(c.id)
+        if pats or sess:
+            QMessageBox.information(self, tr("admin.center_title"),
+                                    tr("admin.clinician_owns", pats=pats, sess=sess))
+            return
+        if QMessageBox.question(self, tr("admin.center_title"),
+                                tr("admin.clinician_delete_confirm", who=c.username)
+                                ) != QMessageBox.StandardButton.Yes:
+            return
+        self.context.repos.clinicians.delete(c.id)
+        self.context.repos.audit.log("clinician_delete", c.username, self._actor())
+        self._refresh_clinicians()
+
+    # --- Clinic page --------------------------------------------------------
+    def _clinic_page(self) -> QScrollArea:
+        box, v = self._card("admin.tab_clinic", "admin.clinic_intro")
+        s = self.context.repos.settings
+        from PySide6.QtWidgets import QFormLayout
+        self.clinic_name = QLineEdit(s.get("clinic_name", "") or "")
+        self.clinic_address = QLineEdit(s.get("clinic_address", "") or "")
+        self.clinic_email = QLineEdit(s.get("clinic_email", "") or "")
+        self.clinic_phone = QLineEdit(s.get("clinic_phone", "") or "")
+        form = QFormLayout(); form.setSpacing(12)
+        form.addRow(tr("settings.clinic_name"), self.clinic_name)
+        form.addRow(tr("admin.clinic_address"), self.clinic_address)
+        form.addRow(tr("admin.clinic_email"), self.clinic_email)
+        form.addRow(tr("admin.clinic_phone"), self.clinic_phone)
+        v.addLayout(form)
+        save = QPushButton(tr("common.save")); save.setObjectName("Primary")
+        save.clicked.connect(self._save_clinic)
+        v.addWidget(save)
+        return self._page([box])
+
+    def _save_clinic(self) -> None:
+        s = self.context.repos.settings
+        s.set("clinic_name", self.clinic_name.text().strip())
+        s.set("clinic_address", self.clinic_address.text().strip())
+        s.set("clinic_email", self.clinic_email.text().strip())
+        s.set("clinic_phone", self.clinic_phone.text().strip())
+        self.context.repos.audit.log("clinic_update", "", self._actor())
+        QMessageBox.information(self, tr("admin.center_title"), tr("settings.saved"))
 
     # --- Storage page -------------------------------------------------------
     def _storage_page(self) -> QScrollArea:
