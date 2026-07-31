@@ -1,6 +1,6 @@
 # Ayuda y base científica — CETUS
 
-_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.7.1._
+_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.7.2._
 
 ## Contents
 

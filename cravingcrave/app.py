@@ -44,8 +44,9 @@ def _ensure_media_backend() -> None:
 
 _ensure_media_backend()
 
-from PySide6.QtGui import QIcon  # noqa: E402
-from PySide6.QtWidgets import QApplication  # noqa: E402
+from PySide6.QtCore import QRect, Qt, QTimer  # noqa: E402
+from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap  # noqa: E402
+from PySide6.QtWidgets import QApplication, QSplashScreen  # noqa: E402
 
 from . import paths  # noqa: E402
 from .config import AppConfig  # noqa: E402
@@ -54,6 +55,29 @@ from .services import i18n  # noqa: E402
 from .ui.context import AppContext  # noqa: E402
 from .ui.main_window import MainWindow  # noqa: E402
 from .ui.theme import apply_theme  # noqa: E402
+
+
+def _build_splash() -> QSplashScreen | None:
+    """A small branded launch screen (logo on the CETUS navy) shown while the DB loads."""
+    width, height = 520, 340
+    pm = QPixmap(width, height)
+    pm.fill(QColor("#0d1b2a"))
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    logo_path = paths.resource_path("icons", "cetus.png")
+    if logo_path.is_file():
+        logo = QPixmap(str(logo_path)).scaled(
+            160, 160, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        p.drawPixmap((width - logo.width()) // 2, 46, logo)
+    p.setPen(QColor("#e6edf3"))
+    p.setFont(QFont("Segoe UI", 30, QFont.Weight.Bold))
+    p.drawText(QRect(0, 222, width, 46), Qt.AlignmentFlag.AlignHCenter, "CETUS")
+    p.setPen(QColor("#9fb0bd"))
+    p.setFont(QFont("Segoe UI", 11))
+    p.drawText(QRect(0, 272, width, 28), Qt.AlignmentFlag.AlignHCenter,
+               "Cue Exposure Therapy · CET-USCS")
+    p.end()
+    return QSplashScreen(pm)
 
 
 def main() -> int:
@@ -67,6 +91,11 @@ def main() -> int:
     configure_logging(config.data_dir)
     apply_theme(app)   # base light theme immediately; re-applied with the saved theme below
 
+    splash = _build_splash()
+    if splash is not None:
+        splash.show()
+        app.processEvents()
+
     # Build the context first: AppContext.create() reads the clinic's saved UI language and
     # theme from the DB into config, so applying them afterwards lets the persisted choices
     # win over the bootstrap defaults.
@@ -76,6 +105,9 @@ def main() -> int:
     i18n.set_locale(config.locale)
     window = MainWindow(context)
     window.show()
+    if splash is not None:
+        # Keep the splash up briefly for a smooth launch even when the DB loads instantly.
+        QTimer.singleShot(800, lambda: splash.finish(window))
     return app.exec()
 
 

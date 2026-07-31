@@ -2,6 +2,14 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.7.2 — launch screen + fullscreen reminder (2026-07)
+
+### Added
+- **Launch screen** — a small branded splash (CETUS logo on the navy, title + tagline) shown at
+  startup while the database loads, then hands off to the main window.
+- **F11 reminder** — a subtle "F11: fullscreen" hint at the top-right of the exposure screen; it
+  hides automatically in fullscreen/immersive mode and reappears when you exit.
+
 ## 0.7.1 — adaptive + random ordering guidance (2026-07)
 
 ### Added

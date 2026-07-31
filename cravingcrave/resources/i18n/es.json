@@ -302,6 +302,7 @@
   "exposure.legend": "Modo teclado: ← → cambian de señal · 1 tamaño · 2 desenfoque · 3 oscurecer · +/− ajustan el eje elegido · 0 silenciar · 4 afrontar · 5 positivas · en la escala de deseo, teclea el número y Enter.",
   "exposure.legend_pick_axis": "Elige primero un eje (1 tamaño, 2 desenfoque, 3 oscurecer) y luego usa +/−.",
   "exposure.fullscreen_hint": "1 tamaño · 2 desenfoque · 3 oscurecer · +/− ajustar · 4 afrontar · 5 positivas",
+  "exposure.fullscreen_reminder": "F11: pantalla completa",
 
   "intensity.title": "Controla la intensidad",
   "intensity.size": "Tamaño",

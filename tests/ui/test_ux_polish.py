@@ -65,9 +65,11 @@ def test_immersive_mode_enter_exit(tmp_path, qtbot):
     screen, _ = _exposure(ctx, qtbot)
     assert screen._immersive is False and not screen._right_box.isHidden()
     # Entering fullscreen hides the chart/sliders + top labels and floats the action bar.
+    assert not screen.fs_reminder.isHidden()            # F11 reminder shown windowed
     screen.notify_fullscreen(True)
     assert screen._immersive is True
     assert screen._right_box.isHidden()
+    assert screen.fs_reminder.isHidden()                # hidden once fullscreen
     assert not screen._bar_counter.isHidden()           # counter moves into the bar
     assert screen._actionbar.property("immersive") is True
     screen.on_user_activity()                            # reveal the auto-hiding bar

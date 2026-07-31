@@ -59,6 +59,9 @@ class ExposureScreen(QWidget):
 
         self.cue_counter = QLabel("")
         self.cue_counter.setObjectName("Muted")
+        # Subtle reminder that F11 goes fullscreen (hidden while already immersive/fullscreen).
+        self.fs_reminder = QLabel(tr("exposure.fullscreen_reminder"))
+        self.fs_reminder.setObjectName("Muted")
         self.hint = QLabel(tr("exposure.waiting"))
         self.hint.setObjectName("Muted")
         self.hint.setWordWrap(True)
@@ -111,8 +114,12 @@ class ExposureScreen(QWidget):
         self._right_box.setMaximumWidth(380)
 
         # --- center ---------------------------------------------------------
+        top_row = QHBoxLayout()
+        top_row.addWidget(self.cue_counter)
+        top_row.addStretch(1)
+        top_row.addWidget(self.fs_reminder)
         center = QVBoxLayout()
-        center.addWidget(self.cue_counter)
+        center.addLayout(top_row)
         center.addWidget(self.cue_view, 1)
         center.addWidget(self.hint)
         center.addWidget(self.legend)
@@ -270,6 +277,7 @@ class ExposureScreen(QWidget):
         self.setPalette(pal); self.setAutoFillBackground(True)
         self._right_box.hide()
         self.cue_counter.hide(); self.hint.hide(); self.legend.hide(); self.banner.hide()
+        self.fs_reminder.hide()   # already fullscreen — no need to advertise F11
         self._bar_counter.show()
         self._actionbar.setProperty("immersive", True)
         self._repolish(self._actionbar)
@@ -288,7 +296,7 @@ class ExposureScreen(QWidget):
         self.setAutoFillBackground(False)
         self.main_layout.setContentsMargins(20, 14, 20, 14)
         self._right_box.show()
-        self.cue_counter.show(); self.hint.show()
+        self.cue_counter.show(); self.hint.show(); self.fs_reminder.show()
         self.legend.setVisible(self.context.config.accessibility_kbmode)
         self._bar_counter.hide()
         self._actionbar.setProperty("immersive", False)

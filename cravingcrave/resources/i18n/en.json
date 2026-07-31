@@ -302,6 +302,7 @@
   "exposure.legend": "Keyboard mode: ← → change cue · 1 size · 2 blur · 3 dim · +/− adjust the chosen axis · 0 mute · 4 cope · 5 positive · on the craving scale, type the number and Enter.",
   "exposure.legend_pick_axis": "Pick an axis first (1 size, 2 blur, 3 dim), then use +/−.",
   "exposure.fullscreen_hint": "1 size · 2 blur · 3 dim · +/− adjust · 4 cope · 5 positive",
+  "exposure.fullscreen_reminder": "F11: fullscreen",
 
   "intensity.title": "Control the intensity",
   "intensity.size": "Size",
