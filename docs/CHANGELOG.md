@@ -2,6 +2,17 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.7.1 — adaptive + random ordering guidance (2026-07)
+
+### Added
+- **Rule of thumb** in the *Adaptive cue ordering* Help topic (ES + EN) for combining adaptive
+  and random order: applied suggested order with random **off** for graded low→high exposure;
+  random **on** occasionally to strengthen/de-bias the learning (order shuffles, but every rating
+  still feeds the model). Notes that random **overrides** the suggested order for that session.
+- **Warning in the Parameters popup** under *Randomize cue order* (shown when adaptive ordering is
+  enabled): random order overrides the suggested graded order for this session; learning is
+  unaffected.
+
 ## 0.7.0 — adaptive cue ordering (2026-07)
 
 ### Added

@@ -272,6 +272,7 @@
   "setup.ambient": "Ambient sound (optional)",
   "setup.ambient_none": "No sound",
   "setup.random_order": "Randomize cue order (← → to change)",
+  "setup.random_overrides_adaptive": "Note: with random order on, the suggested graded (adaptive) order is overridden for this session; learning is unaffected.",
   "setup.loop_cues": "Loop cues (does not stop at the end)",
   "setup.parameters": "Parameters…",
   "setup.params_title": "Session parameters",

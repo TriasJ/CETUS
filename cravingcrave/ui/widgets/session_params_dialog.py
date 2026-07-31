@@ -33,6 +33,12 @@ class SessionParamsDialog(QDialog):
         self.random_order.setChecked(random_order)
         self.loop_cues = QCheckBox(tr("setup.loop_cues"))
         self.loop_cues.setChecked(loop)
+        # When adaptive ordering is enabled, warn that random shuffling overrides the learned
+        # graded order for this session (learning itself is unaffected).
+        self._random_note = QLabel(tr("setup.random_overrides_adaptive"))
+        self._random_note.setWordWrap(True)
+        self._random_note.setStyleSheet("color:#8a5a00; font-size:13px;")
+        self._random_note.setVisible(getattr(config, "adaptive_ordering", False))
 
         self.autoscroll_on_grading = QCheckBox(tr("settings.autoscroll_on_grading"))
         self.autoscroll_on_grading.setChecked(config.autoscroll_on_grading)
@@ -52,6 +58,7 @@ class SessionParamsDialog(QDialog):
         form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
         form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.DontWrapRows)
         form.addRow(self.random_order)
+        form.addRow(self._random_note)
         form.addRow(self.loop_cues)
         form.addRow(self.autoscroll_on_grading)
         form.addRow(tr("settings.autoscroll_timed"), self.autoscroll_timed)

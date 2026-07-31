@@ -272,6 +272,7 @@
   "setup.ambient": "Sonido ambiente (opcional)",
   "setup.ambient_none": "Sin sonido",
   "setup.random_order": "Orden aleatorio de las señales (← → para cambiar)",
+  "setup.random_overrides_adaptive": "Nota: con el orden aleatorio activado se anula el orden graduado sugerido (adaptativo) en esta sesión; el aprendizaje no se ve afectado.",
   "setup.loop_cues": "Repetir señales en bucle (no se atasca al final)",
   "setup.parameters": "Parámetros…",
   "setup.params_title": "Parámetros de la sesión",
