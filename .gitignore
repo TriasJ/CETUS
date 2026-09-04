@@ -24,8 +24,13 @@ dist/
 
 # Secrets
 .env
+/media/*.env
 *.key
 *.pem
+
+# Build / release logs (regenerable)
+build_*.log
+release_watch*.log
 
 # Backup of redundant/regenerable items (tidied here, safe to delete)
 /_backup/

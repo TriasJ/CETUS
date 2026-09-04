@@ -12,3 +12,6 @@ imageio-ffmpeg>=0.4  # provides a bundled ffmpeg binary on Windows (no manual in
 #   (free key: https://freesound.org/apiv2/apply/).
 # fetch_wikimedia_video.py (CC video) is stdlib + ffmpeg (from imageio-ffmpeg or PATH);
 #   no API key required.
+# fetch_pexels.py (photos & video) is stdlib-only — needs PEXELS_API_KEY env var
+#   or media/pexels.env (free key: https://www.pexels.com/api/).
+# pexels_gui.py is the PySide6 GUI for Pexels — needs PySide6 (already in the venv).
