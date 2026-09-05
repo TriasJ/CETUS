@@ -52,6 +52,22 @@ class SessionParamsDialog(QDialog):
         self.time_cap.setValue(config.session_time_cap_seconds // 60)
         self.start_fullscreen = QCheckBox(tr("setup.start_fullscreen"))
 
+        # Per-cue craving prompt
+        self.vas_per_cue = QSpinBox(); self.vas_per_cue.setRange(0, 600)
+        self.vas_per_cue.setSuffix(" s"); self.vas_per_cue.setMinimumWidth(120)
+        self.vas_per_cue.setValue(config.vas_prompt_per_cue_seconds)
+
+        # Progressive down-regulation
+        self.progressive_enabled = QCheckBox(tr("settings.progressive_enabled"))
+        self.progressive_enabled.setChecked(config.progressive_downreg_enabled)
+        self.progressive_target = QSpinBox(); self.progressive_target.setRange(1, 100)
+        self.progressive_target.setSuffix(" %"); self.progressive_target.setMinimumWidth(120)
+        self.progressive_target.setValue(config.progressive_downreg_target_pct)
+
+        # Auto-coping
+        self.auto_coping = QCheckBox(tr("settings.auto_coping_enabled"))
+        self.auto_coping.setChecked(config.auto_coping_enabled)
+
         # Full-width rows for the checkboxes so their (long) labels never clip; the two
         # spinboxes keep a right-aligned label column.
         form = QFormLayout(); form.setSpacing(12)
@@ -65,6 +81,10 @@ class SessionParamsDialog(QDialog):
         form.addRow(self.accessibility)
         form.addRow(tr("settings.time_cap_min"), self.time_cap)
         form.addRow(self.start_fullscreen)
+        form.addRow(tr("settings.vas_per_cue_seconds"), self.vas_per_cue)
+        form.addRow(self.progressive_enabled)
+        form.addRow(tr("settings.progressive_target"), self.progressive_target)
+        form.addRow(self.auto_coping)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -95,6 +115,10 @@ class SessionParamsDialog(QDialog):
             "autoscroll_timed_seconds": self.autoscroll_timed.value(),
             "accessibility_kbmode": self.accessibility.isChecked(),
             "session_time_cap_seconds": self.time_cap.value() * 60,
+            "vas_prompt_per_cue_seconds": self.vas_per_cue.value(),
+            "progressive_downreg_enabled": self.progressive_enabled.isChecked(),
+            "progressive_downreg_target_pct": self.progressive_target.value(),
+            "auto_coping_enabled": self.auto_coping.isChecked(),
         }
 
     def wants_fullscreen(self) -> bool:

@@ -195,6 +195,18 @@ class ExposureScreen(QWidget):
             self._autoscroll_timer.setInterval(context.config.autoscroll_timed_seconds * 1000)
             self._autoscroll_timer.timeout.connect(self._on_autoscroll_tick)
 
+        # Per-cue dwell timer: prompt craving after N seconds on the SAME cue.
+        self._per_cue_timer = QTimer(self)
+        if context.config.vas_prompt_per_cue_seconds > 0:
+            self._per_cue_timer.setInterval(context.config.vas_prompt_per_cue_seconds * 1000)
+            self._per_cue_timer.timeout.connect(self._on_per_cue_timeout)
+
+        # Progressive down-regulation: gradually apply a floor on a chosen lever.
+        self._downreg_timer = QTimer(self)
+        self._downreg_timer.setInterval(1000)  # tick every second for smooth ramping
+        self._downreg_timer.timeout.connect(self._on_downreg_tick)
+        self._downreg_floor = 0
+
         # --- input: standard shortcuts OR keyboard-only accessibility mode --
         self._shortcuts: list[QShortcut] = []
         self._access_input: AccessibilityInput | None = None
@@ -411,10 +423,15 @@ class ExposureScreen(QWidget):
         if self.ambient_path:
             self.cue_view.set_ambient(self.ambient_path)
         self._load_cue()
-        self.cue_view.set_intensity(100, 0, 0, False)
         self._timer.start()
         if self.context.config.autoscroll_timed_seconds > 0:
             self._autoscroll_timer.start()
+        if self.context.config.vas_prompt_per_cue_seconds > 0:
+            self._per_cue_timer.start()
+        if self.context.config.progressive_downreg_enabled:
+            self._downreg_floor = 0
+            self._enforce_downreg_floor()
+            self._downreg_timer.start()
 
     def _on_ambient_mute(self, muted: bool) -> None:
         self.cue_view.set_ambient_muted(muted)
@@ -434,7 +451,13 @@ class ExposureScreen(QWidget):
         else:
             self.cue_view.show_image(abs_path)
         self.intensity.reset()
-        self.cue_view.set_intensity(100, 0, 0, False)
+        if self.context.config.progressive_downreg_enabled:
+            self._enforce_downreg_floor()
+        scale, blur, dim, muted = self.intensity.state()
+        self.cue_view.set_intensity(scale, blur, dim, muted)
+        # Restart per-cue dwell timer (resets the per-cue clock on each cue change).
+        if self.context.config.vas_prompt_per_cue_seconds > 0:
+            self._per_cue_timer.start()
         counter = tr("exposure.cue_counter",
                      current=self.controller.current_cue_index() + 1,
                      total=self.controller.cue_count)
@@ -467,9 +490,12 @@ class ExposureScreen(QWidget):
     def _reset_intensity(self) -> None:
         """R key: snap every lever back to default (100% size, no blur/dim, audible)."""
         self.intensity.reset()
-        self.cue_view.set_intensity(100, 0, 0, False)
-        self.controller.record_intensity("reset", scale_pct=100, blur_pct=0,
-                                         dim_pct=0, muted=False)
+        if self.context.config.progressive_downreg_enabled:
+            self._enforce_downreg_floor()
+        scale, blur, dim, muted = self.intensity.state()
+        self.cue_view.set_intensity(scale, blur, dim, muted)
+        self.controller.record_intensity("reset", scale_pct=scale, blur_pct=blur,
+                                         dim_pct=dim, muted=muted)
 
     def _toggle_loop(self) -> None:
         """L key: toggle cue-list looping at runtime."""
@@ -520,9 +546,11 @@ class ExposureScreen(QWidget):
             self._begin_exposure()
         elif kind is RatingKind.ENDPOINT:
             self._finish(value)
-        elif self.context.config.autoscroll_on_grading:
-            # After a periodic/peak rating, advance the cue automatically (hands-free).
-            self._next_cue()
+        else:
+            # PERIODIC or PEAK: check auto-coping first, then autoscroll.
+            coping_triggered = self._maybe_auto_coping()
+            if not coping_triggered and self.context.config.autoscroll_on_grading:
+                self._next_cue()
 
     def _on_autoscroll_tick(self) -> None:
         # Timed auto-advance; skip while a prompt or a patient panel is up (same guard
@@ -530,6 +558,78 @@ class ExposureScreen(QWidget):
         if self._prompt_open or self.coping_panel.isVisible() or self.gallery.isVisible():
             return
         self._next_cue()
+
+    # --- per-cue dwell timer ------------------------------------------------
+    def _on_per_cue_timeout(self) -> None:
+        """Per-cue dwell timer fired: prompt craving for this specific cue."""
+        self._open_periodic_vas()
+
+    # --- progressive down-regulation ----------------------------------------
+    def _compute_downreg_value(self) -> int:
+        """Current progressive floor percentage (0 … target)."""
+        cfg = self.context.config
+        if not cfg.progressive_downreg_enabled:
+            return 0
+        elapsed = self.controller.elapsed_sec()
+        target = cfg.progressive_downreg_target_pct
+        cap = cfg.session_time_cap_seconds
+        if cap <= 0:
+            return target
+        if cfg.progressive_downreg_mode == "linear":
+            return int(min(1.0, elapsed / cap) * target)
+        # stepped
+        step_sec = max(1, cfg.progressive_downreg_step_seconds)
+        total_steps = max(1, cap // step_sec)
+        step_value = target / total_steps
+        current_step = min(elapsed // step_sec, total_steps)
+        return int(min(target, current_step * step_value))
+
+    def _on_downreg_tick(self) -> None:
+        new_floor = self._compute_downreg_value()
+        if new_floor == self._downreg_floor:
+            return
+        self._downreg_floor = new_floor
+        self._enforce_downreg_floor()
+
+    def _enforce_downreg_floor(self) -> None:
+        """Adjust the chosen lever's slider range so the patient cannot reduce below the
+        progressive floor. For *shrink* the floor decreases the maximum instead."""
+        cfg = self.context.config
+        lever = cfg.progressive_downreg_lever
+        floor = self._downreg_floor
+        if lever == "blur":
+            self.intensity._blur.setMinimum(floor)
+            if self.intensity._blur.value() < floor:
+                self.intensity._blur.setValue(floor)
+        elif lever == "dim":
+            self.intensity._dim.setMinimum(floor)
+            if self.intensity._dim.value() < floor:
+                self.intensity._dim.setValue(floor)
+        elif lever == "shrink":
+            new_max = max(10, 100 - floor)
+            self.intensity._size.setMaximum(new_max)
+            if self.intensity._size.value() > new_max:
+                self.intensity._size.setValue(new_max)
+        scale, blur, dim, muted = self.intensity.state()
+        self.cue_view.set_intensity(scale, blur, dim, muted)
+        self.controller.record_intensity(
+            f"progressive_{lever}", scale_pct=scale, blur_pct=blur,
+            dim_pct=dim, muted=muted,
+        )
+
+    # --- auto-coping --------------------------------------------------------
+    def _maybe_auto_coping(self) -> bool:
+        """Open coping if N consecutive high scores. Returns True if triggered."""
+        cfg = self.context.config
+        if not cfg.auto_coping_enabled or self.coping_panel.isVisible():
+            return False
+        n = cfg.auto_coping_consecutive
+        threshold = cfg.auto_coping_threshold
+        recent = self.controller.recent_values(n)
+        if len(recent) >= n and all(v >= threshold for v in recent):
+            self._open_coping()
+            return True
+        return False
 
     # --- coping & gallery ---------------------------------------------------
     def _open_coping(self) -> None:
@@ -557,6 +657,8 @@ class ExposureScreen(QWidget):
         self._pending_end_reason = reason
         self._timer.stop()
         self._autoscroll_timer.stop()
+        self._per_cue_timer.stop()
+        self._downreg_timer.stop()
         self.controller.go_to_endpoint()
         self._vas_mode = RatingKind.ENDPOINT
         self._prompt_open = True
@@ -572,6 +674,8 @@ class ExposureScreen(QWidget):
     def stop_timers(self) -> None:
         self._timer.stop()
         self._autoscroll_timer.stop()
+        self._per_cue_timer.stop()
+        self._downreg_timer.stop()
         self._chrome_timer.stop()
         self.remove_access_filter()
         self.cue_view.fade_to_black()

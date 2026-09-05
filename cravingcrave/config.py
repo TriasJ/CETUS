@@ -59,6 +59,7 @@ class AppConfig:
     # Adaptive craving prompts (beyond the fixed periodic timer). Both off by default.
     vas_prompt_after_coping: bool = False      # ask craving after each coping (afrontamiento)
     vas_prompt_every_n_cues: int = 0           # 0 = off, else ask craving every N cue advances
+    vas_prompt_per_cue_seconds: int = 0        # 0 = off, else prompt after N sec on the SAME cue
 
     # Per-session run defaults (also overridable per session in the Parameters popup).
     default_random_order: bool = False         # randomize the cue order
@@ -71,6 +72,21 @@ class AppConfig:
     # Adaptive cue ordering: learn a per-patient low→high craving hierarchy and offer a
     # clinician-reviewed suggested order in the cue library. Off by default.
     adaptive_ordering: bool = False
+
+    # Progressive down-regulation (experimental): gradually applies a down-regulation
+    # lever over the session duration. The progressive value acts as a floor that the
+    # patient can increase but not decrease below.
+    progressive_downreg_enabled: bool = False
+    progressive_downreg_lever: str = "blur"       # "blur" | "shrink" | "dim"
+    progressive_downreg_target_pct: int = 10      # % at session end
+    progressive_downreg_mode: str = "linear"      # "linear" | "stepped"
+    progressive_downreg_step_seconds: int = 10    # for stepped mode: step every N seconds
+
+    # Auto-coping: automatically open the coping panel when the patient records
+    # N consecutive high craving scores (>= threshold).
+    auto_coping_enabled: bool = False
+    auto_coping_threshold: int = 7                # score >= this is "high"
+    auto_coping_consecutive: int = 3              # N consecutive highs → auto-open coping
 
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""

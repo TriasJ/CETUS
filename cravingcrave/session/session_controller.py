@@ -167,6 +167,10 @@ class SessionController(QObject):
     def mark_due_periodic(self) -> None:
         self._last_periodic_sec = self.elapsed_sec()
 
+    def recent_values(self, n: int) -> list[int]:
+        """Return the last *n* exposure craving values (periodic/peak only)."""
+        return self._values[-n:] if n > 0 else []
+
     # --- coping & intensity logging ----------------------------------------
     def record_coping(self, skill: str, detail: str | None = None) -> None:
         self.repos.coping.add(

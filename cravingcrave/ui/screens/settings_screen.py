@@ -225,7 +225,7 @@ class SettingsScreen(QWidget):
     def _session_page(self) -> QScrollArea:
         return self._page([self._build_clinical_card(), self._build_session_options_card(),
                            self._build_autoscroll_card(), self._build_accessibility_card(),
-                           self._build_advanced_card()])
+                           self._build_advanced_card(), self._build_progressive_card()])
 
     # --- session run-option defaults (Session) ------------------------------
     def _build_session_options_card(self) -> QGroupBox:
@@ -277,9 +277,13 @@ class SettingsScreen(QWidget):
         self.vas_after_coping.setChecked(cfg.vas_prompt_after_coping)
         self.vas_every_n = QSpinBox(); self.vas_every_n.setRange(0, 20)
         self.vas_every_n.setValue(cfg.vas_prompt_every_n_cues)
+        self.vas_per_cue = QSpinBox(); self.vas_per_cue.setRange(0, 600)
+        self.vas_per_cue.setSuffix(" s")
+        self.vas_per_cue.setValue(cfg.vas_prompt_per_cue_seconds)
         form = QFormLayout(); form.setSpacing(10)
         form.addRow("", self.vas_after_coping)
         form.addRow(tr("settings.vas_every_n_cues"), self.vas_every_n)
+        form.addRow(tr("settings.vas_per_cue_seconds"), self.vas_per_cue)
         v.addLayout(form)
 
         self.adaptive_ordering = QCheckBox(tr("settings.adaptive_ordering"))
@@ -288,6 +292,59 @@ class SettingsScreen(QWidget):
         hint.setObjectName("Muted"); hint.setWordWrap(True)
         v.addWidget(self.adaptive_ordering)
         v.addWidget(hint)
+
+        # Auto-coping on consecutive high craving scores
+        sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine)
+        v.addWidget(sep)
+        self.auto_coping_enabled = QCheckBox(tr("settings.auto_coping_enabled"))
+        self.auto_coping_enabled.setChecked(cfg.auto_coping_enabled)
+        self.auto_coping_threshold = QSpinBox(); self.auto_coping_threshold.setRange(1, cfg.vas_max)
+        self.auto_coping_threshold.setValue(cfg.auto_coping_threshold)
+        self.auto_coping_consecutive = QSpinBox(); self.auto_coping_consecutive.setRange(1, 10)
+        self.auto_coping_consecutive.setValue(cfg.auto_coping_consecutive)
+        v.addWidget(self.auto_coping_enabled)
+        form2 = QFormLayout(); form2.setSpacing(10)
+        form2.addRow(tr("settings.auto_coping_threshold"), self.auto_coping_threshold)
+        form2.addRow(tr("settings.auto_coping_consecutive"), self.auto_coping_consecutive)
+        v.addLayout(form2)
+        return box
+
+    def _build_progressive_card(self) -> QGroupBox:
+        cfg = self.context.config
+        box, v = self._card("settings.progressive_title", "settings.progressive_hint")
+        self.progressive_enabled = QCheckBox(tr("settings.progressive_enabled"))
+        self.progressive_enabled.setChecked(cfg.progressive_downreg_enabled)
+        v.addWidget(self.progressive_enabled)
+
+        self.progressive_lever = QComboBox()
+        for code, label_key in [("blur", "intensity.blur"), ("dim", "intensity.dim"),
+                                ("shrink", "intensity.size")]:
+            self.progressive_lever.addItem(tr(label_key), code)
+        idx = self.progressive_lever.findData(cfg.progressive_downreg_lever)
+        if idx >= 0:
+            self.progressive_lever.setCurrentIndex(idx)
+
+        self.progressive_target = QSpinBox(); self.progressive_target.setRange(1, 100)
+        self.progressive_target.setSuffix(" %")
+        self.progressive_target.setValue(cfg.progressive_downreg_target_pct)
+
+        self.progressive_mode = QComboBox()
+        self.progressive_mode.addItem(tr("settings.progressive_linear"), "linear")
+        self.progressive_mode.addItem(tr("settings.progressive_stepped"), "stepped")
+        idx = self.progressive_mode.findData(cfg.progressive_downreg_mode)
+        if idx >= 0:
+            self.progressive_mode.setCurrentIndex(idx)
+
+        self.progressive_step_sec = QSpinBox(); self.progressive_step_sec.setRange(1, 600)
+        self.progressive_step_sec.setSuffix(" s")
+        self.progressive_step_sec.setValue(cfg.progressive_downreg_step_seconds)
+
+        form = QFormLayout(); form.setSpacing(10)
+        form.addRow(tr("settings.progressive_lever"), self.progressive_lever)
+        form.addRow(tr("settings.progressive_target"), self.progressive_target)
+        form.addRow(tr("settings.progressive_mode"), self.progressive_mode)
+        form.addRow(tr("settings.progressive_step_sec"), self.progressive_step_sec)
+        v.addLayout(form)
         return box
 
     # --- appearance: language + theme (User) --------------------------------
@@ -538,11 +595,31 @@ class SettingsScreen(QWidget):
         if hasattr(self, "vas_after_coping"):
             cfg.vas_prompt_after_coping = self.vas_after_coping.isChecked()
             cfg.vas_prompt_every_n_cues = self.vas_every_n.value()
+            cfg.vas_prompt_per_cue_seconds = self.vas_per_cue.value()
             s.set("vas_prompt_after_coping", "1" if cfg.vas_prompt_after_coping else "0")
             s.set("vas_prompt_every_n_cues", str(cfg.vas_prompt_every_n_cues))
+            s.set("vas_prompt_per_cue_seconds", str(cfg.vas_prompt_per_cue_seconds))
         if hasattr(self, "adaptive_ordering"):
             cfg.adaptive_ordering = self.adaptive_ordering.isChecked()
             s.set("adaptive_ordering", "1" if cfg.adaptive_ordering else "0")
+        if hasattr(self, "auto_coping_enabled"):
+            cfg.auto_coping_enabled = self.auto_coping_enabled.isChecked()
+            cfg.auto_coping_threshold = self.auto_coping_threshold.value()
+            cfg.auto_coping_consecutive = self.auto_coping_consecutive.value()
+            s.set("auto_coping_enabled", "1" if cfg.auto_coping_enabled else "0")
+            s.set("auto_coping_threshold", str(cfg.auto_coping_threshold))
+            s.set("auto_coping_consecutive", str(cfg.auto_coping_consecutive))
+        if hasattr(self, "progressive_enabled"):
+            cfg.progressive_downreg_enabled = self.progressive_enabled.isChecked()
+            cfg.progressive_downreg_lever = self.progressive_lever.currentData()
+            cfg.progressive_downreg_target_pct = self.progressive_target.value()
+            cfg.progressive_downreg_mode = self.progressive_mode.currentData()
+            cfg.progressive_downreg_step_seconds = self.progressive_step_sec.value()
+            s.set("progressive_downreg_enabled", "1" if cfg.progressive_downreg_enabled else "0")
+            s.set("progressive_downreg_lever", cfg.progressive_downreg_lever)
+            s.set("progressive_downreg_target_pct", str(cfg.progressive_downreg_target_pct))
+            s.set("progressive_downreg_mode", cfg.progressive_downreg_mode)
+            s.set("progressive_downreg_step_seconds", str(cfg.progressive_downreg_step_seconds))
         if hasattr(self, "default_random_order"):
             cfg.default_random_order = self.default_random_order.isChecked()
             cfg.default_loop = self.default_loop.isChecked()

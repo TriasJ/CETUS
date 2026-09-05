@@ -73,7 +73,22 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.default_random_order = as_bool("default_random_order", config.default_random_order)
     config.default_loop = as_bool("default_loop", config.default_loop)
     config.default_start_fullscreen = as_bool("default_start_fullscreen", config.default_start_fullscreen)
+    config.vas_prompt_per_cue_seconds = as_int("vas_prompt_per_cue_seconds", config.vas_prompt_per_cue_seconds)
     config.adaptive_ordering = as_bool("adaptive_ordering", config.adaptive_ordering)
+
+    config.progressive_downreg_enabled = as_bool("progressive_downreg_enabled", config.progressive_downreg_enabled)
+    lever = s.get("progressive_downreg_lever")
+    if lever in ("blur", "shrink", "dim"):
+        config.progressive_downreg_lever = lever
+    config.progressive_downreg_target_pct = as_int("progressive_downreg_target_pct", config.progressive_downreg_target_pct)
+    mode = s.get("progressive_downreg_mode")
+    if mode in ("linear", "stepped"):
+        config.progressive_downreg_mode = mode
+    config.progressive_downreg_step_seconds = as_int("progressive_downreg_step_seconds", config.progressive_downreg_step_seconds)
+
+    config.auto_coping_enabled = as_bool("auto_coping_enabled", config.auto_coping_enabled)
+    config.auto_coping_threshold = as_int("auto_coping_threshold", config.auto_coping_threshold)
+    config.auto_coping_consecutive = as_int("auto_coping_consecutive", config.auto_coping_consecutive)
     # The clinic-selected UI language (persisted by the language switcher) overrides
     # the bootstrap default. app.main() applies it to i18n after the context is built.
     locale = s.get("locale")
