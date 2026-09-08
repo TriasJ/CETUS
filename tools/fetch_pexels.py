@@ -152,6 +152,10 @@ def main() -> None:
         "--video-quality", default="hd", choices=("sd", "hd", "fhd", "uhd"),
         help="preferred video quality (ignored for photo)",
     )
+    ap.add_argument(
+        "--no-reencode", action="store_true",
+        help="skip ffmpeg re-encode (default: re-encode to H.264+AAC if ffmpeg is available)",
+    )
     args = ap.parse_args()
 
     api_key = _load_api_key(args.media_root)
@@ -242,7 +246,32 @@ def _fetch_videos(api_key: str, args: argparse.Namespace, out_dir: Path, slug: s
         res = f"{vf.get('width', '?')}x{vf.get('height', '?')}"
         dest = out_dir / f"px_{slug}_{i:02d}.mp4"
 
-        if _download(dl_url, dest, timeout=120):
+        reencode = not args.no_reencode and shutil.which("ffmpeg")
+        ok = False
+        if reencode:
+            import tempfile, subprocess
+            tmp = Path(tempfile.mktemp(suffix=".mp4"))
+            if _download(dl_url, tmp, timeout=120):
+                print(f"  Re-encoding to H.264 + AAC…")
+                cmd = [
+                    "ffmpeg", "-y", "-i", str(tmp),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                    "-c:a", "aac", "-movflags", "+faststart",
+                    str(dest),
+                ]
+                result = subprocess.run(cmd, capture_output=True, text=True,
+                                       creationflags=subprocess.CREATE_NO_WINDOW
+                                       if sys.platform == "win32" else 0)
+                tmp.unlink(missing_ok=True)
+                ok = result.returncode == 0
+                if not ok:
+                    print(f"  ! ffmpeg failed for {dest.name}")
+            else:
+                tmp.unlink(missing_ok=True)
+        else:
+            ok = _download(dl_url, dest, timeout=120)
+
+        if ok:
             saved += 1
             user = video.get("user", {})
             creator = user.get("name", "")

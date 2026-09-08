@@ -21,6 +21,8 @@ import csv
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -209,7 +211,8 @@ class DownloadWorker(QThread):
     finished_err = Signal(str)
 
     def __init__(self, items: list[dict], media_type: str, save_dir: Path,
-                 slug: str, size_key: str, video_quality: int) -> None:
+                 slug: str, size_key: str, video_quality: int,
+                 reencode: bool = False) -> None:
         super().__init__()
         self.items = items
         self.media_type = media_type
@@ -217,6 +220,7 @@ class DownloadWorker(QThread):
         self.slug = slug
         self.size_key = size_key
         self.video_quality = video_quality
+        self.reencode = reencode
         self._cancelled = False
 
     def cancel(self) -> None:
@@ -312,8 +316,31 @@ class DownloadWorker(QThread):
 
         req = urllib.request.Request(dl_url, headers={"User-Agent": USER_AGENT})
         try:
-            with urllib.request.urlopen(req, timeout=120) as resp:
-                dest.write_bytes(resp.read())
+            if self.reencode and shutil.which("ffmpeg"):
+                # Download to temp, re-encode to H.264+AAC for safe clinical playback.
+                import tempfile
+                with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
+                    tmp_path = Path(tmp.name)
+                with urllib.request.urlopen(req, timeout=120) as resp:
+                    tmp_path.write_bytes(resp.read())
+                self.log.emit(f"  Re-encoding to H.264 + AAC…")
+                cmd = [
+                    "ffmpeg", "-y", "-i", str(tmp_path),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                    "-c:a", "aac", "-movflags", "+faststart",
+                    str(dest),
+                ]
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True,
+                    creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+                )
+                tmp_path.unlink(missing_ok=True)
+                if result.returncode != 0:
+                    self.log.emit(f"  ! ffmpeg failed: {result.stderr[-200:]}")
+                    return False, None
+            else:
+                with urllib.request.urlopen(req, timeout=120) as resp:
+                    dest.write_bytes(resp.read())
             self.log.emit(f"  [ok] {dest.name}")
             return True, [dest.name, "Pexels License", creator, video.get("url", "")]
         except Exception as exc:
@@ -519,6 +546,15 @@ class PexelsDownloader(QWidget):
         browse_btn.clicked.connect(self._browse_folder)
         dl_row.addWidget(browse_btn)
         root.addLayout(dl_row)
+
+        # Re-encode checkbox (for videos)
+        self.reencode_cb = QCheckBox("Re-encode videos to H.264 + AAC (safe clinical playback)")
+        has_ffmpeg = shutil.which("ffmpeg") is not None
+        self.reencode_cb.setChecked(has_ffmpeg)
+        self.reencode_cb.setEnabled(has_ffmpeg)
+        if not has_ffmpeg:
+            self.reencode_cb.setToolTip("Requires ffmpeg on PATH")
+        root.addWidget(self.reencode_cb)
 
         # Action buttons
         btn_row = QHBoxLayout()
@@ -889,6 +925,7 @@ class PexelsDownloader(QWidget):
             slug=slug,
             size_key=self.size_combo.currentText().lower().replace(" ", ""),
             video_quality=video_max_h,
+            reencode=self.reencode_cb.isChecked(),
         )
         self._download_worker.log.connect(self._on_log)
         self._download_worker.progress.connect(self.progress_bar.setValue)
