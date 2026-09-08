@@ -383,6 +383,7 @@ class PexelsDownloader(QWidget):
         self._current_items: list[dict] = []
         self._current_meta: dict = {}
         self._cards: list[ResultCard] = []
+        self._queued_items: list[dict] = []   # accumulates across pages
         self._search_worker: SearchWorker | None = None
         self._thumb_worker: ThumbnailWorker | None = None
         self._download_worker: DownloadWorker | None = None
@@ -527,9 +528,23 @@ class PexelsDownloader(QWidget):
         self.select_none_btn = QPushButton("Select None")
         self.select_none_btn.clicked.connect(lambda: self._set_all_selected(False))
         btn_row.addWidget(self.select_none_btn)
+
+        add_queue_btn = QPushButton("➕ Add to Queue")
+        add_queue_btn.clicked.connect(self._add_to_queue)
+        btn_row.addWidget(add_queue_btn)
+
+        self.queue_label = QLabel("Queue: 0")
+        self.queue_label.setObjectName("Muted")
+        self.queue_label.setMinimumWidth(80)
+        btn_row.addWidget(self.queue_label)
+
+        clear_queue_btn = QPushButton("Clear Queue")
+        clear_queue_btn.clicked.connect(self._clear_queue)
+        btn_row.addWidget(clear_queue_btn)
+
         btn_row.addStretch()
 
-        self.download_btn = QPushButton("  Download Selected  ")
+        self.download_btn = QPushButton("  Download All Queued  ")
         self.download_btn.setObjectName("Primary")
         self.download_btn.clicked.connect(self._on_download)
         btn_row.addWidget(self.download_btn)
@@ -669,6 +684,35 @@ class PexelsDownloader(QWidget):
         for card in self._cards:
             card.set_selected(selected)
 
+    def _add_to_queue(self) -> None:
+        """Add currently checked items to the persistent download queue."""
+        existing_ids = {item.get("id") for item in self._queued_items}
+        added = 0
+        for card in self._cards:
+            if card.is_selected():
+                item = self._current_items[card.index]
+                if item.get("id") not in existing_ids:
+                    self._queued_items.append(item)
+                    existing_ids.add(item.get("id"))
+                    added += 1
+                card.set_selected(False)  # uncheck after queuing
+        self._update_queue_label()
+        if added:
+            self._on_log(f"Added {added} item(s) to queue. Total: {len(self._queued_items)}")
+
+    def _clear_queue(self) -> None:
+        self._queued_items.clear()
+        self._update_queue_label()
+        self._on_log("Queue cleared.")
+
+    def _update_queue_label(self) -> None:
+        n = len(self._queued_items)
+        self.queue_label.setText(f"Queue: {n}")
+        if n > 0:
+            self.queue_label.setStyleSheet(f"color: {PRIMARY}; font-weight: 600;")
+        else:
+            self.queue_label.setStyleSheet(f"color: {MUTED};")
+
     def _clear_results(self) -> None:
         for card in self._cards:
             card.setParent(None)
@@ -789,23 +833,43 @@ class PexelsDownloader(QWidget):
     # -- pagination --------------------------------------------------------
 
     def _on_prev_page(self) -> None:
+        self._auto_queue_checked()
         page = self._current_meta.get("page", 1)
         if page > 1:
             self._on_search(page=page - 1)
 
     def _on_next_page(self) -> None:
+        self._auto_queue_checked()
         page = self._current_meta.get("page", 1)
         self._on_search(page=page + 1)
+
+    def _auto_queue_checked(self) -> None:
+        """Auto-save any checked items to the queue before navigating away."""
+        existing_ids = {item.get("id") for item in self._queued_items}
+        for card in self._cards:
+            if card.is_selected():
+                item = self._current_items[card.index]
+                if item.get("id") not in existing_ids:
+                    self._queued_items.append(item)
+                    existing_ids.add(item.get("id"))
+        self._update_queue_label()
 
     # -- download ----------------------------------------------------------
 
     def _on_download(self) -> None:
-        selected_indices = [c.index for c in self._cards if c.is_selected()]
-        if not selected_indices:
-            QMessageBox.warning(self, "Nothing selected", "Select at least one item to download.")
+        # Collect: queued items + any currently checked on this page
+        existing_ids = {item.get("id") for item in self._queued_items}
+        page_selected = [
+            self._current_items[c.index] for c in self._cards
+            if c.is_selected() and self._current_items[c.index].get("id") not in existing_ids
+        ]
+        all_items = self._queued_items + page_selected
+        if not all_items:
+            QMessageBox.warning(self, "Nothing selected",
+                                "Add items to the queue or select items on this page.")
             return
 
-        selected_items = [self._current_items[i] for i in selected_indices]
+        selected_items = all_items
         query = self.query_edit.text().strip()
         slug = "".join(c if c.isalnum() else "-" for c in query.lower())[:24].strip("-") or "pexels"
 
@@ -846,7 +910,9 @@ class PexelsDownloader(QWidget):
         self.download_btn.setEnabled(True)
         self.cancel_btn.setEnabled(False)
         self.progress_bar.setValue(100)
-        self._on_log(f"\n✅ Downloaded {count} file(s).")
+        self._queued_items.clear()
+        self._update_queue_label()
+        self._on_log(f"\n✅ Downloaded {count} file(s). Queue cleared.")
         QMessageBox.information(
             self,
             "Download complete",
