@@ -244,11 +244,28 @@ class SettingsScreen(QWidget):
         v.addWidget(self.default_random_order)
         v.addWidget(self.default_loop)
         v.addWidget(self.default_start_fullscreen)
+
+        self.cue_audio_mode = QComboBox()
+        for code, label_key in [("auto", "settings.cue_audio_auto"),
+                                ("always", "settings.cue_audio_always"),
+                                ("muted", "settings.cue_audio_muted"),
+                                ("audio_only", "settings.cue_audio_only")]:
+            self.cue_audio_mode.addItem(tr(label_key), code)
+        idx = self.cue_audio_mode.findData(cfg.cue_audio_mode)
+        if idx >= 0:
+            self.cue_audio_mode.setCurrentIndex(idx)
+        form = QFormLayout(); form.setSpacing(10)
+        form.addRow(tr("settings.cue_audio_label"), self.cue_audio_mode)
+        v.addLayout(form)
         return box
 
     def _user_page(self) -> QScrollArea:
-        return self._page([self._build_contacts_card(), self._build_language_card(),
-                           self._build_branding_card()])
+        cards = [self._build_contacts_card(), self._build_language_card(),
+                 self._build_branding_card()]
+        tools_card = self._build_tools_card()
+        if tools_card is not None:
+            cards.append(tools_card)
+        return self._page(cards)
 
     # --- clinical parameters (Session) --------------------------------------
     def _build_clinical_card(self) -> QGroupBox:
@@ -522,6 +539,66 @@ class SettingsScreen(QWidget):
         self.context.repos.settings.set("clinic_logo_path", "")
         self._refresh_logo_label()
 
+    # --- media tools launcher (local only, not shipped) ----------------------
+    def _build_tools_card(self) -> QGroupBox | None:
+        """Show launcher buttons for offline media tools (only when the tools/ dir exists).
+
+        Works both in dev (tools/ is next to the package) and when the frozen exe
+        sits inside the project tree (dist/CETUS.exe → ../../tools/).  The venv
+        python is discovered by probing standard locations relative to the project
+        root so the tool scripts can be executed even from the frozen binary.
+        """
+        import subprocess, sys
+        from pathlib import Path
+
+        # Locate the project root and tools/ dir.
+        if getattr(sys, "frozen", False):
+            # Frozen exe: dist/CETUS.exe → project root is two levels up.
+            project_root = Path(sys.executable).resolve().parent.parent
+        else:
+            # Dev: cravingcrave/ui/screens/settings_screen.py → 3 levels to package, +1 to root.
+            project_root = Path(__file__).resolve().parents[3]
+
+        tools_dir = project_root / "tools"
+        if not tools_dir.is_dir():
+            return None
+        pexels_gui = tools_dir / "pexels_gui.py"
+        if not pexels_gui.exists():
+            return None
+
+        # Find a usable Python interpreter (the venv, NOT the frozen exe).
+        venv_python = project_root / ".venv" / "Scripts" / "python.exe"
+        if not venv_python.exists():
+            venv_python = project_root / ".venv" / "bin" / "python"
+        if not venv_python.exists() and not getattr(sys, "frozen", False):
+            venv_python = Path(sys.executable)  # fallback: dev python
+        if not venv_python.exists():
+            return None  # no usable interpreter → hide the card
+
+        box, v = self._card("settings.tools_title" if "settings.tools_title" in
+                            self.context.config.__dict__ else "settings.tools_title")
+        # Use direct strings (local-only, not i18n'd)
+        box.setTitle("Herramientas de medios")
+        hint = QLabel("Descargadores de medios para la biblioteca de señales (solo local).")
+        hint.setObjectName("Muted"); hint.setWordWrap(True)
+        v.addWidget(hint)
+
+        def _launch(script: Path) -> None:
+            subprocess.Popen(
+                [str(venv_python), str(script)],
+                cwd=str(project_root),
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+            )
+
+        row = QHBoxLayout()
+        if pexels_gui.exists():
+            px_btn = QPushButton("📷  Pexels Downloader")
+            px_btn.clicked.connect(lambda: _launch(pexels_gui))
+            row.addWidget(px_btn)
+        row.addStretch(1)
+        v.addLayout(row)
+        return box
+
     # --- custom substances (Substances) -------------------------------------
     def _build_substances_card(self) -> QGroupBox:
         box, v = self._card("settings.substances_title", "settings.substances_intro")
@@ -631,6 +708,9 @@ class SettingsScreen(QWidget):
             s.set("default_random_order", "1" if cfg.default_random_order else "0")
             s.set("default_loop", "1" if cfg.default_loop else "0")
             s.set("default_start_fullscreen", "1" if cfg.default_start_fullscreen else "0")
+        if hasattr(self, "cue_audio_mode"):
+            cfg.cue_audio_mode = self.cue_audio_mode.currentData()
+            s.set("cue_audio_mode", cfg.cue_audio_mode)
         if hasattr(self, "clinic_name"):
             s.set("clinic_name", self.clinic_name.text().strip())
         QMessageBox.information(self, tr("app.title"), tr("settings.saved"))
