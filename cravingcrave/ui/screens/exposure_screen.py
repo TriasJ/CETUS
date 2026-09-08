@@ -525,6 +525,7 @@ class ExposureScreen(QWidget):
         N cues. No-op if a prompt/overlay is already up so prompts never stack."""
         if self._prompt_open or self.coping_panel.isVisible() or self.gallery.isVisible():
             return
+        self._per_cue_timer.stop()   # pause dwell counter while rating
         self.controller.mark_due_periodic()
         self._vas_mode = RatingKind.PERIODIC
         self._prompt_open = True
@@ -534,10 +535,15 @@ class ExposureScreen(QWidget):
         """Coping (afrontamiento) panel closed — optionally re-check craving."""
         if self.context.config.vas_prompt_after_coping:
             self._open_periodic_vas()
+        elif self.context.config.vas_prompt_per_cue_seconds > 0:
+            # Resume per-cue dwell timer (patient is back to the cue).
+            # Skip if _open_periodic_vas() was called — it pauses the timer itself.
+            self._per_cue_timer.start()
 
     def _mark_peak(self) -> None:
         if self._prompt_open:
             return
+        self._per_cue_timer.stop()   # pause dwell counter while rating
         self._vas_mode = RatingKind.PEAK
         self._prompt_open = True
         self.vas_prompt.ask(tr("vas.peak_title"))
@@ -557,6 +563,12 @@ class ExposureScreen(QWidget):
             coping_triggered = self._maybe_auto_coping()
             if not coping_triggered and self.context.config.autoscroll_on_grading:
                 self._next_cue()
+            # Resume per-cue dwell timer (patient is back to viewing the cue).
+            # _next_cue() restarts it internally, so only resume if cue didn't change.
+            if (not coping_triggered
+                    and not self.context.config.autoscroll_on_grading
+                    and self.context.config.vas_prompt_per_cue_seconds > 0):
+                self._per_cue_timer.start()
 
     def _on_autoscroll_tick(self) -> None:
         # Timed auto-advance; skip while a prompt or a patient panel is up (same guard
@@ -639,14 +651,19 @@ class ExposureScreen(QWidget):
 
     # --- coping & gallery ---------------------------------------------------
     def _open_coping(self) -> None:
+        self._per_cue_timer.stop()   # pause dwell counter — patient is coping, not viewing cue
         self.coping_panel.start()
 
     def _open_gallery(self) -> None:
+        self._per_cue_timer.stop()   # pause dwell counter — patient is viewing positive images
         self.controller.record_intensity("gallery_open")
         self.gallery.open_with(self.positive_paths)
 
     def _on_gallery_closed(self) -> None:
         self.controller.record_intensity("gallery_close")
+        # Resume per-cue dwell timer — patient is back to the cue.
+        if self.context.config.vas_prompt_per_cue_seconds > 0:
+            self._per_cue_timer.start()
 
     # --- habituation & ending ----------------------------------------------
     def _on_habituation(self) -> None:
