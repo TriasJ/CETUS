@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from ..widgets.craving_chart import CravingChart
 
 _log = logging.getLogger(__name__)
@@ -87,8 +88,10 @@ class SummaryScreen(QWidget):
         saved.setObjectName("Muted")
 
         export_btn = QPushButton(tr("summary.export"))
+        export_btn.setIcon(emoji_icon("\U0001F4CA"))
         export_btn.clicked.connect(self._export)
         finish_btn = QPushButton(tr("summary.finish"))
+        finish_btn.setIcon(emoji_icon("✅"))
         finish_btn.setObjectName("Primary")
         finish_btn.clicked.connect(lambda: window.show_patient(patient.id))
 

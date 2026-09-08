@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
 from ...services import substances as subs
 from ...services.i18n import tr
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from .add_clinician_dialog import AddClinicianDialog
 from .patient_form import PatientFormDialog
 
@@ -32,14 +33,19 @@ class DashboardScreen(QWidget):
         welcome.setObjectName("Muted")
 
         add_clinician_btn = QPushButton(tr("dashboard.add_clinician"))
+        add_clinician_btn.setIcon(emoji_icon("✏")); add_clinician_btn.setIconSize(QSize(20, 20))
         add_clinician_btn.clicked.connect(self._add_clinician)
         admin_btn = QPushButton(tr("dashboard.admin"))
+        admin_btn.setIcon(emoji_icon("\U0001F6E1")); admin_btn.setIconSize(QSize(20, 20))
         admin_btn.clicked.connect(window.show_admin_center)
         help_btn = QPushButton(tr("dashboard.help"))
+        help_btn.setIcon(emoji_icon("❓")); help_btn.setIconSize(QSize(20, 20))
         help_btn.clicked.connect(window.show_help)
         settings_btn = QPushButton(tr("dashboard.settings"))
+        settings_btn.setIcon(emoji_icon("⚙")); settings_btn.setIconSize(QSize(20, 20))
         settings_btn.clicked.connect(window.show_settings)
         logout_btn = QPushButton(tr("dashboard.logout"))
+        logout_btn.setIcon(emoji_icon("\U0001F513")); logout_btn.setIconSize(QSize(20, 20))
         logout_btn.clicked.connect(window.show_login)
 
         header = QHBoxLayout()
@@ -58,6 +64,7 @@ class DashboardScreen(QWidget):
         section.setObjectName("H2")
         add_btn = QPushButton(tr("dashboard.add_patient"))
         add_btn.setObjectName("Primary")
+        add_btn.setIcon(emoji_icon("\U0001F464")); add_btn.setIconSize(QSize(20, 20))
         add_btn.clicked.connect(self._add_patient)
 
         section_row = QHBoxLayout()
@@ -71,6 +78,7 @@ class DashboardScreen(QWidget):
         self.list.itemDoubleClicked.connect(self._open_selected)
 
         open_btn = QPushButton(tr("dashboard.open"))
+        open_btn.setIcon(emoji_icon("\U0001F4C2")); open_btn.setIconSize(QSize(20, 20))
         open_btn.clicked.connect(self._open_selected)
 
         layout = QVBoxLayout(self)

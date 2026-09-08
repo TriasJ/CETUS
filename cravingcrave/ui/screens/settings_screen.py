@@ -41,6 +41,7 @@ from ...services.crisis import CrisisInfo
 from ...services.i18n import available_locales, current_locale, tr
 from .. import hotkeys, theme
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from ..widgets.key_capture_button import KeyCaptureButton
 
 _NAV_INK = "#2f5d63"       # dark teal for an unselected row (on white)
@@ -125,10 +126,12 @@ class SettingsScreen(QWidget):
         info = context.crisis.get()
 
         back = QPushButton(tr("common.back"))
+        back.setIcon(emoji_icon("←"))
         back.clicked.connect(window.show_dashboard)
         title = QLabel(tr("settings.title"))
         title.setObjectName("H1")
         help_btn = QPushButton(tr("common.help"))
+        help_btn.setIcon(emoji_icon("❓"))
         help_btn.clicked.connect(lambda: self.window.show_help("settings_help"))
         header = QHBoxLayout()
         header.addWidget(back); header.addSpacing(10); header.addWidget(title)
@@ -176,6 +179,7 @@ class SettingsScreen(QWidget):
         body.addWidget(self.stack, 1)
 
         save = QPushButton(tr("common.save"))
+        save.setIcon(emoji_icon("\U0001F4BE"))
         save.setObjectName("Primary")
         save.clicked.connect(self._save)
         save_row = QHBoxLayout(); save_row.addStretch(1); save_row.addWidget(save)

@@ -9,6 +9,7 @@ from __future__ import annotations
 import dataclasses
 import json
 
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -25,6 +26,7 @@ from ...domain import playlist as playlist_rules
 from ...services import substances as subs
 from ...services.i18n import tr
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from ..widgets.session_params_dialog import SessionParamsDialog
 
 
@@ -44,6 +46,7 @@ class SessionSetupScreen(QWidget):
         self._load_last_params()
 
         back = QPushButton(tr("common.back"))
+        back.setIcon(emoji_icon("←")); back.setIconSize(QSize(20, 20))
         back.clicked.connect(lambda: window.show_patient(patient.id))
         title = QLabel(tr("setup.title"))
         title.setObjectName("H1")
@@ -76,6 +79,7 @@ class SessionSetupScreen(QWidget):
         # Quick run parameters live in the Parameters popup (random order, loop, auto-advance,
         # keyboard-only, time limit, start fullscreen) — all defaulted in Ajustes.
         self.params_btn = QPushButton(tr("setup.parameters"))
+        self.params_btn.setIcon(emoji_icon("⚙")); self.params_btn.setIconSize(QSize(20, 20))
         self.params_btn.clicked.connect(self._open_params)
         self.params_status = QLabel(
             tr("setup.params_custom") if self._params_customized else tr("setup.params_default"))
@@ -89,6 +93,7 @@ class SessionSetupScreen(QWidget):
 
         self.begin = QPushButton(tr("setup.begin"))
         self.begin.setObjectName("Primary")
+        self.begin.setIcon(emoji_icon("▶")); self.begin.setIconSize(QSize(20, 20))
         self.begin.clicked.connect(self._begin)
 
         inner = QVBoxLayout(card)

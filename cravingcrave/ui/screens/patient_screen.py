@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 
 from PySide6.QtCharts import QChart, QChartView, QLineSeries, QValueAxis
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (
     QFileDialog,
@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
 from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from .patient_form import PatientFormDialog
 
 _log = logging.getLogger(__name__)
@@ -43,10 +44,12 @@ class PatientScreen(QWidget):
         self.patient = context.repos.patients.get(patient_id)
 
         back = QPushButton(tr("common.back"))
+        back.setIcon(emoji_icon("←")); back.setIconSize(QSize(20, 20))
         back.clicked.connect(window.show_dashboard)
         self.title = QLabel(tr("patient.detail_title", code=self.patient.code))
         self.title.setObjectName("H1")
         edit_btn = QPushButton(tr("patient.edit"))
+        edit_btn.setIcon(emoji_icon("✏")); edit_btn.setIconSize(QSize(20, 20))
         edit_btn.clicked.connect(self._edit)
 
         header = QHBoxLayout()
@@ -57,16 +60,21 @@ class PatientScreen(QWidget):
         header.addWidget(edit_btn)
 
         cfg_btn = QPushButton(tr("patient.configure_cues"))
+        cfg_btn.setIcon(emoji_icon("\U0001F3AF")); cfg_btn.setIconSize(QSize(20, 20))
         cfg_btn.clicked.connect(lambda: window.show_cue_config(self.patient))
         start_btn = QPushButton(tr("patient.start_session"))
         start_btn.setObjectName("Primary")
+        start_btn.setIcon(emoji_icon("▶")); start_btn.setIconSize(QSize(20, 20))
         start_btn.clicked.connect(lambda: window.show_session_setup(self.patient))
         export_btn = QPushButton(tr("patient.export"))
+        export_btn.setIcon(emoji_icon("\U0001F4CA")); export_btn.setIconSize(QSize(20, 20))
         export_btn.clicked.connect(self._export)
         report_btn = QPushButton(tr("patient.report"))
+        report_btn.setIcon(emoji_icon("\U0001F4CB")); report_btn.setIconSize(QSize(20, 20))
         report_btn.clicked.connect(lambda: window.show_report(self.patient))
         archive_btn = QPushButton(tr("patient.archive"))
         archive_btn.setObjectName("Danger")
+        archive_btn.setIcon(emoji_icon("\U0001F4E6")); archive_btn.setIconSize(QSize(20, 20))
         archive_btn.clicked.connect(self._archive)
 
         actions = QHBoxLayout()

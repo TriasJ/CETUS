@@ -35,6 +35,7 @@ from ..widgets.gallery_panel import GalleryPanel
 from ..widgets.intensity_controls import IntensityControls
 from ..widgets.uscs_panel import UscsPanel
 from ..widgets.vas_slider import VasPrompt
+from ..emoji_icon import emoji_icon
 
 
 class ExposureScreen(QWidget):
@@ -131,14 +132,19 @@ class ExposureScreen(QWidget):
 
         # --- action bar (a frame so it can float over the cue in fullscreen) -
         self.peak_btn = QPushButton(tr("exposure.peak_button"))
+        self.peak_btn.setIcon(emoji_icon("\U0001F4C8"))
         self.peak_btn.clicked.connect(self._mark_peak)
         self.coping_btn = QPushButton(tr("exposure.coping"))
+        self.coping_btn.setIcon(emoji_icon("\U0001F9D8"))
         self.coping_btn.clicked.connect(self._open_coping)
         self.gallery_btn = QPushButton(tr("exposure.positive_gallery"))
+        self.gallery_btn.setIcon(emoji_icon("\U0001F33F"))
         self.gallery_btn.clicked.connect(self._open_gallery)
         self.next_btn = QPushButton(tr("exposure.next_cue"))
+        self.next_btn.setIcon(emoji_icon("⏭"))
         self.next_btn.clicked.connect(self._next_cue)
         self.end_btn = QPushButton(tr("exposure.end"))
+        self.end_btn.setIcon(emoji_icon("⏹"))
         self.end_btn.setObjectName("Primary")
         self.end_btn.clicked.connect(self._end_clicked)
         # Compact counter shown inside the bar only in immersive (fullscreen) mode.

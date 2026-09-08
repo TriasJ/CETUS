@@ -58,6 +58,7 @@ from ...domain import reports
 from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 
 _log = logging.getLogger(__name__)
 
@@ -119,6 +120,7 @@ class ReportScreen(QWidget):
         self._pdf_img_width = 1600
 
         back = QPushButton(tr("common.back"))
+        back.setIcon(emoji_icon("←"))
         back.clicked.connect(lambda: window.show_patient(patient.id))
         title = QLabel(tr("report.title", code=patient.code))
         title.setObjectName("H1")
@@ -132,12 +134,16 @@ class ReportScreen(QWidget):
         self.include_notes = QCheckBox(tr("report.include_notes"))
         self.include_notes.setChecked(True)
         export_png = QPushButton(tr("report.export_png"))
+        export_png.setIcon(emoji_icon("\U0001F4F8"))
         export_png.clicked.connect(self._export_png)
         export_coping = QPushButton(tr("report.export_coping"))
+        export_coping.setIcon(emoji_icon("\U0001F4CA"))
         export_coping.clicked.connect(self._export_coping_csv)
         export_pdf = QPushButton(tr("report.export_pdf_session"))
+        export_pdf.setIcon(emoji_icon("\U0001F4C4"))
         export_pdf.clicked.connect(self._export_pdf)
         export_pdf_full = QPushButton(tr("report.export_pdf_full"))
+        export_pdf_full.setIcon(emoji_icon("\U0001F4C4"))
         export_pdf_full.setObjectName("Primary")
         export_pdf_full.clicked.connect(self._export_pdf_full)
         actions = QHBoxLayout()
@@ -215,6 +221,7 @@ class ReportScreen(QWidget):
         self.notes_edit = QPlainTextEdit()
         self.notes_edit.setMinimumHeight(90)
         save_notes = QPushButton(tr("report.save_notes"))
+        save_notes.setIcon(emoji_icon("\U0001F4BE"))
         save_notes.clicked.connect(self._save_notes)
         notes_btn_row = QHBoxLayout(); notes_btn_row.addStretch(1); notes_btn_row.addWidget(save_notes)
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QComboBox,
@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 
 from ...services.i18n import available_locales, current_locale, tr
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from .admin_dialog import AdminDialog
 
 
@@ -63,9 +64,11 @@ class LoginScreen(QWidget):
             form.addWidget(self.password)
             form.addWidget(self.confirm)
             submit = QPushButton(tr("login.create"))
+            submit.setIcon(emoji_icon("✏")); submit.setIconSize(QSize(20, 20))
         else:
             form.addWidget(self.password)
             submit = QPushButton(tr("login.submit"))
+            submit.setIcon(emoji_icon("\U0001F511")); submit.setIconSize(QSize(20, 20))
 
         submit.setObjectName("Primary")
         submit.clicked.connect(self._submit)
