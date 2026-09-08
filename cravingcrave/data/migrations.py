@@ -11,7 +11,7 @@ import importlib.resources as resources
 import sqlite3
 from collections.abc import Callable
 
-CURRENT_VERSION = 4
+CURRENT_VERSION = 5
 
 
 def _load_schema_sql() -> str:
@@ -49,12 +49,29 @@ def _migrate_to_4(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE clinician ADD COLUMN disabled INTEGER NOT NULL DEFAULT 0")
 
 
+def _migrate_to_5(conn: sqlite3.Connection) -> None:
+    """v5: cue_dwell table — per-cue viewing time tracking."""
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS cue_dwell ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "session_id INTEGER NOT NULL REFERENCES session(id) ON DELETE CASCADE, "
+        "cue_config_id INTEGER REFERENCES cue_config(id), "
+        "start_sec INTEGER NOT NULL, "
+        "end_sec INTEGER NOT NULL, "
+        "dwell_sec INTEGER NOT NULL)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_cue_dwell_session ON cue_dwell(session_id)"
+    )
+
+
 # Ordered: index i upgrades the DB to version (i + 1).
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     _migrate_to_1,
     _migrate_to_2,
     _migrate_to_3,
     _migrate_to_4,
+    _migrate_to_5,
 ]
 
 

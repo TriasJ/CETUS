@@ -91,6 +91,16 @@ CREATE TABLE IF NOT EXISTS intensity_event (
 );
 CREATE INDEX IF NOT EXISTS idx_intensity_session ON intensity_event(session_id);
 
+CREATE TABLE IF NOT EXISTS cue_dwell (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id    INTEGER NOT NULL REFERENCES session(id) ON DELETE CASCADE,
+    cue_config_id INTEGER REFERENCES cue_config(id),
+    start_sec     INTEGER NOT NULL,
+    end_sec       INTEGER NOT NULL,
+    dwell_sec     INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_cue_dwell_session ON cue_dwell(session_id);
+
 CREATE TABLE IF NOT EXISTS app_setting (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL

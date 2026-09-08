@@ -146,9 +146,13 @@ class ReportScreen(QWidget):
         export_pdf_full.setIcon(emoji_icon("\U0001F4C4"))
         export_pdf_full.setObjectName("Primary")
         export_pdf_full.clicked.connect(self._export_pdf_full)
+        export_dwell = QPushButton(tr("report.export_dwell_csv"))
+        export_dwell.setIcon(emoji_icon("\U0001F4CA"))
+        export_dwell.clicked.connect(self._export_dwell_csv)
         actions = QHBoxLayout()
         actions.addWidget(self.include_notes); actions.addStretch(1)
-        actions.addWidget(export_png); actions.addWidget(export_coping)
+        actions.addWidget(export_dwell); actions.addWidget(export_png)
+        actions.addWidget(export_coping)
         actions.addWidget(export_pdf); actions.addWidget(export_pdf_full)
 
         layout = QVBoxLayout(self)
@@ -210,11 +214,17 @@ class ReportScreen(QWidget):
         caveat = QLabel(tr("report.exploratory_caveat")); caveat.setObjectName("Muted"); caveat.setWordWrap(True)
 
         self.cue_table = QTableWidget()
-        self.cue_table.setColumnCount(5)
+        self.cue_table.setColumnCount(7)
         self.cue_table.setHorizontalHeaderLabels(
-            [tr("report.col_cue"), tr("report.col_mean"), tr("report.col_peak"),
-             tr("report.col_reactivity"), tr("report.col_count")])
+            [tr("report.dwell_col_cue"), tr("report.dwell_col_dwell"),
+             tr("report.dwell_col_views"), tr("report.dwell_col_mean"),
+             tr("report.dwell_col_peak"), tr("report.dwell_col_reactivity"),
+             tr("report.col_count")])
         self.cue_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+
+        self.dwell_summary = QLabel()
+        self.dwell_summary.setWordWrap(True)
+        self.dwell_summary.setStyleSheet("font-size: 13px; padding: 6px 0;")
 
         self.coping_list = QListWidget()
 
@@ -231,7 +241,7 @@ class ReportScreen(QWidget):
         left.addWidget(self._card(tr("report.metrics"), self.metrics_table, caveat), 2)
 
         right = QVBoxLayout(); right.setSpacing(12)
-        right.addWidget(self._card(tr("report.per_cue"), self.cue_table), 2)
+        right.addWidget(self._card(tr("report.dwell_title"), self.cue_table, self.dwell_summary), 3)
         right.addWidget(self._card(tr("report.coping_text"), self.coping_list), 2)
         right.addWidget(self._card(tr("report.clinician_notes"), self.notes_edit, notes_btn_row), 2)
 
@@ -255,6 +265,73 @@ class ReportScreen(QWidget):
         self._update_notes_badge(bool(notes))
         QMessageBox.information(self, tr("app.title"), tr("report.notes_saved"))
 
+    def _update_dwell_summary(self, analysis: list[dict], cue_index: dict) -> None:
+        """Build the text summary below the per-cue table."""
+        if not analysis:
+            self.dwell_summary.setText(tr("report.no_dwell_data"))
+            return
+
+        lines: list[str] = []
+        # Highest craving cue
+        with_craving = [a for a in analysis if a["mean_craving"] is not None]
+        if with_craving:
+            top = max(with_craving, key=lambda a: a["mean_craving"])
+            cue = cue_index.get(top["cue_config_id"])
+            name = _short(cue.media_path) if cue else "—"
+            mean_str = f"{top['mean_craving']:.1f}"
+            lines.append(
+                f"🔴 <b>{tr('report.dwell_highest_craving')}</b>: {name} — "
+                f"{tr('report.dwell_summary_craving', mean=mean_str, peak=top['peak_craving'])}"
+            )
+
+        # Longest dwell cue
+        longest = reports.highest_dwell_cue(analysis)
+        if longest:
+            cue = cue_index.get(longest["cue_config_id"])
+            name = _short(cue.media_path) if cue else "—"
+            lines.append(
+                f"⏱ <b>{tr('report.dwell_longest_viewing')}</b>: {name} — "
+                f"{tr('report.dwell_summary_dwell', seconds=longest['total_dwell_sec'], views=longest['view_count'])}"
+            )
+
+        # Most challenging (combined)
+        provocative = reports.most_provocative_cue(analysis)
+        if provocative:
+            cue = cue_index.get(provocative["cue_config_id"])
+            name = _short(cue.media_path) if cue else "—"
+            lines.append(
+                f"⚠ <b>{tr('report.dwell_most_challenging')}</b>: {name} — "
+                f"{tr('report.dwell_summary_combined')}"
+            )
+
+        self.dwell_summary.setText("<br>".join(lines) if lines else tr("report.no_dwell_data"))
+        self.dwell_summary.setTextFormat(Qt.TextFormat.RichText)
+
+    def _export_dwell_csv(self) -> None:
+        """Export per-cue dwell + craving analysis for the selected session."""
+        sid = self.session_combo.currentData()
+        if sid is None:
+            return
+        session = self.context.repos.sessions.get(sid)
+        ratings = self.context.repos.ratings.list_for_session(sid)
+        dwell_events = self.context.repos.cue_dwell.list_for_session(sid)
+        analysis = reports.per_cue_analysis(ratings, dwell_events)
+
+        if not analysis:
+            QMessageBox.information(self, tr("app.title"), tr("report.no_dwell_data"))
+            return
+
+        cue_index = self._patient_cue_index()
+        cue_names = {cid: _short(c.media_path) for cid, c in cue_index.items()}
+
+        default_name = export.safe_filename(self.patient.code, "per_cue_analysis")
+        path, _ = QFileDialog.getSaveFileName(self, tr("report.export_dwell_csv"),
+                                               default_name, "CSV (*.csv)")
+        if not path:
+            return
+        export.export_session_dwell(Path(path), self.patient.code, session, analysis, cue_names)
+        QMessageBox.information(self, tr("app.title"), tr("export.saved", path=path))
+
     def _refresh_session(self, _idx: int) -> None:
         sid = self.session_combo.currentData()
         if sid is None:
@@ -272,22 +349,30 @@ class ReportScreen(QWidget):
         # --- session metrics ----------------------------------------------
         self._fill_metrics_table(reports.session_metrics(sel, ratings))
 
-        # --- per-cue table (bold the highest-reactivity cue) --------------
-        per_cue = reports.per_cue_craving(ratings)
+        # --- per-cue table with dwell data -----------------------------------
+        dwell_events = self.context.repos.cue_dwell.list_for_session(sid)
+        analysis = reports.per_cue_analysis(ratings, dwell_events)
         top_id = reports.highest_reactivity_cue_id(ratings)
-        self.cue_table.setRowCount(len(per_cue))
-        for row, info in enumerate(per_cue):
+        self.cue_table.setRowCount(len(analysis))
+        for row, info in enumerate(analysis):
             cue = cue_index.get(info["cue_config_id"])
             cells = [
                 _short(cue.media_path) if cue else "—",
-                f"{info['mean']:.1f}", str(info["peak"]),
-                f"+{info['cue_reactivity']}", str(info["count"]),
+                str(info["total_dwell_sec"]),
+                str(info["view_count"]),
+                _fmt(info["mean_craving"], decimals=1),
+                _fmt(info["peak_craving"]),
+                _fmt(info["cue_reactivity"], decimals=0) if info["cue_reactivity"] is not None else "—",
+                str(info["view_count"]),
             ]
             for col, text in enumerate(cells):
                 item = QTableWidgetItem(text)
                 if info["cue_config_id"] == top_id:
                     f = item.font(); f.setBold(True); item.setFont(f)
                 self.cue_table.setItem(row, col, item)
+
+        # --- dwell summary text ----------------------------------------------
+        self._update_dwell_summary(analysis, cue_index)
 
         # --- coping text list ---------------------------------------------
         self.coping_list.clear()
@@ -703,20 +788,25 @@ class ReportScreen(QWidget):
         blocks = []
         for i, s in enumerate(sessions, start=1):
             ratings = self.context.repos.ratings.list_for_session(s.id)
+            dwell_events = self.context.repos.cue_dwell.list_for_session(s.id)
+            analysis = reports.per_cue_analysis(ratings, dwell_events)
             top_id = reports.highest_reactivity_cue_id(ratings)
             per_cue_rows = ""
-            for info in reports.per_cue_craving(ratings):
+            for info in analysis:
                 cue = cue_index.get(info["cue_config_id"])
                 name = _short(cue.media_path) if cue else "—"
                 if info["cue_config_id"] == top_id:
                     name = f"<b>{name}</b>"
+                mean_c = f"{info['mean_craving']:.1f}" if info["mean_craving"] is not None else "—"
+                peak_c = str(info["peak_craving"]) if info["peak_craving"] is not None else "—"
+                react = f"+{info['cue_reactivity']}" if info["cue_reactivity"] is not None else "—"
                 per_cue_rows += (
                     f"<tr><td>{name}</td>"
-                    f"<td>{info['mean']:.1f}</td><td>{info['peak']}</td>"
-                    f"<td>+{info['cue_reactivity']}</td><td>{info['count']}</td></tr>"
+                    f"<td>{info['total_dwell_sec']}</td><td>{info['view_count']}</td>"
+                    f"<td>{mean_c}</td><td>{peak_c}</td>"
+                    f"<td>{react}</td></tr>"
                 )
-            ratings_full = self.context.repos.ratings.list_for_session(s.id)
-            metrics_html = _metrics_table_html(reports.session_metrics(s, ratings_full))
+            metrics_html = _metrics_table_html(reports.session_metrics(s, ratings))
             notes_html = ""
             if include_notes and s.clinician_notes:
                 notes_html = (
@@ -728,11 +818,14 @@ class ReportScreen(QWidget):
                 f"<h3 {page_break}>{tr('report.session_section')} {i} — {s.started_at[:16]}</h3>"
                 f"<p><img src='img://session-{s.id}' width='{self._pdf_img_width}'></p>"
                 f"<h4>{tr('report.metrics')}</h4>{metrics_html}"
-                f"<h4>{tr('report.per_cue')}</h4>"
+                f"<h4>{tr('report.dwell_title')}</h4>"
                 f"<table border='1' cellpadding='4' cellspacing='0'>"
-                f"<tr><th>{tr('report.col_cue')}</th><th>{tr('report.col_mean')}</th>"
-                f"<th>{tr('report.col_peak')}</th><th>{tr('report.col_reactivity')}</th>"
-                f"<th>{tr('report.col_count')}</th></tr>"
+                f"<tr><th>{tr('report.dwell_col_cue')}</th>"
+                f"<th>{tr('report.dwell_col_dwell')}</th>"
+                f"<th>{tr('report.dwell_col_views')}</th>"
+                f"<th>{tr('report.dwell_col_mean')}</th>"
+                f"<th>{tr('report.dwell_col_peak')}</th>"
+                f"<th>{tr('report.dwell_col_reactivity')}</th></tr>"
                 f"{per_cue_rows}</table>"
                 f"{self._coping_html(s.id)}"
                 f"{notes_html}"
@@ -785,18 +878,24 @@ class ReportScreen(QWidget):
         sel_block = ""
         if sel:
             ratings = self.context.repos.ratings.list_for_session(sel.id)
+            dwell_events = self.context.repos.cue_dwell.list_for_session(sel.id)
+            analysis = reports.per_cue_analysis(ratings, dwell_events)
             cue_index = self._patient_cue_index()
             top_id = reports.highest_reactivity_cue_id(ratings)
             rows_per_cue = ""
-            for info in reports.per_cue_craving(ratings):
+            for info in analysis:
                 cue = cue_index.get(info["cue_config_id"])
                 name = _short(cue.media_path) if cue else "—"
                 if info["cue_config_id"] == top_id:
                     name = f"<b>{name}</b>"
+                mean_c = f"{info['mean_craving']:.1f}" if info["mean_craving"] is not None else "—"
+                peak_c = str(info["peak_craving"]) if info["peak_craving"] is not None else "—"
+                react = f"+{info['cue_reactivity']}" if info["cue_reactivity"] is not None else "—"
                 rows_per_cue += (
                     f"<tr><td>{name}</td>"
-                    f"<td>{info['mean']:.1f}</td><td>{info['peak']}</td>"
-                    f"<td>+{info['cue_reactivity']}</td><td>{info['count']}</td></tr>"
+                    f"<td>{info['total_dwell_sec']}</td><td>{info['view_count']}</td>"
+                    f"<td>{mean_c}</td><td>{peak_c}</td>"
+                    f"<td>{react}</td></tr>"
                 )
             notes_html = ""
             if include_notes and sel.clinician_notes:
@@ -810,11 +909,14 @@ class ReportScreen(QWidget):
                 f"<p><img src='img://detail' width='{self._pdf_img_width}'></p>"
                 f"<h3>{tr('report.metrics')}</h3>"
                 f"{_metrics_table_html(reports.session_metrics(sel, ratings))}"
-                f"<h3>{tr('report.per_cue')}</h3>"
+                f"<h3>{tr('report.dwell_title')}</h3>"
                 f"<table border='1' cellpadding='4' cellspacing='0'>"
-                f"<tr><th>{tr('report.col_cue')}</th><th>{tr('report.col_mean')}</th>"
-                f"<th>{tr('report.col_peak')}</th><th>{tr('report.col_reactivity')}</th>"
-                f"<th>{tr('report.col_count')}</th></tr>"
+                f"<tr><th>{tr('report.dwell_col_cue')}</th>"
+                f"<th>{tr('report.dwell_col_dwell')}</th>"
+                f"<th>{tr('report.dwell_col_views')}</th>"
+                f"<th>{tr('report.dwell_col_mean')}</th>"
+                f"<th>{tr('report.dwell_col_peak')}</th>"
+                f"<th>{tr('report.dwell_col_reactivity')}</th></tr>"
                 f"{rows_per_cue}</table>"
                 f"{self._coping_html(sel.id)}"
                 f"{notes_html}"

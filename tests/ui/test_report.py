@@ -236,7 +236,7 @@ def test_metrics_table_and_reactivity_column(ctx, qtbot):
     window = MainWindow(ctx); qtbot.addWidget(window); window.show()
     screen = ReportScreen(window, ctx, p); qtbot.addWidget(screen)
     assert screen.metrics_table.rowCount() == 8         # 8 metric rows
-    assert screen.cue_table.columnCount() == 5          # added reactivity column
+    assert screen.cue_table.columnCount() == 7          # expanded with dwell columns
     assert screen.recovery_view.chart() is not None     # spontaneous-recovery chart built
     # metrics appear in the PDF HTML
     html = screen._build_html()

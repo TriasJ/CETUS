@@ -14,7 +14,7 @@ from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-from ..domain.models import CopingEvent, CravingRating, IntensityEvent, Session
+from ..domain.models import CopingEvent, CravingRating, CueDwell, IntensityEvent, Session
 
 # Explicit allowlist — PII columns (display_name/birth_year/notes) are NOT here.
 SESSION_COLUMNS = [
@@ -183,4 +183,39 @@ def export_coping_responses(
                     "skill_label": labels.get(e.skill, e.skill),
                     "response_text": e.detail or "",
                 })
+    return path
+
+
+CUE_DWELL_COLUMNS = [
+    "patient_code", "session_id", "cue_media_path",
+    "total_dwell_sec", "view_count", "mean_craving", "peak_craving", "cue_reactivity",
+]
+
+
+def export_session_dwell(
+    path: Path,
+    patient_code: str,
+    session: Session,
+    analysis: Sequence[dict],
+    cue_names: dict[int, str],
+) -> Path:
+    """Per-cue dwell + craving analysis for one session (expanded report CSV).
+
+    ``analysis``: output of ``reports.per_cue_analysis()``.
+    ``cue_names``: maps cue_config_id → human-readable media filename.
+    """
+    with open(path, "w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=CUE_DWELL_COLUMNS)
+        writer.writeheader()
+        for a in analysis:
+            writer.writerow({
+                "patient_code": patient_code,
+                "session_id": session.id,
+                "cue_media_path": cue_names.get(a["cue_config_id"], ""),
+                "total_dwell_sec": a["total_dwell_sec"],
+                "view_count": a["view_count"],
+                "mean_craving": a["mean_craving"] if a["mean_craving"] is not None else "",
+                "peak_craving": a["peak_craving"] if a["peak_craving"] is not None else "",
+                "cue_reactivity": a["cue_reactivity"] if a["cue_reactivity"] is not None else "",
+            })
     return path

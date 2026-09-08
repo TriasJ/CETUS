@@ -40,6 +40,73 @@ def highest_reactivity_cue_id(ratings) -> int | None:
     return max(per_cue, key=lambda c: c["cue_reactivity"])["cue_config_id"]
 
 
+def per_cue_analysis(ratings, dwell_events) -> list[dict]:
+    """Combine craving ratings and dwell tracking per cue for the expanded report.
+
+    Returns one dict per cue (first-appearance order by dwell_events, then ratings)
+    with keys: cue_config_id, total_dwell_sec, view_count, mean_craving, peak_craving,
+    cue_reactivity.
+    """
+    # Aggregate dwell time per cue
+    dwell_by_cue: OrderedDict[int, dict] = OrderedDict()
+    for d in dwell_events:
+        cid = d.cue_config_id
+        if cid is None:
+            continue
+        entry = dwell_by_cue.setdefault(cid, {"total": 0, "views": 0})
+        entry["total"] += d.dwell_sec
+        entry["views"] += 1
+
+    # Aggregate craving ratings per cue
+    craving_by_cue: dict[int, list[int]] = {}
+    for r in ratings:
+        cid = r.cue_config_id
+        if cid is None:
+            continue
+        craving_by_cue.setdefault(cid, []).append(int(r.value))
+
+    # Merge: use dwell key order, then add any cues that have ratings but no dwell
+    all_cids: list[int] = list(dwell_by_cue.keys())
+    for cid in craving_by_cue:
+        if cid not in dwell_by_cue:
+            all_cids.append(cid)
+
+    out = []
+    for cid in all_cids:
+        dw = dwell_by_cue.get(cid, {"total": 0, "views": 0})
+        vs = craving_by_cue.get(cid, [])
+        out.append({
+            "cue_config_id": cid,
+            "total_dwell_sec": dw["total"],
+            "view_count": dw["views"],
+            "mean_craving": round(sum(vs) / len(vs), 1) if vs else None,
+            "peak_craving": max(vs) if vs else None,
+            "cue_reactivity": (max(vs) - vs[0]) if vs else None,
+        })
+    return out
+
+
+def highest_dwell_cue(analysis: list[dict]) -> dict | None:
+    """Cue with the longest total dwell time."""
+    with_dwell = [a for a in analysis if a["total_dwell_sec"] > 0]
+    return max(with_dwell, key=lambda a: a["total_dwell_sec"]) if with_dwell else None
+
+
+def most_provocative_cue(analysis: list[dict]) -> dict | None:
+    """Cue with both highest craving and longest dwell (combined ranking).
+
+    Ranks by ``mean_craving * total_dwell_sec`` — a cue that is both highly
+    provocative and held on screen for a long time.
+    """
+    scored = [
+        a for a in analysis
+        if a["mean_craving"] is not None and a["total_dwell_sec"] > 0
+    ]
+    if not scored:
+        return None
+    return max(scored, key=lambda a: a["mean_craving"] * a["total_dwell_sec"])
+
+
 def coping_skill_counts(coping_events) -> dict[str, int]:
     """How many times each USCS skill was used."""
     return dict(Counter(e.skill for e in coping_events))

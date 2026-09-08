@@ -23,6 +23,7 @@ from ..domain.models import (
     Clinician,
     CopingEvent,
     CravingRating,
+    CueDwell,
     CueConfig,
     EndReason,
     IntensityEvent,
@@ -72,6 +73,7 @@ class SessionController(QObject):
         self._peak = 0
         self._baseline: int | None = None
         self._finalized = False
+        self._cue_start_sec: int | None = None   # for dwell tracking
 
     # --- lifecycle ----------------------------------------------------------
     def begin(self) -> Session:
@@ -111,9 +113,27 @@ class SessionController(QObject):
     def current_cue_index(self) -> int:
         return self._cue_index
 
+    def _record_cue_dwell(self) -> None:
+        """Persist a dwell row for the outgoing cue (if any)."""
+        if self._cue_start_sec is None or self.session is None:
+            return
+        cue = self.current_cue()
+        end = self.elapsed_sec()
+        dwell = end - self._cue_start_sec
+        if dwell > 0 and cue is not None:
+            self.repos.cue_dwell.add(CueDwell(
+                session_id=self.session.id,
+                cue_config_id=cue.id,
+                start_sec=self._cue_start_sec,
+                end_sec=end,
+                dwell_sec=dwell,
+            ))
+        self._cue_start_sec = end
+
     def advance_cue(self) -> CueConfig | None:
         if not self.exposure_cues:
             return None
+        self._record_cue_dwell()
         if self._cue_index < len(self.exposure_cues) - 1:
             self._cue_index += 1
         elif self.loop:
@@ -124,6 +144,7 @@ class SessionController(QObject):
     def previous_cue(self) -> CueConfig | None:
         if not self.exposure_cues:
             return None
+        self._record_cue_dwell()
         if self._cue_index > 0:
             self._cue_index -= 1
         elif self.loop:
@@ -163,6 +184,7 @@ class SessionController(QObject):
 
     def start_exposure(self) -> None:
         self._set_state(SessionState.EXPOSURE)
+        self._cue_start_sec = self.elapsed_sec()   # mark first cue onset
 
     def mark_due_periodic(self) -> None:
         self._last_periodic_sec = self.elapsed_sec()
@@ -198,6 +220,7 @@ class SessionController(QObject):
         """Write the closing fields exactly once. Idempotent against double-calls."""
         if self._finalized or self.session is None:
             return self.session
+        self._record_cue_dwell()   # flush the last cue's dwell
         if endpoint_value is not None:
             self.session.endpoint_vas = max(0, min(self.config.vas_max, int(endpoint_value)))
         ratings = self.repos.ratings.list_for_session(self.session.id)

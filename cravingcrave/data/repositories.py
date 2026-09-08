@@ -12,6 +12,7 @@ from ..domain.models import (
     Clinician,
     CopingEvent,
     CravingRating,
+    CueDwell,
     CueConfig,
     IntensityEvent,
     Patient,
@@ -407,6 +408,44 @@ class IntensityEventRepo:
         ]
 
 
+class CueDwellRepo:
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
+    def add(self, d: CueDwell) -> CueDwell:
+        with self.db.transaction() as conn:
+            cur = conn.execute(
+                "INSERT INTO cue_dwell (session_id, cue_config_id, start_sec, end_sec, dwell_sec) "
+                "VALUES (?,?,?,?,?)",
+                (d.session_id, d.cue_config_id, d.start_sec, d.end_sec, d.dwell_sec),
+            )
+            d.id = cur.lastrowid
+        return d
+
+    def list_for_session(self, session_id: int) -> list[CueDwell]:
+        rows = self.db.conn.execute(
+            "SELECT * FROM cue_dwell WHERE session_id = ? ORDER BY start_sec, id",
+            (session_id,),
+        ).fetchall()
+        return [self._row(r) for r in rows]
+
+    def list_for_patient(self, patient_id: int) -> list[CueDwell]:
+        """Every cue dwell for a patient across all sessions (for cross-session analysis)."""
+        rows = self.db.conn.execute(
+            "SELECT d.* FROM cue_dwell d JOIN session s ON d.session_id = s.id "
+            "WHERE s.patient_id = ? ORDER BY d.session_id, d.start_sec, d.id",
+            (patient_id,),
+        ).fetchall()
+        return [self._row(r) for r in rows]
+
+    @staticmethod
+    def _row(r: sqlite3.Row) -> CueDwell:
+        return CueDwell(
+            id=r["id"], session_id=r["session_id"], cue_config_id=r["cue_config_id"],
+            start_sec=r["start_sec"], end_sec=r["end_sec"], dwell_sec=r["dwell_sec"],
+        )
+
+
 class SettingRepo:
     def __init__(self, db: Database) -> None:
         self.db = db
@@ -462,5 +501,6 @@ class Repositories:
         self.ratings = CravingRatingRepo(db)
         self.coping = CopingEventRepo(db)
         self.intensity = IntensityEventRepo(db)
+        self.cue_dwell = CueDwellRepo(db)
         self.settings = SettingRepo(db)
         self.audit = AuditRepo(db)

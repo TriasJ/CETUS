@@ -151,6 +151,16 @@ class IntensityEvent:
 
 
 @dataclass
+class CueDwell:
+    id: int | None = None
+    session_id: int = 0
+    cue_config_id: int | None = None
+    start_sec: int = 0
+    end_sec: int = 0
+    dwell_sec: int = 0
+
+
+@dataclass
 class MediaItem:
     """A media file discovered on disk (not necessarily yet a configured cue)."""
 
