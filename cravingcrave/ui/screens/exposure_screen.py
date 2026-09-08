@@ -444,6 +444,19 @@ class ExposureScreen(QWidget):
         self.ambient_btn.setText(tr("exposure.ambient_unmute") if muted else tr("exposure.ambient_mute"))
         self.controller.record_intensity(IntensityAction.AMBIENT_MUTE.value, muted=muted)
 
+    # --- cue audio mode -----------------------------------------------------
+    def _should_mute_cue(self, cue) -> bool:
+        """Decide whether the cue's audio should start muted based on the config."""
+        mode = self.context.config.cue_audio_mode
+        if mode == "muted":
+            return True
+        if mode == "always":
+            return False
+        if mode == "audio_only":
+            return cue.media_type != "audio"
+        # "auto": mute when ambient sound is active
+        return bool(self.ambient_path)
+
     # --- cue handling -------------------------------------------------------
     def _load_cue(self) -> None:
         cue = self.controller.current_cue()
@@ -460,6 +473,10 @@ class ExposureScreen(QWidget):
         if self.context.config.progressive_downreg_enabled:
             self._enforce_downreg_floor()
         scale, blur, dim, muted = self.intensity.state()
+        # Apply cue audio mode: decide whether to start this cue muted.
+        muted = self._should_mute_cue(cue)
+        if muted:
+            self.intensity._mute_btn.setChecked(True)
         self.cue_view.set_intensity(scale, blur, dim, muted)
         # Restart per-cue dwell timer (resets the per-cue clock on each cue change).
         if self.context.config.vas_prompt_per_cue_seconds > 0:

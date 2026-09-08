@@ -70,6 +70,9 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.accessibility_kbmode = as_bool("accessibility_kbmode", config.accessibility_kbmode)
     config.vas_prompt_after_coping = as_bool("vas_prompt_after_coping", config.vas_prompt_after_coping)
     config.vas_prompt_every_n_cues = as_int("vas_prompt_every_n_cues", config.vas_prompt_every_n_cues)
+    cue_audio = s.get("cue_audio_mode")
+    if cue_audio in ("auto", "always", "muted", "audio_only"):
+        config.cue_audio_mode = cue_audio
     config.default_random_order = as_bool("default_random_order", config.default_random_order)
     config.default_loop = as_bool("default_loop", config.default_loop)
     config.default_start_fullscreen = as_bool("default_start_fullscreen", config.default_start_fullscreen)

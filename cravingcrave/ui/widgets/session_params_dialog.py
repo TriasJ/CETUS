@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import (
     QCheckBox,
+    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFormLayout,
@@ -68,6 +69,17 @@ class SessionParamsDialog(QDialog):
         self.auto_coping = QCheckBox(tr("settings.auto_coping_enabled"))
         self.auto_coping.setChecked(config.auto_coping_enabled)
 
+        # Cue audio mode
+        self.cue_audio_mode = QComboBox()
+        for code, label_key in [("auto", "settings.cue_audio_auto"),
+                                ("always", "settings.cue_audio_always"),
+                                ("muted", "settings.cue_audio_muted"),
+                                ("audio_only", "settings.cue_audio_only")]:
+            self.cue_audio_mode.addItem(tr(label_key), code)
+        idx = self.cue_audio_mode.findData(config.cue_audio_mode)
+        if idx >= 0:
+            self.cue_audio_mode.setCurrentIndex(idx)
+
         # Full-width rows for the checkboxes so their (long) labels never clip; the two
         # spinboxes keep a right-aligned label column.
         form = QFormLayout(); form.setSpacing(12)
@@ -85,6 +97,7 @@ class SessionParamsDialog(QDialog):
         form.addRow(self.progressive_enabled)
         form.addRow(tr("settings.progressive_target"), self.progressive_target)
         form.addRow(self.auto_coping)
+        form.addRow(tr("settings.cue_audio_label"), self.cue_audio_mode)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -119,6 +132,7 @@ class SessionParamsDialog(QDialog):
             "progressive_downreg_enabled": self.progressive_enabled.isChecked(),
             "progressive_downreg_target_pct": self.progressive_target.value(),
             "auto_coping_enabled": self.auto_coping.isChecked(),
+            "cue_audio_mode": self.cue_audio_mode.currentData(),
         }
 
     def wants_fullscreen(self) -> bool:

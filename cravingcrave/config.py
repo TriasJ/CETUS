@@ -61,6 +61,13 @@ class AppConfig:
     vas_prompt_every_n_cues: int = 0           # 0 = off, else ask craving every N cue advances
     vas_prompt_per_cue_seconds: int = 0        # 0 = off, else prompt after N sec on the SAME cue
 
+    # Cue audio mode: controls whether video/audio cue sound plays during exposure.
+    # "auto"       = mute cue audio when ambient sound is active (default; avoids cacophony)
+    # "always"     = always play cue audio (even over ambient)
+    # "muted"      = always start cue audio muted
+    # "audio_only" = play audio only for audio-type cues, mute video audio
+    cue_audio_mode: str = "auto"
+
     # Per-session run defaults (also overridable per session in the Parameters popup).
     default_random_order: bool = False         # randomize the cue order
     default_loop: bool = False                 # loop the cue list at the ends
