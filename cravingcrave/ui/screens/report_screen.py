@@ -87,9 +87,12 @@ def _fmt(value, suffix: str = "", decimals: int | None = None) -> str:
 
 
 # Consistent PDF table styling — used by all HTML tables in the report.
-_TBL = ("border='1' cellpadding='6' cellspacing='0' "
-        "style='font-size:11pt;border-collapse:collapse;width:100%;margin:6px 0'")
-_TH = "style='background:#f0f4f5;padding:5px 8px'"
+# Qt's QTextDocument needs width as an HTML attribute, not CSS, to fill the page.
+_TBL = ("width='100%' border='1' cellpadding='6' cellspacing='0' "
+        "style='font-size:11pt;border-collapse:collapse;margin:6px 0;"
+        "page-break-inside:avoid'")
+_TH = "style='background:#f0f4f5;padding:5px 8px;font-weight:bold'"
+_PB = "style='page-break-before:always'"  # force a new page
 
 
 def _metrics_table_html(m: dict) -> str:
@@ -827,10 +830,16 @@ class ReportScreen(QWidget):
                     f"<h4>{tr('report.clinician_notes')}</h4>"
                     f"<p style='white-space:pre-wrap'>{_html_escape(s.clinician_notes)}</p>"
                 )
-            page_break = "style='page-break-before: always'" if i > 1 else ""
+            # Page 1: chart (full page for readability)
+            page_break = _PB if i > 1 else ""
             blocks.append(
-                f"<h3 {page_break}>{tr('report.session_section')} {i} — {s.started_at[:16]}</h3>"
+                f"<h3 {page_break}>{tr('report.session_section')} {i} — "
+                f"{s.started_at[:16]}</h3>"
                 f"<p><img src='img://session-{s.id}' width='{self._pdf_img_width}'></p>"
+            )
+            # Page 2: metrics + per-cue analysis + coping + notes
+            blocks.append(
+                f"<div {_PB}>"
                 f"<h4>{tr('report.metrics')}</h4>{metrics_html}"
                 f"<h4>{tr('report.dwell_title')}</h4>"
                 f"<table {_TBL}>"
@@ -843,6 +852,7 @@ class ReportScreen(QWidget):
                 f"{per_cue_rows}</table>"
                 f"{self._coping_html(s.id)}"
                 f"{notes_html}"
+                f"</div>"
             )
 
         return (
@@ -851,12 +861,19 @@ class ReportScreen(QWidget):
             f"{tr('report.sessions_total', n=len(sessions))}</p>"
             f"<p style='color:#922'><b>{tr('report.disclaimer')}</b></p>"
             f"<p style='color:#666'><i>{tr('report.exploratory_caveat')}</i></p>"
+            # Progress charts — one per page for full-size readability
             f"<h2>{tr('report.progress_section')}</h2>"
             f"<p><img src='img://trends' width='{self._pdf_img_width}'></p>"
+            f"<div {_PB}>"
             f"<p><img src='img://slope'  width='{self._pdf_img_width}'></p>"
+            f"</div>"
+            f"<div {_PB}>"
             f"<p><img src='img://recovery' width='{self._pdf_img_width}'></p>"
-            f"{summary_table}"
-            f"<h2>{tr('report.full_per_session')}</h2>"
+            f"</div>"
+            # Summary table — own page
+            f"<div {_PB}>{summary_table}</div>"
+            # Per-session detail blocks
+            f"<h2 {_PB}>{tr('report.full_per_session')}</h2>"
             f"{''.join(blocks)}"
         )
 
@@ -923,10 +940,16 @@ class ReportScreen(QWidget):
                     f"<h3>{tr('report.clinician_notes')}</h3>"
                     f"<p style='white-space:pre-wrap'>{_html_escape(sel.clinician_notes)}</p>"
                 )
+            # Page 1: chart (full page)
             sel_block = (
                 f"<h2>{tr('report.session_section')}</h2>"
-                f"<p><b>{sel.started_at}</b> · {tr(END_REASON_KEYS.get(sel.end_reason, '')) or '—'}</p>"
+                f"<p><b>{sel.started_at}</b> · "
+                f"{tr(END_REASON_KEYS.get(sel.end_reason, '')) or '—'}</p>"
                 f"<p><img src='img://detail' width='{self._pdf_img_width}'></p>"
+            )
+            # Page 2: metrics + per-cue + coping + notes
+            sel_block += (
+                f"<div {_PB}>"
                 f"<h3>{tr('report.metrics')}</h3>"
                 f"{_metrics_table_html(reports.session_metrics(sel, ratings))}"
                 f"<h3>{tr('report.dwell_title')}</h3>"
@@ -940,6 +963,7 @@ class ReportScreen(QWidget):
                 f"{rows_per_cue}</table>"
                 f"{self._coping_html(sel.id)}"
                 f"{notes_html}"
+                f"</div>"
             )
         return (
             f"{self._header_html(tr('report.title', code=self.patient.code), has_logo)}"
@@ -948,10 +972,12 @@ class ReportScreen(QWidget):
             f"<p style='color:#922'><b>{tr('report.disclaimer')}</b></p>"
             f"<p style='color:#666'><i>{tr('report.exploratory_caveat')}</i></p>"
             f"{sel_block}"
-            f"<h2>{tr('report.progress_section')}</h2>"
+            f"<h2 {_PB}>{tr('report.progress_section')}</h2>"
             f"<p><img src='img://trends' width='{self._pdf_img_width}'></p>"
+            f"<div {_PB}>"
             f"<p><img src='img://slope'  width='{self._pdf_img_width}'></p>"
             f"<p><img src='img://recovery' width='{self._pdf_img_width}'></p>"
+            f"</div>"
         )
 
 
