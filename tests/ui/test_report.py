@@ -62,7 +62,7 @@ def test_report_screen_populates_from_data(ctx, qtbot, monkeypatch):
     screen = ReportScreen(window, ctx, p); qtbot.addWidget(screen)
     assert screen.session_combo.count() == 1
     assert screen.cue_table.rowCount() == 1
-    assert screen.coping_list.count() == 2
+    assert screen.coping_table.rowCount() == 2
     assert screen.detail_chart_view.chart() is not None
     assert screen.trends_view.chart() is not None
     assert screen.slope_view.chart() is not None
@@ -236,7 +236,7 @@ def test_metrics_table_and_reactivity_column(ctx, qtbot):
     window = MainWindow(ctx); qtbot.addWidget(window); window.show()
     screen = ReportScreen(window, ctx, p); qtbot.addWidget(screen)
     assert screen.metrics_table.rowCount() == 8         # 8 metric rows
-    assert screen.cue_table.columnCount() == 7          # expanded with dwell columns
+    assert screen.cue_table.columnCount() == 6          # dwell + craving columns (no duplicate)
     assert screen.recovery_view.chart() is not None     # spontaneous-recovery chart built
     # metrics appear in the PDF HTML
     html = screen._build_html()

@@ -41,7 +41,6 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QLabel,
     QLayout,
-    QListWidget,
     QMessageBox,
     QPlainTextEdit,
     QPushButton,
@@ -90,9 +89,12 @@ def _fmt(value, suffix: str = "", decimals: int | None = None) -> str:
 def _metrics_table_html(m: dict) -> str:
     """2-column HTML table of the session metrics (for the PDF)."""
     cells = "".join(
-        f"<tr><td><b>{label}</b></td><td>{value}</td></tr>" for label, value in _metric_rows(m)
+        f"<tr><td style='padding:4px 8px'><b>{label}</b></td>"
+        f"<td style='padding:4px 8px;text-align:right'>{value}</td></tr>"
+        for label, value in _metric_rows(m)
     )
-    return f"<table border='1' cellpadding='4' cellspacing='0'>{cells}</table>"
+    return (f"<table border='1' cellpadding='6' cellspacing='0' "
+            f"style='font-size:11pt;border-collapse:collapse'>{cells}</table>")
 
 
 def _metric_rows(m: dict) -> list[tuple[str, str]]:
@@ -214,19 +216,26 @@ class ReportScreen(QWidget):
         caveat = QLabel(tr("report.exploratory_caveat")); caveat.setObjectName("Muted"); caveat.setWordWrap(True)
 
         self.cue_table = QTableWidget()
-        self.cue_table.setColumnCount(7)
+        self.cue_table.setColumnCount(6)
         self.cue_table.setHorizontalHeaderLabels(
             [tr("report.dwell_col_cue"), tr("report.dwell_col_dwell"),
              tr("report.dwell_col_views"), tr("report.dwell_col_mean"),
-             tr("report.dwell_col_peak"), tr("report.dwell_col_reactivity"),
-             tr("report.col_count")])
+             tr("report.dwell_col_peak"), tr("report.dwell_col_reactivity")])
         self.cue_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self.cue_table.setMaximumHeight(160)
 
         self.dwell_summary = QLabel()
         self.dwell_summary.setWordWrap(True)
         self.dwell_summary.setStyleSheet("font-size: 13px; padding: 6px 0;")
 
-        self.coping_list = QListWidget()
+        self.coping_table = QTableWidget()
+        self.coping_table.setColumnCount(3)
+        self.coping_table.setHorizontalHeaderLabels(
+            [tr("report.col_time"), tr("report.col_skill"), tr("report.col_response")])
+        self.coping_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+        self.coping_table.verticalHeader().setVisible(False)
+        self.coping_table.setWordWrap(True)
+        self.coping_table.setTextElideMode(Qt.TextElideMode.ElideNone)
 
         self.notes_edit = QPlainTextEdit()
         self.notes_edit.setMinimumHeight(90)
@@ -242,7 +251,7 @@ class ReportScreen(QWidget):
 
         right = QVBoxLayout(); right.setSpacing(12)
         right.addWidget(self._card(tr("report.dwell_title"), self.cue_table, self.dwell_summary), 3)
-        right.addWidget(self._card(tr("report.coping_text"), self.coping_list), 2)
+        right.addWidget(self._card(tr("report.coping_text"), self.coping_table), 2)
         right.addWidget(self._card(tr("report.clinician_notes"), self.notes_edit, notes_btn_row), 2)
 
         cols = QHBoxLayout(); cols.setSpacing(14)
@@ -363,7 +372,6 @@ class ReportScreen(QWidget):
                 _fmt(info["mean_craving"], decimals=1),
                 _fmt(info["peak_craving"]),
                 _fmt(info["cue_reactivity"], decimals=0) if info["cue_reactivity"] is not None else "—",
-                str(info["view_count"]),
             ]
             for col, text in enumerate(cells):
                 item = QTableWidgetItem(text)
@@ -374,14 +382,14 @@ class ReportScreen(QWidget):
         # --- dwell summary text ----------------------------------------------
         self._update_dwell_summary(analysis, cue_index)
 
-        # --- coping text list ---------------------------------------------
-        self.coping_list.clear()
-        for e in coping:
-            label = tr(SKILL_LABELS.get(e.skill, ("", QColor()))[0]) if e.skill in SKILL_LABELS else e.skill
-            line = f"[{e.elapsed_sec:>4}s]  {label}"
-            if e.detail:
-                line += f"  —  {e.detail}"
-            self.coping_list.addItem(line)
+        # --- coping table (structured: time | skill | response) ------------
+        self.coping_table.setRowCount(len(coping))
+        for row, e in enumerate(coping):
+            skill_label = tr(SKILL_LABELS[e.skill][0]) if e.skill in SKILL_LABELS else e.skill
+            self.coping_table.setItem(row, 0, QTableWidgetItem(f"{e.elapsed_sec}s"))
+            self.coping_table.setItem(row, 1, QTableWidgetItem(skill_label))
+            self.coping_table.setItem(row, 2, QTableWidgetItem(e.detail or "—"))
+        self.coping_table.resizeRowsToContents()
 
         # --- clinician notes ----------------------------------------------
         self.notes_edit.setPlainText((sel.clinician_notes if sel else "") or "")
@@ -858,13 +866,21 @@ class ReportScreen(QWidget):
         for e in events:
             skill = labels.get(e.skill, e.skill)
             text = _html_escape(e.detail) if e.detail else "—"
-            rows += (f"<tr><td>{e.elapsed_sec}s</td><td>{skill}</td>"
-                     f"<td style='white-space:pre-wrap'>{text}</td></tr>")
+            rows += (
+                f"<tr>"
+                f"<td style='white-space:nowrap;text-align:right'>{e.elapsed_sec}s</td>"
+                f"<td style='white-space:nowrap'>{skill}</td>"
+                f"<td style='white-space:pre-wrap;word-break:break-word'>{text}</td>"
+                f"</tr>"
+            )
         return (
-            f"<h3>{tr('report.coping_text')}</h3>"
-            f"<table border='1' cellpadding='4' cellspacing='0'>"
-            f"<tr><th>{tr('report.col_time')}</th><th>{tr('report.col_skill')}</th>"
-            f"<th>{tr('report.col_response')}</th></tr>"
+            f"<h4>{tr('report.coping_text')}</h4>"
+            f"<table border='1' cellpadding='6' cellspacing='0' "
+            f"style='font-size:11pt;border-collapse:collapse;width:100%'>"
+            f"<tr style='background:#f0f4f5'>"
+            f"<th style='width:8%'>{tr('report.col_time')}</th>"
+            f"<th style='width:28%'>{tr('report.col_skill')}</th>"
+            f"<th style='width:64%'>{tr('report.col_response')}</th></tr>"
             f"{rows}</table>"
         )
 
