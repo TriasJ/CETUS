@@ -86,6 +86,12 @@ def _fmt(value, suffix: str = "", decimals: int | None = None) -> str:
     return f"{value}{suffix}"
 
 
+# Consistent PDF table styling — used by all HTML tables in the report.
+_TBL = ("border='1' cellpadding='6' cellspacing='0' "
+        "style='font-size:11pt;border-collapse:collapse;width:100%;margin:6px 0'")
+_TH = "style='background:#f0f4f5;padding:5px 8px'"
+
+
 def _metrics_table_html(m: dict) -> str:
     """2-column HTML table of the session metrics (for the PDF)."""
     cells = "".join(
@@ -93,8 +99,7 @@ def _metrics_table_html(m: dict) -> str:
         f"<td style='padding:4px 8px;text-align:right'>{value}</td></tr>"
         for label, value in _metric_rows(m)
     )
-    return (f"<table border='1' cellpadding='6' cellspacing='0' "
-            f"style='font-size:11pt;border-collapse:collapse'>{cells}</table>")
+    return f"<table {_TBL}>{cells}</table>"
 
 
 def _metric_rows(m: dict) -> list[tuple[str, str]]:
@@ -784,11 +789,12 @@ class ReportScreen(QWidget):
             )
         summary_table = (
             f"<h2>{tr('report.summary_table')}</h2>"
-            f"<table border='1' cellpadding='4' cellspacing='0'>"
-            f"<tr><th>#</th><th>{tr('report.col_date')}</th><th>{tr('report.col_endreason')}</th>"
-            f"<th>{tr('summary.baseline')}</th><th>{tr('summary.peak')}</th>"
-            f"<th>{tr('summary.endpoint')}</th><th>{tr('report.col_change')}</th>"
-            f"<th>{tr('report.col_slope')}</th><th>{tr('report.col_notes')}</th></tr>"
+            f"<table {_TBL}>"
+            f"<tr><th {_TH}>#</th><th {_TH}>{tr('report.col_date')}</th>"
+            f"<th {_TH}>{tr('report.col_endreason')}</th>"
+            f"<th {_TH}>{tr('summary.baseline')}</th><th {_TH}>{tr('summary.peak')}</th>"
+            f"<th {_TH}>{tr('summary.endpoint')}</th><th {_TH}>{tr('report.col_change')}</th>"
+            f"<th {_TH}>{tr('report.col_slope')}</th><th {_TH}>{tr('report.col_notes')}</th></tr>"
             f"{''.join(rows)}</table>"
         )
 
@@ -827,13 +833,13 @@ class ReportScreen(QWidget):
                 f"<p><img src='img://session-{s.id}' width='{self._pdf_img_width}'></p>"
                 f"<h4>{tr('report.metrics')}</h4>{metrics_html}"
                 f"<h4>{tr('report.dwell_title')}</h4>"
-                f"<table border='1' cellpadding='4' cellspacing='0'>"
-                f"<tr><th>{tr('report.dwell_col_cue')}</th>"
-                f"<th>{tr('report.dwell_col_dwell')}</th>"
-                f"<th>{tr('report.dwell_col_views')}</th>"
-                f"<th>{tr('report.dwell_col_mean')}</th>"
-                f"<th>{tr('report.dwell_col_peak')}</th>"
-                f"<th>{tr('report.dwell_col_reactivity')}</th></tr>"
+                f"<table {_TBL}>"
+                f"<tr><th {_TH}>{tr('report.dwell_col_cue')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_dwell')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_views')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_mean')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_peak')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_reactivity')}</th></tr>"
                 f"{per_cue_rows}</table>"
                 f"{self._coping_html(s.id)}"
                 f"{notes_html}"
@@ -875,12 +881,10 @@ class ReportScreen(QWidget):
             )
         return (
             f"<h4>{tr('report.coping_text')}</h4>"
-            f"<table border='1' cellpadding='6' cellspacing='0' "
-            f"style='font-size:11pt;border-collapse:collapse;width:100%'>"
-            f"<tr style='background:#f0f4f5'>"
-            f"<th style='width:8%'>{tr('report.col_time')}</th>"
-            f"<th style='width:28%'>{tr('report.col_skill')}</th>"
-            f"<th style='width:64%'>{tr('report.col_response')}</th></tr>"
+            f"<table {_TBL}>"
+            f"<tr><th {_TH} style='width:8%'>{tr('report.col_time')}</th>"
+            f"<th {_TH} style='width:28%'>{tr('report.col_skill')}</th>"
+            f"<th {_TH} style='width:64%'>{tr('report.col_response')}</th></tr>"
             f"{rows}</table>"
         )
 
@@ -926,13 +930,13 @@ class ReportScreen(QWidget):
                 f"<h3>{tr('report.metrics')}</h3>"
                 f"{_metrics_table_html(reports.session_metrics(sel, ratings))}"
                 f"<h3>{tr('report.dwell_title')}</h3>"
-                f"<table border='1' cellpadding='4' cellspacing='0'>"
-                f"<tr><th>{tr('report.dwell_col_cue')}</th>"
-                f"<th>{tr('report.dwell_col_dwell')}</th>"
-                f"<th>{tr('report.dwell_col_views')}</th>"
-                f"<th>{tr('report.dwell_col_mean')}</th>"
-                f"<th>{tr('report.dwell_col_peak')}</th>"
-                f"<th>{tr('report.dwell_col_reactivity')}</th></tr>"
+                f"<table {_TBL}>"
+                f"<tr><th {_TH}>{tr('report.dwell_col_cue')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_dwell')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_views')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_mean')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_peak')}</th>"
+                f"<th {_TH}>{tr('report.dwell_col_reactivity')}</th></tr>"
                 f"{rows_per_cue}</table>"
                 f"{self._coping_html(sel.id)}"
                 f"{notes_html}"
