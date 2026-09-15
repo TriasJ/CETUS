@@ -24,11 +24,15 @@ CSV_PATH = DOCS / "1-s2.0-S037687162030106X-mmc2.csv"
 MEDIA = ROOT / "media"
 
 # Supplementary PDFs containing the actual cue images.
-PDFS = [
-    DOCS / "1-s2.0-S037687162030106X-mmc1.pdf",
-    DOCS / "1-s2.0-S037687162030106X-mmc3.pdf",
-    DOCS / "1-s2.0-S037687162030106X-mmc4.pdf",
-    DOCS / "1-s2.0-S037687162030106X-mmc5.pdf",
+# Each PDF corresponds to one ImageSet (verified from first-page text):
+#   mmc3 = "Neutral Image"  → media/neutral/   (120 control cues)
+#   mmc4 = "Meth Image"     → media/meth/      (120 meth cues)
+#   mmc5 = "Opioid Image"   → media/opioid/    (120 opioid cues)
+# mmc1 and mmc7 are overview/appendix pages (few images), not cue sets.
+PDFS: list[tuple[Path, str]] = [
+    (DOCS / "1-s2.0-S037687162030106X-mmc3.pdf", "neutral"),
+    (DOCS / "1-s2.0-S037687162030106X-mmc4.pdf", "meth"),
+    (DOCS / "1-s2.0-S037687162030106X-mmc5.pdf", "opioid"),
 ]
 
 # Map CSV categories to media folders.
@@ -85,10 +89,33 @@ def load_csv_metadata() -> dict[str, dict]:
     return meta
 
 
+def _parse_craving_from_text(text: str) -> float | None:
+    """Extract the craving mean from a PDF page's text block.
+
+    Each page has a vertical info panel with headers and values.  The layout
+    (from pymupdf text extraction) places headers first, then values.  The
+    clinical measures appear in order: Typicality, Arousal, Valence, Craving —
+    and the values follow the same order in the numeric block.  The craving
+    value (e.g. "92.07 (12.9)") is always the last "mean (SD)" value before
+    the category label line.
+    """
+    import re
+    # Find all "mean (SD)" patterns — numbers like "92.07 (12.9)".
+    matches = re.findall(r"(\d+\.?\d*)\s*\(\d+\.?\d*\)", text)
+    if not matches:
+        return None
+    # The craving value is the last "mean (SD)" match in the text.
+    # (Order: HSV hue, sat, val → Typicality → Arousal → Valence → Craving)
+    try:
+        return float(matches[-1])
+    except (ValueError, IndexError):
+        return None
+
+
 def extract_images_from_pdfs() -> None:
     """Extract images from each PDF using pymupdf."""
     try:
-        import fitz  # noqa: F401 — pymupdf
+        import pymupdf
     except ImportError:
         print("pymupdf not installed.  Run:  pip install pymupdf")
         sys.exit(1)
@@ -100,17 +127,25 @@ def extract_images_from_pdfs() -> None:
         (MEDIA / folder).mkdir(parents=True, exist_ok=True)
 
     total = 0
-    for pdf_path in PDFS:
+    craving_log: list[tuple[str, float]] = []
+
+    for pdf_path, target_folder in PDFS:
         if not pdf_path.exists():
             print(f"  PDF not found, skipping: {pdf_path.name}")
             continue
 
-        print(f"\nProcessing {pdf_path.name} ...")
-        doc = fitz.open(str(pdf_path))
+        print(f"\nProcessing {pdf_path.name} → media/{target_folder}/ ...")
+        doc = pymupdf.open(str(pdf_path))
+        pdf_tag = pdf_path.stem.split("-")[-1]  # mmc3, mmc4, mmc5
+        cue_num = 0
 
         for page_num in range(len(doc)):
             page = doc[page_num]
             images = page.get_images(full=True)
+
+            # Extract the craving value from the page text.
+            page_text = page.get_text()
+            craving_val = _parse_craving_from_text(page_text)
 
             for img_idx, img in enumerate(images):
                 xref = img[0]
@@ -124,26 +159,26 @@ def extract_images_from_pdfs() -> None:
                 if len(img_bytes) < MIN_IMAGE_BYTES:
                     continue
 
-                # Derive a stable filename from the PDF and page number.
-                pdf_tag = pdf_path.stem.split("-")[-1]          # mmc1, mmc3, …
-                name = f"mocis_{pdf_tag}_p{page_num + 1:03d}_{img_idx + 1}.{ext}"
-
-                # Match the page to a CSV row (CSV uses "Slide{NNN}.jpeg").
-                slide_name = f"Slide{page_num + 1:03d}.jpeg"
-                info = meta.get(slide_name, {})
-                folder = info.get("folder", "neutral")
-
-                dest = MEDIA / folder / name
+                cue_num += 1
+                name = f"mocis_{pdf_tag}_{cue_num:03d}.{ext}"
+                dest = MEDIA / target_folder / name
                 if dest.exists():
                     continue
 
                 dest.write_bytes(img_bytes)
                 total += 1
 
+                if craving_val is not None:
+                    craving_log.append((name, craving_val))
+
         doc.close()
-        print(f"  {pdf_path.name}: done")
+        print(f"  {pdf_path.name}: {cue_num} cue images extracted")
 
     print(f"\nExtracted {total} images total.")
+    if craving_log:
+        print(f"Craving values parsed from {len(craving_log)} pages.")
+        avg = sum(v for _, v in craving_log) / len(craving_log)
+        print(f"  Average craving: {avg:.1f}/100")
 
 
 def main() -> None:
