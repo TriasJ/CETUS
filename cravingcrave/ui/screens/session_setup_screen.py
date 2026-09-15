@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
+    QSpinBox,
     QVBoxLayout,
     QWidget,
 )
@@ -42,6 +43,7 @@ class SessionSetupScreen(QWidget):
         self._random_order = False
         self._loop = False
         self._start_fullscreen = False
+        self._selected_mode = context.config.default_session_mode
         self._params_customized = False
         self._load_last_params()
 
@@ -55,6 +57,43 @@ class SessionSetupScreen(QWidget):
 
         card = QFrame(); card.setObjectName("Card")
         card.setMaximumWidth(620)
+
+        # Session mode selector: Intense / Interspersed / Custom.
+        self.mode_selector = QComboBox()
+        self.mode_selector.addItem(tr("mode.intense"), "intense")
+        self.mode_selector.addItem(tr("mode.interspersed"), "interspersed")
+        self.mode_selector.addItem(tr("mode.custom"), "custom")
+        idx = self.mode_selector.findData(self._selected_mode)
+        if idx >= 0:
+            self.mode_selector.setCurrentIndex(idx)
+        self.mode_selector.currentIndexChanged.connect(self._on_mode_changed)
+
+        # Interspersed-mode parameters (shown for interspersed and custom modes).
+        self._inter_frame = QFrame()
+        inter_layout = QVBoxLayout(self._inter_frame)
+        inter_layout.setContentsMargins(0, 0, 0, 0); inter_layout.setSpacing(8)
+        self.craving_pct_spin = QSpinBox()
+        self.craving_pct_spin.setRange(1, 50); self.craving_pct_spin.setSuffix(" %")
+        self.craving_pct_spin.setValue(context.config.interspersed_craving_pct)
+        self.craving_count_spin = QSpinBox()
+        self.craving_count_spin.setRange(0, 500)
+        self.craving_count_spin.setValue(context.config.interspersed_craving_count)
+        self.min_exposure_spin = QSpinBox()
+        self.min_exposure_spin.setRange(1, 60); self.min_exposure_spin.setSuffix(" s")
+        self.min_exposure_spin.setValue(context.config.interspersed_min_exposure_sec)
+        self.neutral_label = QLabel("")
+        self.neutral_label.setObjectName("Muted")
+        pct_row = QHBoxLayout()
+        pct_row.addWidget(QLabel(tr("setup.interspersed_pct"))); pct_row.addWidget(self.craving_pct_spin)
+        count_row = QHBoxLayout()
+        count_row.addWidget(QLabel(tr("setup.interspersed_count"))); count_row.addWidget(self.craving_count_spin)
+        min_row = QHBoxLayout()
+        min_row.addWidget(QLabel(tr("setup.min_exposure_sec"))); min_row.addWidget(self.min_exposure_spin)
+        inter_layout.addLayout(pct_row)
+        inter_layout.addLayout(count_row)
+        inter_layout.addLayout(min_row)
+        inter_layout.addWidget(self.neutral_label)
+        self._inter_frame.setVisible(self._selected_mode in ("interspersed", "custom"))
 
         self.substance = QComboBox()
         for value, label in subs.available_substances(self.context.repos.settings):
@@ -99,6 +138,10 @@ class SessionSetupScreen(QWidget):
         inner = QVBoxLayout(card)
         inner.setContentsMargins(28, 24, 28, 24)
         inner.setSpacing(14)
+        inner.addWidget(QLabel(tr("setup.mode_label")))
+        inner.addWidget(self.mode_selector)
+        inner.addWidget(self._inter_frame)
+        inner.addSpacing(4)
         inner.addWidget(QLabel(tr("setup.choose_substance")))
         inner.addWidget(self.substance)
         inner.addWidget(self.count_label)
@@ -137,12 +180,23 @@ class SessionSetupScreen(QWidget):
                 paths.append(str(self.context.media.absolute(c.media_path)))
         return paths
 
+    def _on_mode_changed(self) -> None:
+        mode = self.mode_selector.currentData()
+        self._inter_frame.setVisible(mode in ("interspersed", "custom"))
+        self._update()
+
     def _update(self) -> None:
         cues = self._exposure_cues()
         if cues:
             self.count_label.setText(tr("setup.cues_count", n=len(cues)))
         else:
             self.count_label.setText(tr("setup.no_cues"))
+        # Show neutral cue availability when an interspersed/custom mode is selected.
+        mode = self.mode_selector.currentData()
+        if mode in ("interspersed", "custom"):
+            n_neutral = len(self.context.media.by_category("neutral"))
+            self.neutral_label.setText(
+                tr("setup.neutral_count", n=n_neutral) if n_neutral else tr("setup.no_neutral"))
         self.begin.setEnabled(bool(cues) and self.consent.isChecked())
 
     def _params_key(self) -> str:
@@ -167,18 +221,21 @@ class SessionSetupScreen(QWidget):
             self._random_order = bool(d.get("random_order", cfg.default_random_order))
             self._loop = bool(d.get("loop", cfg.default_loop))
             self._start_fullscreen = bool(d.get("start_fullscreen", cfg.default_start_fullscreen))
+            self._selected_mode = str(d.get("mode", cfg.default_session_mode))
             self._params_customized = True
         else:
             self._param_overrides = None
             self._random_order = cfg.default_random_order
             self._loop = cfg.default_loop
             self._start_fullscreen = cfg.default_start_fullscreen
+            self._selected_mode = cfg.default_session_mode
             self._params_customized = False
 
     def _persist_last_params(self) -> None:
         d = dict(self._param_overrides or {})
         d.update(random_order=self._random_order, loop=self._loop,
-                 start_fullscreen=self._start_fullscreen)
+                 start_fullscreen=self._start_fullscreen,
+                 mode=self.mode_selector.currentData())
         self.context.repos.settings.set(self._params_key(), json.dumps(d))
 
     def _effective_config(self):
@@ -204,12 +261,23 @@ class SessionSetupScreen(QWidget):
         cues = self._exposure_cues()
         if not cues or not self.consent.isChecked():
             return
-        if self._random_order:
+        mode = self.mode_selector.currentData()
+        if mode in ("interspersed", "custom"):
+            neutral_media = self.context.media.by_category("neutral")
+            neutral_pool = playlist_rules.media_to_neutral_cues(neutral_media)
+            cues = playlist_rules.build_playlist_for_mode(
+                mode, cues, neutral_pool=neutral_pool,
+                craving_pct=self.craving_pct_spin.value(),
+                craving_count=self.craving_count_spin.value(),
+            )
+        elif self._random_order:
             cues = playlist_rules.randomized(cues)
+        self._persist_last_params()
         self.window.start_exposure(
             self.patient, self.substance.currentData(), cues, self._positive_paths(),
             self.ambient.currentData(),
             loop=self._loop,
             overrides=self._param_overrides,
             start_fullscreen=self._start_fullscreen,
+            mode=mode,
         )

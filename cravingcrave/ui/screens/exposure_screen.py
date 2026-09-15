@@ -28,6 +28,7 @@ from ...services.i18n import tr
 from ...session.session_controller import SessionController
 from .. import hotkeys
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from ..hotkeys import AccessibilityInput
 from ..widgets.craving_chart import CravingChart
 from ..widgets.cue_view import CueView
@@ -35,7 +36,6 @@ from ..widgets.gallery_panel import GalleryPanel
 from ..widgets.intensity_controls import IntensityControls
 from ..widgets.uscs_panel import UscsPanel
 from ..widgets.vas_slider import VasPrompt
-from ..emoji_icon import emoji_icon
 
 
 class ExposureScreen(QWidget):
@@ -177,7 +177,8 @@ class ExposureScreen(QWidget):
         self._chrome_timer.timeout.connect(self._hide_chrome)
 
         # --- overlays (children of this screen; panic button stays above) ---
-        self.vas_prompt = VasPrompt(self, context.config.vas_max)
+        self.vas_prompt = VasPrompt(self, context.config.vas_max,
+                                    mode=context.config.vas_display_mode)
         self.vas_prompt.submitted.connect(self._on_vas_submitted)
         self.coping_panel = UscsPanel(self)
         # Keep the raw text (even empty) so "skill used, no text" is distinguishable
@@ -484,10 +485,16 @@ class ExposureScreen(QWidget):
         counter = tr("exposure.cue_counter",
                      current=self.controller.current_cue_index() + 1,
                      total=self.controller.cue_count)
+        if cue.is_neutral:
+            counter += " " + tr("exposure.neutral_indicator")
         self.cue_counter.setText(counter)
         self._bar_counter.setText(counter)
 
     def _next_cue(self) -> None:
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec > 0 and self.controller.current_cue_dwell() < min_sec:
+            self.hint.setText(tr("setup.min_exposure_hint"))
+            return  # enforce minimum viewing time
         self.controller.advance_cue()
         self._load_cue()
         self._maybe_prompt_after_n_cues()
@@ -498,7 +505,7 @@ class ExposureScreen(QWidget):
         if n <= 0:
             return
         self._cue_advances += 1
-        if self._cue_advances % n == 0:
+        if self._cue_advances % n == 0 and self.controller.should_prompt_vas():
             self._open_periodic_vas()
 
     def _prev_cue(self) -> None:
@@ -535,6 +542,8 @@ class ExposureScreen(QWidget):
         if self.controller.check_time_cap():
             self._request_end(EndReason.TIME_CAP)
             return
+        if not self.controller.should_prompt_vas():
+            return  # neutral cue in interspersed/custom mode — skip VAS
         self._open_periodic_vas()
 
     def _open_periodic_vas(self) -> None:
@@ -597,6 +606,8 @@ class ExposureScreen(QWidget):
     # --- per-cue dwell timer ------------------------------------------------
     def _on_per_cue_timeout(self) -> None:
         """Per-cue dwell timer fired: prompt craving for this specific cue."""
+        if not self.controller.should_prompt_vas():
+            return  # neutral cue — skip VAS
         self._open_periodic_vas()
 
     # --- progressive down-regulation ----------------------------------------

@@ -58,6 +58,10 @@ class SessionParamsDialog(QDialog):
         self.vas_per_cue.setSuffix(" s"); self.vas_per_cue.setMinimumWidth(120)
         self.vas_per_cue.setValue(config.vas_prompt_per_cue_seconds)
 
+        # Interspersed-mode: measure craving on neutral cues too?
+        self.vas_on_neutral = QCheckBox(tr("setup.vas_on_neutral"))
+        self.vas_on_neutral.setChecked(config.interspersed_vas_on_neutral)
+
         # Progressive down-regulation
         self.progressive_enabled = QCheckBox(tr("settings.progressive_enabled"))
         self.progressive_enabled.setChecked(config.progressive_downreg_enabled)
@@ -94,6 +98,7 @@ class SessionParamsDialog(QDialog):
         form.addRow(tr("settings.time_cap_min"), self.time_cap)
         form.addRow(self.start_fullscreen)
         form.addRow(tr("settings.vas_per_cue_seconds"), self.vas_per_cue)
+        form.addRow(self.vas_on_neutral)
         form.addRow(self.progressive_enabled)
         form.addRow(tr("settings.progressive_target"), self.progressive_target)
         form.addRow(self.auto_coping)
@@ -133,6 +138,7 @@ class SessionParamsDialog(QDialog):
             "progressive_downreg_target_pct": self.progressive_target.value(),
             "auto_coping_enabled": self.auto_coping.isChecked(),
             "cue_audio_mode": self.cue_audio_mode.currentData(),
+            "interspersed_vas_on_neutral": self.vas_on_neutral.isChecked(),
         }
 
     def wants_fullscreen(self) -> bool:

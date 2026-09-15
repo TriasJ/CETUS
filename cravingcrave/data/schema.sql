@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS cue_config (
     appetitive_rank    INTEGER NOT NULL DEFAULT 0,
     enabled            INTEGER NOT NULL DEFAULT 1,
     is_personal_reason INTEGER NOT NULL DEFAULT 0,
+    is_neutral         INTEGER NOT NULL DEFAULT 0,
+    craving_weight     REAL,
     created_at         TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_cue_patient ON cue_config(patient_id);
@@ -53,7 +55,8 @@ CREATE TABLE IF NOT EXISTS session (
     endpoint_vas      INTEGER,
     habituation_slope REAL,
     app_version       TEXT NOT NULL,
-    clinician_notes   TEXT
+    clinician_notes   TEXT,
+    mode              TEXT NOT NULL DEFAULT 'intense'
 );
 CREATE INDEX IF NOT EXISTS idx_session_patient ON session(patient_id);
 

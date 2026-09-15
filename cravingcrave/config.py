@@ -95,9 +95,33 @@ class AppConfig:
     auto_coping_threshold: int = 7                # score >= this is "high"
     auto_coping_consecutive: int = 3              # N consecutive highs → auto-open coping
 
+    # Session mode: which exposure protocol to use.
+    # "intense"       = all cues are craving-related, graded escalation (default CET)
+    # "interspersed"  = craving cues mixed with neutral stimuli
+    # "custom"        = clinician-configured combination of both
+    default_session_mode: str = "intense"
+
+    # Interspersed-mode parameters (neutral + craving cue mixing).
+    interspersed_craving_pct: int = 5             # % of total cues that are craving-inducing
+    interspersed_craving_count: int = 0            # 0 = use pct; >0 = exact count overrides pct
+    interspersed_min_exposure_sec: int = 5         # min seconds each cue is shown before advance
+    interspersed_vas_on_neutral: bool = False      # prompt VAS on neutral cues?
+
+    # Dynamic neutral increase: when enabled in interspersed/custom mode, extra
+    # neutral cues are inserted after a craving cue until the patient's craving
+    # drops below the threshold. This dynamically stretches neutral runs.
+    dynamic_neutral_enabled: bool = False
+    dynamic_neutral_threshold: int = 4            # craving must drop ≤ this before next craving cue
+
+    # VAS display mode: how the 0-10 craving rating is presented to the patient.
+    # "slider"  = horizontal drag slider (default, current behaviour)
+    # "circles" = 11 circles of increasing size
+    # "stars"   = 0-10 star rating
+    vas_display_mode: str = "slider"
+
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.media_root.mkdir(parents=True, exist_ok=True)
-        for sub in ("alcohol", "cigarettes", "meth", "positive", "sounds"):
+        for sub in ("alcohol", "cigarettes", "meth", "positive", "sounds", "neutral"):
             (self.media_root / sub).mkdir(parents=True, exist_ok=True)

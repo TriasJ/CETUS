@@ -489,5 +489,46 @@
   "error.codec": "No se pudo reproducir este medio. Verifica el formato (se recomienda MP4 H.264 / MP3).",
   "error.no_cues": "No hay señales para mostrar.",
   "error.save_failed": "No se pudo guardar. Verifica los permisos y el espacio en disco.",
-  "report.export_failed": "No se pudo generar el archivo. Verifica la ruta, los permisos y el espacio en disco."
+  "report.export_failed": "No se pudo generar el archivo. Verifica la ruta, los permisos y el espacio en disco.",
+
+  "mode.label": "Modo de sesión",
+  "mode.intense": "Evocación intensa de deseo",
+  "mode.interspersed": "Estímulos neutros intercalados",
+  "mode.custom": "Personalizado",
+  "mode.intense_desc": "Todas las señales provocan deseo, presentadas en orden graduado (protocolo CET estándar).",
+  "mode.interspersed_desc": "Las señales de deseo se intercalan entre estímulos neutros para moderar la intensidad.",
+  "mode.custom_desc": "Control total sobre la proporción, el orden y el comportamiento del VAS para señales de deseo y neutras.",
+
+  "setup.mode_label": "Modo de sesión",
+  "setup.interspersed_pct": "Porcentaje de señales de deseo (%)",
+  "setup.interspersed_count": "Cantidad exacta de señales de deseo (0 = usar %)",
+  "setup.min_exposure_sec": "Exposición mínima por señal (seg)",
+  "setup.min_exposure_hint": "Cada señal permanece en pantalla al menos este tiempo antes de avanzar.",
+  "setup.vas_on_neutral": "Medir deseo en señales neutras",
+  "setup.dynamic_neutral": "Aumento dinámico de neutras",
+  "setup.dynamic_neutral_hint": "Sigue mostrando señales neutras hasta que el deseo baje del umbral antes de mostrar la siguiente señal de deseo.",
+  "setup.dynamic_neutral_threshold": "Umbral de deseo para siguiente señal de deseo",
+  "setup.neutral_count": "{n} señal(es) neutra(s) disponible(s)",
+  "setup.no_neutral": "No hay señales neutras disponibles. Agrega imágenes a media/neutral/.",
+
+  "substance.neutral": "Neutras (control)",
+
+  "vas.display_label": "Formato de escala de deseo",
+  "vas.display_slider": "Deslizador",
+  "vas.display_circles": "Círculos",
+  "vas.display_stars": "Estrellas",
+
+  "settings.session_mode": "Modo de sesión predeterminado",
+  "settings.session_mode_hint": "Elige cómo se presentan las señales de deseo y neutras durante la exposición.",
+  "settings.vas_display_mode": "Formato de escala de deseo",
+  "settings.vas_display_hint": "Cómo se presenta la calificación de deseo 0–10. Todos los formatos producen los mismos datos.",
+  "settings.min_exposure_sec": "Tiempo mín. de exposición por señal (intercalado)",
+
+  "cueconfig.weight_label": "Peso de deseo",
+  "cueconfig.suggest_weights": "Sugerir pesos desde datos de investigación",
+  "cueconfig.weights_applied": "Pesos aplicados a {n} señal(es)",
+  "cueconfig.weight_hint": "Peso basado en investigación de bases de datos validadas (MOCIS, Tabaco). Mayor = más deseo.",
+  "cueconfig.neutral_flag": "Señal neutra (sin deseo)",
+
+  "exposure.neutral_indicator": "[neutra]"
 }

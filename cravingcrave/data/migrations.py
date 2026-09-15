@@ -11,7 +11,7 @@ import importlib.resources as resources
 import sqlite3
 from collections.abc import Callable
 
-CURRENT_VERSION = 5
+CURRENT_VERSION = 6
 
 
 def _load_schema_sql() -> str:
@@ -65,6 +65,18 @@ def _migrate_to_5(conn: sqlite3.Connection) -> None:
     )
 
 
+def _migrate_to_6(conn: sqlite3.Connection) -> None:
+    """v6: session mode system, neutral cue flag, and craving weight."""
+    cols = [row[1] for row in conn.execute("PRAGMA table_info(session)").fetchall()]
+    if "mode" not in cols:
+        conn.execute("ALTER TABLE session ADD COLUMN mode TEXT NOT NULL DEFAULT 'intense'")
+    cols = [row[1] for row in conn.execute("PRAGMA table_info(cue_config)").fetchall()]
+    if "is_neutral" not in cols:
+        conn.execute("ALTER TABLE cue_config ADD COLUMN is_neutral INTEGER NOT NULL DEFAULT 0")
+    if "craving_weight" not in cols:
+        conn.execute("ALTER TABLE cue_config ADD COLUMN craving_weight REAL")
+
+
 # Ordered: index i upgrades the DB to version (i + 1).
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     _migrate_to_1,
@@ -72,6 +84,7 @@ _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     _migrate_to_3,
     _migrate_to_4,
     _migrate_to_5,
+    _migrate_to_6,
 ]
 
 

@@ -92,6 +92,25 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.auto_coping_enabled = as_bool("auto_coping_enabled", config.auto_coping_enabled)
     config.auto_coping_threshold = as_int("auto_coping_threshold", config.auto_coping_threshold)
     config.auto_coping_consecutive = as_int("auto_coping_consecutive", config.auto_coping_consecutive)
+
+    # Session mode and interspersed parameters.
+    session_mode = s.get("default_session_mode")
+    if session_mode in ("intense", "interspersed", "custom"):
+        config.default_session_mode = session_mode
+    config.interspersed_craving_pct = as_int("interspersed_craving_pct", config.interspersed_craving_pct)
+    config.interspersed_craving_count = as_int("interspersed_craving_count", config.interspersed_craving_count)
+    config.interspersed_min_exposure_sec = as_int("interspersed_min_exposure_sec", config.interspersed_min_exposure_sec)
+    config.interspersed_vas_on_neutral = as_bool("interspersed_vas_on_neutral", config.interspersed_vas_on_neutral)
+
+    # Dynamic neutral increase.
+    config.dynamic_neutral_enabled = as_bool("dynamic_neutral_enabled", config.dynamic_neutral_enabled)
+    config.dynamic_neutral_threshold = as_int("dynamic_neutral_threshold", config.dynamic_neutral_threshold)
+
+    # VAS display mode.
+    vas_display = s.get("vas_display_mode")
+    if vas_display in ("slider", "circles", "stars"):
+        config.vas_display_mode = vas_display
+
     # The clinic-selected UI language (persisted by the language switcher) overrides
     # the bootstrap default. app.main() applies it to i18n after the context is built.
     locale = s.get("locale")

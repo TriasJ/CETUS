@@ -165,7 +165,7 @@ class MainWindow(QMainWindow):
 
     def start_exposure(self, patient, substance: str, exposure_cues, positive_paths,
                        ambient_path=None, loop: bool = False, overrides: dict | None = None,
-                       start_fullscreen: bool = False) -> None:
+                       start_fullscreen: bool = False, mode: str = "intense") -> None:
         # Defense-in-depth: never enter EXPOSURE against a blank cue surface, even if a
         # caller bypasses the session-setup gate.
         if not exposure_cues:
@@ -177,7 +177,8 @@ class MainWindow(QMainWindow):
         if overrides:
             run_ctx = dataclasses.replace(
                 self.context, config=dataclasses.replace(self.context.config, **overrides))
-        controller = build_controller(run_ctx, patient, substance, exposure_cues, loop=loop)
+        controller = build_controller(run_ctx, patient, substance, exposure_cues,
+                                      loop=loop, mode=mode)
         screen = ExposureScreen(self, run_ctx, controller, positive_paths, ambient_path)
         self._active_controller = controller
         self._active_exposure = screen

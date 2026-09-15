@@ -72,6 +72,9 @@ class SummaryScreen(QWidget):
         form.addRow(tr("summary.duration"), QLabel(_duration(session)))
         reason = tr(_END_REASON_KEYS.get(session.end_reason, "")) if session.end_reason else "—"
         form.addRow(tr("summary.end_reason"), QLabel(reason))
+        mode_key = {"intense": "mode.intense", "interspersed": "mode.interspersed",
+                     "custom": "mode.custom"}.get(getattr(session, "mode", "intense"), "mode.intense")
+        form.addRow(tr("mode.label"), QLabel(tr(mode_key)))
 
         slope_hint = QLabel(tr("summary.slope_hint"))
         slope_hint.setObjectName("Muted")

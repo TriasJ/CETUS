@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from ..domain.models import SessionMode
 from ..session.session_controller import SessionController
 
 
-def build_controller(context, patient, substance: str, exposure_cues, loop: bool = False):
+def build_controller(context, patient, substance: str, exposure_cues,
+                     loop: bool = False, mode: str = SessionMode.INTENSE.value):
     return SessionController(
         repos=context.repos,
         config=context.config,
@@ -14,4 +16,5 @@ def build_controller(context, patient, substance: str, exposure_cues, loop: bool
         substance=substance,
         exposure_cues=exposure_cues,
         loop=loop,
+        mode=mode,
     )

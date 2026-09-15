@@ -14,25 +14,19 @@ from PySide6.QtWidgets import (
 
 from ...services.i18n import tr
 from .overlay import Overlay
+from .vas_input import AbstractVasInput, create_vas_input
 
 
-class VasSlider(QWidget):
+class SliderVasInput(AbstractVasInput):
     """A large, touch-friendly 0..max slider with a prominent value readout."""
 
-    valueChanged = Signal(int)
-
     def __init__(self, vas_max: int = 10, parent: QWidget | None = None) -> None:
-        super().__init__(parent)
-        self.vas_max = vas_max
-
-        self.value_label = QLabel("0")
-        self.value_label.setObjectName("Big")
-        self.value_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        super().__init__(vas_max, parent)
 
         self.slider = QSlider(Qt.Orientation.Horizontal)
         self.slider.setRange(0, vas_max)
         self.slider.setPageStep(1)
-        self.slider.setMinimumHeight(44)
+        self.slider.setMinimumHeight(64)
         self.slider.valueChanged.connect(self._on_change)
 
         ends = QHBoxLayout()
@@ -57,7 +51,7 @@ class VasSlider(QWidget):
 
     def set_value(self, v: int) -> None:
         """Set the rating, clamped to 0..max (used by keyboard-only entry)."""
-        self.slider.setValue(max(0, min(self.vas_max, v)))
+        self.slider.setValue(self._clamp(v))
 
     def nudge(self, delta: int) -> None:
         self.set_value(self.slider.value() + delta)
@@ -67,12 +61,17 @@ class VasSlider(QWidget):
         self.value_label.setText("0")
 
 
+# Backward-compatible alias — existing callers import VasSlider.
+VasSlider = SliderVasInput
+
+
 class VasPrompt(Overlay):
     """Overlay asking the patient to rate craving. Emits the submitted value."""
 
     submitted = Signal(int)
 
-    def __init__(self, parent: QWidget, vas_max: int = 10) -> None:
+    def __init__(self, parent: QWidget, vas_max: int = 10,
+                 mode: str = "slider") -> None:
         super().__init__(parent)
 
         card = QWidget(self)
@@ -87,7 +86,7 @@ class VasPrompt(Overlay):
         question.setWordWrap(True)
         question.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.slider = VasSlider(vas_max)
+        self.slider = create_vas_input(mode, vas_max)
         submit = QPushButton(tr("vas.submit"))
         submit.setObjectName("Primary")
         submit.clicked.connect(self._submit)

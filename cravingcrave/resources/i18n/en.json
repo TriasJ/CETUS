@@ -489,5 +489,46 @@
   "error.codec": "This media could not be played. Check the format (MP4 H.264 / MP3 recommended).",
   "error.no_cues": "No cues to show.",
   "error.save_failed": "Could not save. Check permissions and disk space.",
-  "report.export_failed": "Could not generate the file. Check the path, permissions, and disk space."
+  "report.export_failed": "Could not generate the file. Check the path, permissions, and disk space.",
+
+  "mode.label": "Session mode",
+  "mode.intense": "Intense craving evocation",
+  "mode.interspersed": "Interspersed neutral stimuli",
+  "mode.custom": "Custom",
+  "mode.intense_desc": "All cues are craving-related, presented in graded order (default CET protocol).",
+  "mode.interspersed_desc": "Craving cues are interspersed among neutral stimuli to moderate exposure intensity.",
+  "mode.custom_desc": "Full control over the ratio, ordering, and VAS behavior for craving and neutral cues.",
+
+  "setup.mode_label": "Session mode",
+  "setup.interspersed_pct": "Craving cue percentage (%)",
+  "setup.interspersed_count": "Exact craving cue count (0 = use %)",
+  "setup.min_exposure_sec": "Minimum exposure per cue (sec)",
+  "setup.min_exposure_hint": "Each cue stays on screen at least this long before advancing.",
+  "setup.vas_on_neutral": "Measure craving on neutral cues",
+  "setup.dynamic_neutral": "Dynamic neutral increase",
+  "setup.dynamic_neutral_hint": "Keep showing neutral cues until craving drops below the threshold before showing the next craving cue.",
+  "setup.dynamic_neutral_threshold": "Craving threshold for next craving cue",
+  "setup.neutral_count": "{n} neutral cue(s) available",
+  "setup.no_neutral": "No neutral cues available. Add images to media/neutral/.",
+
+  "substance.neutral": "Neutral (control)",
+
+  "vas.display_label": "Craving scale display",
+  "vas.display_slider": "Slider",
+  "vas.display_circles": "Circles",
+  "vas.display_stars": "Stars",
+
+  "settings.session_mode": "Default session mode",
+  "settings.session_mode_hint": "Choose how craving and neutral cues are presented during exposure.",
+  "settings.vas_display_mode": "Craving scale display",
+  "settings.vas_display_hint": "How the 0–10 craving rating is presented. All modes produce the same data.",
+  "settings.min_exposure_sec": "Min. cue exposure time (interspersed)",
+
+  "cueconfig.weight_label": "Craving weight",
+  "cueconfig.suggest_weights": "Suggest weights from research data",
+  "cueconfig.weights_applied": "Weights applied to {n} cue(s)",
+  "cueconfig.weight_hint": "Research-based weight from validated datasets (MOCIS, Tobacco). Higher = more craving.",
+  "cueconfig.neutral_flag": "Neutral cue (no craving)",
+
+  "exposure.neutral_indicator": "[neutral]"
 }
