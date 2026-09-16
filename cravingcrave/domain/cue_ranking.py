@@ -69,13 +69,19 @@ def population_prior(entries) -> dict:
 
 
 def _prior_for(meta: dict, priors: dict) -> float | None:
+    """Resolve the best prior in priority order: same-media cross-patient → same-category
+    cross-patient → global cross-patient → research craving_weight (from validated dataset)."""
     p = priors.get("by_media", {}).get(meta.get("media_path"))
     if p is not None:
         return p
     p = priors.get("by_cat", {}).get((meta.get("substance"), meta.get("media_type")))
     if p is not None:
         return p
-    return priors.get("global")
+    g = priors.get("global")
+    if g is not None:
+        return g
+    # Fallback: research-derived craving weight (bundled from MOCIS / Tobacco datasets).
+    return meta.get("craving_weight")
 
 
 def shrunk_scores(cue_meta_by_id: dict[int, dict], raw_map: dict[int, dict],

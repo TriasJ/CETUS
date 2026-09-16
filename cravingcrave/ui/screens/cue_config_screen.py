@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
 
 from ...domain.models import CueConfig
 from ...services import substances as subs
+from ...services.cue_weights import CueWeightLookup
 from ...services.i18n import tr
 from ...services.media_library import media_type_for
 from ..context import AppContext
@@ -122,7 +123,11 @@ class CueConfigScreen(QWidget):
         disable_all = QPushButton(tr("cueconfig.disable_all")); disable_all.clicked.connect(lambda: self._set_all_enabled(False))
         delete = QPushButton(tr("common.delete")); delete.setObjectName("Danger"); delete.clicked.connect(self._delete)
 
-        buttons = [add_lib, add_files, add_folder, up, down]
+        suggest_w = QPushButton(tr("cueconfig.suggest_weights"))
+        suggest_w.setToolTip(tr("cueconfig.weight_hint"))
+        suggest_w.clicked.connect(self._suggest_weights)
+
+        buttons = [add_lib, add_files, add_folder, up, down, suggest_w]
         # Adaptive ordering (opt-in): suggest a low→high craving order the clinician reviews & applies.
         if self.context.config.adaptive_ordering:
             suggest = QPushButton(tr("cueconfig.suggest_order"))
@@ -166,7 +171,11 @@ class CueConfigScreen(QWidget):
             marks.append("✓" if c.enabled else "✗")
             if c.is_personal_reason:
                 marks.append("★")
-            label = f"[{c.appetitive_rank}] {c.media_path}  ({c.media_type})  {' '.join(marks)}"
+            if c.is_neutral:
+                marks.append("◇")
+            weight_str = f"  w={c.craving_weight:.1f}" if c.craving_weight is not None else ""
+            label = (f"[{c.appetitive_rank}]{weight_str} {c.media_path}"
+                     f"  ({c.media_type})  {' '.join(marks)}")
             item = QListWidgetItem(label)
             item.setData(Qt.ItemDataRole.UserRole, c.id)
             self.list.addItem(item)
@@ -188,12 +197,16 @@ class CueConfigScreen(QWidget):
         if not dialog.exec():
             return
         rank = self._next_rank()
+        weights = CueWeightLookup()
         # Sort by path so files added together keep their graded (filename) order.
         for m in sorted(dialog.selected(), key=lambda m: m.path):
+            w = weights.suggest(m.path)
             self.context.repos.cues.create(CueConfig(
                 patient_id=self.patient.id, substance=m.substance, media_path=m.path,
                 media_type=m.media_type, appetitive_rank=rank,
                 is_personal_reason=(m.substance == "positive"),
+                is_neutral=(m.substance == "neutral"),
+                craving_weight=w,
             ))
             rank += 1
         self._refresh()
@@ -276,6 +289,22 @@ class CueConfigScreen(QWidget):
         if cue:
             self.context.repos.cues.delete(cue.id)
             self._refresh()
+
+    def _suggest_weights(self) -> None:
+        """Populate craving_weight from the bundled research data for all cues that match."""
+        weights = CueWeightLookup()
+        if not weights.available():
+            QMessageBox.information(self, tr("app.title"), tr("cueconfig.suggest_none"))
+            return
+        n = 0
+        for cue in self._cues():
+            w = weights.suggest(cue.media_path)
+            if w is not None and cue.craving_weight != w:
+                cue.craving_weight = w
+                self.context.repos.cues.update(cue)
+                n += 1
+        self._refresh()
+        QMessageBox.information(self, tr("app.title"), tr("cueconfig.weights_applied", n=n))
 
     def _suggest_order(self) -> None:
         """Preview a learned low→high craving order and let the clinician apply it (rewrites ranks)."""

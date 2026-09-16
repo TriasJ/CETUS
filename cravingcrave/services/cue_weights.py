@@ -49,26 +49,47 @@ class CueWeightLookup:
     def suggest(self, media_path: str) -> float | None:
         """Return the published craving weight (0-10) for a media file, or None.
 
-        *media_path* is the CETUS relative path, e.g. ``"meth/gen_crystal_01.png"``
-        or ``"neutral/mocis_mmc1_p005_1.png"``.  The folder name is used to select
-        the correct image set in the MOCIS data.
+        *media_path* is the CETUS relative path, e.g. ``"meth/mocis_mmc4_001.jpeg"``
+        or ``"neutral/tobacco_neutral_110.jpg"``.  The folder name selects the MOCIS
+        image set.  Extracted filenames (``mocis_mmc{N}_{NNN}.ext``) are mapped back
+        to the CSV's ``Slide{NNN}.jpeg`` naming automatically.
         """
+        import re
         parts = Path(media_path).parts
         if len(parts) < 2:
             return None
         folder = parts[0].lower()
         filename = parts[-1].lower()
         image_set = _FOLDER_TO_SET.get(folder)
+
+        # Map extracted filename back to CSV slide name:
+        # "mocis_mmc4_001.jpeg" → "slide001.jpeg"
+        m = re.match(r"mocis_mmc\d+_(\d{3})\.\w+", filename)
+        if m:
+            slide_name = f"slide{m.group(1)}.jpeg"
+        else:
+            slide_name = filename
+
         if image_set:
-            key = f"{image_set}/{filename}"
+            key = f"{image_set}/{slide_name}"
             w = self._meth_opi.get(key)
             if w is not None:
                 return w
-        # Fallback: try all image sets (for files whose folder doesn't map).
+            # Also try the original filename (in case files are named Slide*.jpeg).
+            if slide_name != filename:
+                w = self._meth_opi.get(f"{image_set}/{filename}")
+                if w is not None:
+                    return w
+
+        # Fallback: try all image sets.
         for s in ("control", "meth", "opioid"):
-            w = self._meth_opi.get(f"{s}/{filename}")
+            w = self._meth_opi.get(f"{s}/{slide_name}")
             if w is not None:
                 return w
+            if slide_name != filename:
+                w = self._meth_opi.get(f"{s}/{filename}")
+                if w is not None:
+                    return w
         return None
 
     def available(self) -> bool:
