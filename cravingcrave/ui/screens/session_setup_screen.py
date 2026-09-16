@@ -167,6 +167,21 @@ class SessionSetupScreen(QWidget):
 
         self._update()
 
+        # Auto-launch wizard for first-time patients (0 prior sessions).
+        session_count = len(self.context.repos.sessions.list_for_patient(self.patient.id))
+        wizard_done = self.context.repos.settings.get(f"wizard_complete:{self.patient.id}")
+        if session_count == 0 and not wizard_done:
+            from .patient_wizard import PatientWizard
+            wizard = PatientWizard(self.context, self.patient, self)
+            if wizard.exec() == QDialog.DialogCode.Accepted:
+                wizard.apply_settings()
+                self._load_last_params()
+                # Re-sync mode selector with wizard choice.
+                idx = self.mode_selector.findData(self._selected_mode)
+                if idx >= 0:
+                    self.mode_selector.setCurrentIndex(idx)
+                self._update()
+
     def _exposure_cues(self):
         substance = self.substance.currentData()
         cues = [c for c in self.context.repos.cues.list_for_patient(self.patient.id)
