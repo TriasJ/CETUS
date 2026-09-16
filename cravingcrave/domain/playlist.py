@@ -27,14 +27,26 @@ from .models import CueConfig, MediaItem
 def build_exposure_playlist(
     cues: Sequence[CueConfig],
     max_repeats: int = 0,
+    cue_reactivity: dict[int, dict] | None = None,
 ) -> list[CueConfig]:
     """Enabled, non-positive cues ordered by ascending appetitive rank.
 
     Ties broken by ``id`` (then media_path) for a stable, deterministic order.
 
-    If *max_repeats* > 0, cues shown more than that many times across sessions
-    are moved to the end of the playlist (backlog rotation), preserving their
-    relative order within the backlog.
+    If *max_repeats* > 0, over-exposed cues are deprioritized via **reactivity-
+    gated backlog rotation**:
+
+    * A cue shown > *max_repeats* times whose reactivity has dropped (≤ 2.0, or
+      no data) is moved to the end — it has likely habituated.
+    * A cue shown > *max_repeats* times that **still provokes high reactivity**
+      (> 2.0) stays in its normal position — it still needs extinction exposure.
+    * If *cue_reactivity* is not provided, the backlog uses the cue's
+      ``craving_weight`` as a proxy: high-weight cues are kept, low-weight ones
+      are backlogged.
+
+    This prevents the clinically counterproductive scenario where the most
+    craving-inducing cue gets pushed to the back simply because it has been
+    shown many times.
     """
     exposure = [c for c in cues if c.enabled and not c.is_personal_reason]
     sorted_cues = sorted(
@@ -43,8 +55,24 @@ def build_exposure_playlist(
     )
     if max_repeats <= 0:
         return sorted_cues
-    fresh = [c for c in sorted_cues if c.exposure_count <= max_repeats]
-    backlog = [c for c in sorted_cues if c.exposure_count > max_repeats]
+
+    # Reactivity-gated backlog: only deprioritize over-exposed cues whose
+    # craving response has actually diminished.
+    REACTIVITY_THRESHOLD = 2.0  # reactivity ≤ this = likely habituated
+
+    def _is_backloggable(c: CueConfig) -> bool:
+        if c.exposure_count <= max_repeats:
+            return False  # not over-exposed
+        # Check actual patient reactivity data if available.
+        if cue_reactivity and c.id in cue_reactivity:
+            return cue_reactivity[c.id]["raw"] <= REACTIVITY_THRESHOLD
+        # Fallback: use craving_weight as proxy — keep high-weight cues.
+        if c.craving_weight is not None and c.craving_weight > REACTIVITY_THRESHOLD:
+            return False  # high-weight cue, keep it in position
+        return True  # no data or low weight — safe to backlog
+
+    fresh = [c for c in sorted_cues if not _is_backloggable(c)]
+    backlog = [c for c in sorted_cues if _is_backloggable(c)]
     return fresh + backlog
 
 
@@ -98,6 +126,7 @@ def build_interspersed_playlist(
     craving_pct: int = 5,
     craving_count: int = 0,
     max_repeats: int = 0,
+    cue_reactivity: dict[int, dict] | None = None,
     rng: random.Random | None = None,
 ) -> list[CueConfig]:
     """Build a mixed playlist of craving and neutral cues.
@@ -126,7 +155,8 @@ def build_interspersed_playlist(
     # 1. Prepare the graded craving cues (ascending appetitive rank).
     #    Backlog rotation applies here too — over-exposed craving cues are
     #    deprioritized even when interspersed among neutrals.
-    graded = build_exposure_playlist(list(craving_cues), max_repeats=max_repeats)
+    graded = build_exposure_playlist(list(craving_cues), max_repeats=max_repeats,
+                                     cue_reactivity=cue_reactivity)
     if not graded:
         # No craving cues — return shuffled neutrals only.
         neutrals = list(neutral_pool)
@@ -219,6 +249,7 @@ def build_playlist_for_mode(
     craving_pct: int = 5,
     craving_count: int = 0,
     max_repeats: int = 0,
+    cue_reactivity: dict[int, dict] | None = None,
     use_weights: bool = False,
     rng: random.Random | None = None,
 ) -> list[CueConfig]:
@@ -242,9 +273,10 @@ def build_playlist_for_mode(
     if mode == "interspersed":
         return build_interspersed_playlist(
             craving_cues, neutral_pool or [], craving_pct, craving_count,
-            max_repeats, rng,
+            max_repeats, cue_reactivity, rng,
         )
     # intense and custom both start from the standard graded playlist
     if use_weights:
         return build_weighted_playlist(craving_cues)
-    return build_exposure_playlist(craving_cues, max_repeats=max_repeats)
+    return build_exposure_playlist(craving_cues, max_repeats=max_repeats,
+                                   cue_reactivity=cue_reactivity)

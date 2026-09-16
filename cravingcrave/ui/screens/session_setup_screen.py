@@ -186,8 +186,15 @@ class SessionSetupScreen(QWidget):
         substance = self.substance.currentData()
         cues = [c for c in self.context.repos.cues.list_for_patient(self.patient.id)
                 if c.substance == substance]
+        # Pass per-cue reactivity data for reactivity-gated backlog.
+        reactivity = None
+        if self.context.config.max_cue_repeats > 0:
+            from ...domain.cue_ranking import cue_reactivity
+            ratings = self.context.repos.ratings.list_for_patient(self.patient.id)
+            reactivity = cue_reactivity(ratings) if ratings else None
         return playlist_rules.build_exposure_playlist(
-            cues, max_repeats=self.context.config.max_cue_repeats)
+            cues, max_repeats=self.context.config.max_cue_repeats,
+            cue_reactivity=reactivity)
 
     def _positive_paths(self) -> list[str]:
         paths = [m.absolute_path for m in self.context.media.by_category("positive")]
@@ -289,11 +296,18 @@ class SessionSetupScreen(QWidget):
         if mode in ("interspersed", "custom"):
             neutral_media = self.context.media.by_category("neutral")
             neutral_pool = playlist_rules.media_to_neutral_cues(neutral_media)
+            # Pass per-cue reactivity for reactivity-gated backlog.
+            reactivity = None
+            if self.context.config.max_cue_repeats > 0:
+                from ...domain.cue_ranking import cue_reactivity as _cr
+                ratings = self.context.repos.ratings.list_for_patient(self.patient.id)
+                reactivity = _cr(ratings) if ratings else None
             cues = playlist_rules.build_playlist_for_mode(
                 mode, cues, neutral_pool=neutral_pool,
                 craving_pct=self.craving_pct_spin.value(),
                 craving_count=self.craving_count_spin.value(),
                 max_repeats=self.context.config.max_cue_repeats,
+                cue_reactivity=reactivity,
             )
         elif self._random_order:
             cues = playlist_rules.randomized(cues)
