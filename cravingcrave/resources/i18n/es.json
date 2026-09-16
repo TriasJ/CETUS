@@ -530,6 +530,8 @@
   "cueconfig.weights_applied": "Pesos aplicados a {n} señal(es)",
   "cueconfig.weight_hint": "Peso basado en investigación de bases de datos validadas (MOCIS, Tabaco). Mayor = más deseo.",
   "cueconfig.neutral_flag": "Señal neutra (sin deseo)",
+  "cueconfig.file_missing": "⚠ Archivo de medios no encontrado — pudo haber sido renombrado o eliminado.",
+  "cueconfig.files_missing": "⚠ {n} archivo(s) de señales faltante(s) — revisa la carpeta de medios.",
 
   "exposure.neutral_indicator": "[neutra]"
 }

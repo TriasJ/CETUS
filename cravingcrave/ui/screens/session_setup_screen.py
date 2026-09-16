@@ -188,9 +188,17 @@ class SessionSetupScreen(QWidget):
     def _update(self) -> None:
         cues = self._exposure_cues()
         if cues:
-            self.count_label.setText(tr("setup.cues_count", n=len(cues)))
+            missing = sum(1 for c in cues
+                          if not self.context.media.absolute(c.media_path).exists())
+            if missing:
+                self.count_label.setText(tr("cueconfig.files_missing", n=missing))
+                self.count_label.setStyleSheet("color:#e63946;")
+            else:
+                self.count_label.setText(tr("setup.cues_count", n=len(cues)))
+                self.count_label.setStyleSheet("")
         else:
             self.count_label.setText(tr("setup.no_cues"))
+            self.count_label.setStyleSheet("")
         # Show neutral cue availability when an interspersed/custom mode is selected.
         mode = self.mode_selector.currentData()
         if mode in ("interspersed", "custom"):

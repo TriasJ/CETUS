@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
@@ -166,6 +167,7 @@ class CueConfigScreen(QWidget):
         cues = self._cues()
         self.list.clear()
         self.empty.setVisible(not cues)
+        missing_count = 0
         for c in cues:
             marks = []
             marks.append("✓" if c.enabled else "✗")
@@ -173,12 +175,23 @@ class CueConfigScreen(QWidget):
                 marks.append("★")
             if c.is_neutral:
                 marks.append("◇")
+            # Check if the media file still exists on disk.
+            file_ok = self.context.media.absolute(c.media_path).exists()
+            if not file_ok:
+                marks.append("⚠")
+                missing_count += 1
             weight_str = f"  w={c.craving_weight:.1f}" if c.craving_weight is not None else ""
             label = (f"[{c.appetitive_rank}]{weight_str} {c.media_path}"
                      f"  ({c.media_type})  {' '.join(marks)}")
             item = QListWidgetItem(label)
             item.setData(Qt.ItemDataRole.UserRole, c.id)
+            if not file_ok:
+                item.setForeground(QColor("#e63946"))  # DANGER red
+                item.setToolTip(tr("cueconfig.file_missing"))
             self.list.addItem(item)
+        if missing_count:
+            self.empty.setVisible(True)
+            self.empty.setText(tr("cueconfig.files_missing", n=missing_count))
 
     def _selected_cue(self):
         item = self.list.currentItem()

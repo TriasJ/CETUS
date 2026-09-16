@@ -530,6 +530,8 @@
   "cueconfig.weights_applied": "Weights applied to {n} cue(s)",
   "cueconfig.weight_hint": "Research-based weight from validated datasets (MOCIS, Tobacco). Higher = more craving.",
   "cueconfig.neutral_flag": "Neutral cue (no craving)",
+  "cueconfig.file_missing": "⚠ Media file not found — it may have been renamed or deleted.",
+  "cueconfig.files_missing": "⚠ {n} cue file(s) missing — check the media folder.",
 
   "exposure.neutral_indicator": "[neutral]"
 }
