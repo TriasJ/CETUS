@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QWidget,
+    QWizard,
 )
 
 from ...services import export
@@ -77,8 +78,13 @@ class PatientScreen(QWidget):
         archive_btn.setIcon(emoji_icon("\U0001F4E6")); archive_btn.setIconSize(QSize(20, 20))
         archive_btn.clicked.connect(self._archive)
 
+        wizard_btn = QPushButton(tr("wizard.button"))
+        wizard_btn.setIcon(emoji_icon("🧙")); wizard_btn.setIconSize(QSize(20, 20))
+        wizard_btn.clicked.connect(self._run_wizard)
+
         actions = QHBoxLayout()
         actions.addWidget(cfg_btn)
+        actions.addWidget(wizard_btn)
         actions.addWidget(start_btn)
         actions.addStretch(1)
         actions.addWidget(report_btn)
@@ -168,6 +174,13 @@ class PatientScreen(QWidget):
             self._chart.addSeries(series)
             series.attachAxis(self._axis_x)
             series.attachAxis(self._axis_y)
+
+    def _run_wizard(self) -> None:
+        from .patient_wizard import PatientWizard
+        wizard = PatientWizard(self.context, self.patient, self)
+        if wizard.exec() == QWizard.DialogCode.Accepted:
+            wizard.apply_settings()
+            self._refresh()
 
     # --- export -------------------------------------------------------------
     def _export(self) -> None:

@@ -28,7 +28,8 @@ def _priors(repos):
 
 def _meta(cues):
     return {c.id: {"media_path": c.media_path, "substance": c.substance,
-                   "media_type": c.media_type} for c in cues}
+                   "media_type": c.media_type,
+                   "craving_weight": c.craving_weight} for c in cues}
 
 
 def patient_cue_scores(repos, patient_id) -> list[dict]:

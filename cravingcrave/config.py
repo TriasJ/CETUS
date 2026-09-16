@@ -68,6 +68,11 @@ class AppConfig:
     # "audio_only" = play audio only for audio-type cues, mute video audio
     cue_audio_mode: str = "auto"
 
+    # Video behavior during exposure.
+    pause_video_on_rating: bool = True        # pause video when VAS/coping/gallery opens
+    video_loop: bool = True                   # videos loop indefinitely; False = play once
+    max_cue_exposure_sec: int = 0             # 0 = off; >0 = force VAS/advance after N seconds
+
     # Per-session run defaults (also overridable per session in the Parameters popup).
     default_random_order: bool = False         # randomize the cue order
     default_loop: bool = False                 # loop the cue list at the ends
@@ -95,9 +100,40 @@ class AppConfig:
     auto_coping_threshold: int = 7                # score >= this is "high"
     auto_coping_consecutive: int = 3              # N consecutive highs → auto-open coping
 
+    # Session mode: which exposure protocol to use.
+    # "intense"       = all cues are craving-related, graded escalation (default CET)
+    # "interspersed"  = craving cues mixed with neutral stimuli
+    # "custom"        = clinician-configured combination of both
+    default_session_mode: str = "intense"
+
+    # Interspersed-mode parameters (neutral + craving cue mixing).
+    interspersed_craving_pct: int = 5             # % of total cues that are craving-inducing
+    interspersed_craving_count: int = 0            # 0 = use pct; >0 = exact count overrides pct
+    interspersed_min_exposure_sec: int = 5         # min seconds each cue is shown before advance
+    interspersed_vas_on_neutral: bool = False      # prompt VAS on neutral cues?
+
+    # Dynamic neutral increase: when enabled in interspersed/custom mode, extra
+    # neutral cues are inserted after a craving cue until the patient's craving
+    # drops below the threshold. This dynamically stretches neutral runs.
+    dynamic_neutral_enabled: bool = False
+    dynamic_neutral_threshold: int = 4            # craving must drop ≤ this before next craving cue
+
+    # Discrete countdown hint shown while minimum exposure time blocks cue advance.
+    show_min_exposure_hint: bool = True
+
+    # Backlog rotation: cues shown more than this many times are deprioritized.
+    # 0 = off (no backlog rotation).
+    max_cue_repeats: int = 0
+
+    # VAS display mode: how the 0-10 craving rating is presented to the patient.
+    # "slider"  = horizontal drag slider (default, current behaviour)
+    # "circles" = 11 circles of increasing size
+    # "stars"   = 0-10 star rating
+    vas_display_mode: str = "slider"
+
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.media_root.mkdir(parents=True, exist_ok=True)
-        for sub in ("alcohol", "cigarettes", "meth", "positive", "sounds"):
+        for sub in ("alcohol", "cigarettes", "meth", "opioid", "positive", "sounds", "neutral"):
             (self.media_root / sub).mkdir(parents=True, exist_ok=True)

@@ -1,6 +1,6 @@
 """Auto-discovery of cue media from the external ``media/`` folder.
 
-Convention: ``media/{alcohol,cigarettes,meth,positive,sounds}/<file>``. The folder
+Convention: ``media/{alcohol,cigarettes,meth,positive,sounds,neutral}/<file>``. The folder
 name is the cue category; the file extension determines the media type. Clinicians
 add personalized cues simply by dropping files into these folders — no rebuild.
 """
@@ -18,7 +18,7 @@ AUDIO_EXTS = {".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac"}
 
 # Built-in cue/aux folders. Custom-substance folders (created at runtime) are
 # discovered from disk by ``MediaLibrary.category_folders()`` and appended.
-BUILTIN_CATEGORIES = ("alcohol", "cigarettes", "meth", "positive", "sounds")
+BUILTIN_CATEGORIES = ("alcohol", "cigarettes", "meth", "opioid", "positive", "sounds", "neutral")
 # Back-compat alias (older callers import CATEGORIES).
 CATEGORIES = BUILTIN_CATEGORIES
 

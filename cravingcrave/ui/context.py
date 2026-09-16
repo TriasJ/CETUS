@@ -73,6 +73,9 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     cue_audio = s.get("cue_audio_mode")
     if cue_audio in ("auto", "always", "muted", "audio_only"):
         config.cue_audio_mode = cue_audio
+    config.pause_video_on_rating = as_bool("pause_video_on_rating", config.pause_video_on_rating)
+    config.video_loop = as_bool("video_loop", config.video_loop)
+    config.max_cue_exposure_sec = as_int("max_cue_exposure_sec", config.max_cue_exposure_sec)
     config.default_random_order = as_bool("default_random_order", config.default_random_order)
     config.default_loop = as_bool("default_loop", config.default_loop)
     config.default_start_fullscreen = as_bool("default_start_fullscreen", config.default_start_fullscreen)
@@ -92,6 +95,31 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.auto_coping_enabled = as_bool("auto_coping_enabled", config.auto_coping_enabled)
     config.auto_coping_threshold = as_int("auto_coping_threshold", config.auto_coping_threshold)
     config.auto_coping_consecutive = as_int("auto_coping_consecutive", config.auto_coping_consecutive)
+
+    # Session mode and interspersed parameters.
+    session_mode = s.get("default_session_mode")
+    if session_mode in ("intense", "interspersed", "custom"):
+        config.default_session_mode = session_mode
+    config.interspersed_craving_pct = as_int("interspersed_craving_pct", config.interspersed_craving_pct)
+    config.interspersed_craving_count = as_int("interspersed_craving_count", config.interspersed_craving_count)
+    config.interspersed_min_exposure_sec = as_int("interspersed_min_exposure_sec", config.interspersed_min_exposure_sec)
+    config.interspersed_vas_on_neutral = as_bool("interspersed_vas_on_neutral", config.interspersed_vas_on_neutral)
+
+    # Dynamic neutral increase.
+    config.dynamic_neutral_enabled = as_bool("dynamic_neutral_enabled", config.dynamic_neutral_enabled)
+    config.dynamic_neutral_threshold = as_int("dynamic_neutral_threshold", config.dynamic_neutral_threshold)
+
+    # Min-exposure countdown hint.
+    config.show_min_exposure_hint = as_bool("show_min_exposure_hint", config.show_min_exposure_hint)
+
+    # Backlog rotation.
+    config.max_cue_repeats = as_int("max_cue_repeats", config.max_cue_repeats)
+
+    # VAS display mode.
+    vas_display = s.get("vas_display_mode")
+    if vas_display in ("slider", "circles", "stars"):
+        config.vas_display_mode = vas_display
+
     # The clinic-selected UI language (persisted by the language switcher) overrides
     # the bootstrap default. app.main() applies it to i18n after the context is built.
     locale = s.get("locale")

@@ -23,13 +23,14 @@ from ..domain.models import (
     Clinician,
     CopingEvent,
     CravingRating,
-    CueDwell,
     CueConfig,
+    CueDwell,
     EndReason,
     IntensityEvent,
     Patient,
     RatingKind,
     Session,
+    SessionMode,
     utc_now_iso,
 )
 from .session_state import SessionState
@@ -52,6 +53,7 @@ class SessionController(QObject):
         exposure_cues: Sequence[CueConfig],
         clock: Callable[[], float] = time.monotonic,
         loop: bool = False,
+        mode: str = SessionMode.INTENSE.value,
         parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
@@ -63,6 +65,7 @@ class SessionController(QObject):
         self.exposure_cues = list(exposure_cues)
         self._clock = clock
         self.loop = loop  # advance/previous wrap when True
+        self.mode = mode
 
         self.session: Session | None = None
         self.state = SessionState.CONSENT
@@ -85,6 +88,7 @@ class SessionController(QObject):
                 substance=self.substance,
                 consent_given=True,
                 app_version=__version__,
+                mode=self.mode,
             )
         )
         self._t0 = self._clock()
@@ -152,6 +156,46 @@ class SessionController(QObject):
         self.cueChanged.emit(self._cue_index)
         return self.current_cue()
 
+    # --- mode-aware helpers --------------------------------------------------
+    def should_prompt_vas(self) -> bool:
+        """Whether the current cue warrants a VAS prompt.
+
+        In *interspersed* and *custom* modes, neutral cues skip VAS by default
+        unless ``interspersed_vas_on_neutral`` is enabled.
+        """
+        cue = self.current_cue()
+        if cue is not None and cue.is_neutral:
+            return self.config.interspersed_vas_on_neutral
+        return True
+
+    def min_cue_seconds(self) -> int:
+        """Minimum viewing time before the cue may be advanced (interspersed mode)."""
+        if self.mode in (SessionMode.INTERSPERSED.value, SessionMode.CUSTOM.value):
+            return self.config.interspersed_min_exposure_sec
+        return 0
+
+    def current_cue_dwell(self) -> int:
+        """Seconds elapsed since the current cue was loaded."""
+        if self._cue_start_sec is None:
+            return 0
+        return self.elapsed_sec() - self._cue_start_sec
+
+    def should_skip_craving_cue(self) -> bool:
+        """Dynamic neutral increase: skip the next craving cue if craving is
+        still above the threshold.  The exposure screen should keep showing
+        neutral cues until this returns False.
+
+        Only active when ``dynamic_neutral_enabled`` is True and the session
+        mode is interspersed or custom.
+        """
+        if not self.config.dynamic_neutral_enabled:
+            return False
+        if self.mode not in (SessionMode.INTERSPERSED.value, SessionMode.CUSTOM.value):
+            return False
+        if not self._values:
+            return False
+        return self._values[-1] > self.config.dynamic_neutral_threshold
+
     # --- ratings ------------------------------------------------------------
     def record_rating(self, raw_value: int, kind: RatingKind) -> CravingRating:
         value = max(0, min(self.config.vas_max, int(raw_value)))
@@ -171,8 +215,11 @@ class SessionController(QObject):
             self._baseline = value
         self._peak = max(self._peak, value)
         # Only craving samples during exposure feed the habituation rule.
+        # Neutral-cue ratings (when collected) are excluded so they don't
+        # dilute the habituation signal.
         if kind in (RatingKind.PERIODIC, RatingKind.PEAK, RatingKind.ENDPOINT):
-            self._values.append(value)
+            if cue is None or not cue.is_neutral:
+                self._values.append(value)
         self.ratingRecorded.emit(value, kind.value, elapsed)
 
         if kind in (RatingKind.PERIODIC, RatingKind.PEAK) and self.state is SessionState.EXPOSURE:
@@ -221,6 +268,12 @@ class SessionController(QObject):
         if self._finalized or self.session is None:
             return self.session
         self._record_cue_dwell()   # flush the last cue's dwell
+        # Increment exposure counts for cues shown in this session.
+        seen_ids: set[int] = set()
+        for cue in self.exposure_cues:
+            if cue.id is not None and cue.id not in seen_ids:
+                self.repos.cues.increment_exposure(cue.id)
+                seen_ids.add(cue.id)
         if endpoint_value is not None:
             self.session.endpoint_vas = max(0, min(self.config.vas_max, int(endpoint_value)))
         ratings = self.repos.ratings.list_for_session(self.session.id)

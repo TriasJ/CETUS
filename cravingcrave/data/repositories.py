@@ -12,8 +12,8 @@ from ..domain.models import (
     Clinician,
     CopingEvent,
     CravingRating,
-    CueDwell,
     CueConfig,
+    CueDwell,
     IntensityEvent,
     Patient,
     Session,
@@ -189,10 +189,12 @@ class CueConfigRepo:
         with self.db.transaction() as conn:
             cur = conn.execute(
                 "INSERT INTO cue_config (patient_id, substance, media_path, media_type, "
-                "appetitive_rank, enabled, is_personal_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+                "appetitive_rank, enabled, is_personal_reason, is_neutral, craving_weight, "
+                "exposure_count, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     c.patient_id, c.substance, c.media_path, c.media_type,
-                    c.appetitive_rank, int(c.enabled), int(c.is_personal_reason), c.created_at,
+                    c.appetitive_rank, int(c.enabled), int(c.is_personal_reason),
+                    int(c.is_neutral), c.craving_weight, c.exposure_count, c.created_at,
                 ),
             )
             c.id = cur.lastrowid
@@ -213,20 +215,35 @@ class CueConfigRepo:
         with self.db.transaction() as conn:
             conn.execute(
                 "UPDATE cue_config SET substance=?, media_path=?, media_type=?, "
-                "appetitive_rank=?, enabled=?, is_personal_reason=? WHERE id=?",
+                "appetitive_rank=?, enabled=?, is_personal_reason=?, is_neutral=?, "
+                "craving_weight=?, exposure_count=? WHERE id=?",
                 (
                     c.substance, c.media_path, c.media_type, c.appetitive_rank,
-                    int(c.enabled), int(c.is_personal_reason), c.id,
+                    int(c.enabled), int(c.is_personal_reason), int(c.is_neutral),
+                    c.craving_weight, c.exposure_count, c.id,
                 ),
+            )
+
+    def increment_exposure(self, cue_id: int) -> None:
+        """Increment the exposure counter for a cue (called once per session appearance)."""
+        with self.db.transaction() as conn:
+            conn.execute(
+                "UPDATE cue_config SET exposure_count = exposure_count + 1 WHERE id = ?",
+                (cue_id,),
             )
 
     @staticmethod
     def _row(r: sqlite3.Row) -> CueConfig:
+        keys = r.keys()
         return CueConfig(
             id=r["id"], patient_id=r["patient_id"], substance=r["substance"],
             media_path=r["media_path"], media_type=r["media_type"],
             appetitive_rank=r["appetitive_rank"], enabled=_b(r["enabled"]),
-            is_personal_reason=_b(r["is_personal_reason"]), created_at=r["created_at"],
+            is_personal_reason=_b(r["is_personal_reason"]),
+            is_neutral=_b(r["is_neutral"]) if "is_neutral" in keys else False,
+            craving_weight=r["craving_weight"] if "craving_weight" in keys else None,
+            exposure_count=int(r["exposure_count"]) if "exposure_count" in keys else 0,
+            created_at=r["created_at"],
         )
 
 
@@ -238,9 +255,9 @@ class SessionRepo:
         with self.db.transaction() as conn:
             cur = conn.execute(
                 "INSERT INTO session (patient_id, clinician_id, substance, started_at, "
-                "consent_given, app_version) VALUES (?,?,?,?,?,?)",
+                "consent_given, app_version, mode) VALUES (?,?,?,?,?,?,?)",
                 (s.patient_id, s.clinician_id, s.substance, s.started_at,
-                 int(s.consent_given), s.app_version),
+                 int(s.consent_given), s.app_version, s.mode),
             )
             s.id = cur.lastrowid
         return s
@@ -284,6 +301,7 @@ class SessionRepo:
 
     @staticmethod
     def _row(r: sqlite3.Row) -> Session:
+        keys = r.keys()
         return Session(
             id=r["id"], patient_id=r["patient_id"], clinician_id=r["clinician_id"],
             substance=r["substance"], started_at=r["started_at"], ended_at=r["ended_at"],
@@ -291,7 +309,8 @@ class SessionRepo:
             baseline_vas=r["baseline_vas"], peak_vas=r["peak_vas"],
             endpoint_vas=r["endpoint_vas"], habituation_slope=r["habituation_slope"],
             app_version=r["app_version"],
-            clinician_notes=r["clinician_notes"] if "clinician_notes" in r.keys() else None,
+            clinician_notes=r["clinician_notes"] if "clinician_notes" in keys else None,
+            mode=r["mode"] if "mode" in keys else "intense",
         )
 
 

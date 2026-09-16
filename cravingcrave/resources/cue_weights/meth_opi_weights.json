@@ -1,0 +1,3607 @@
+{
+  "source": "Meth/Opioid Craving Image Set (MOCIS)",
+  "scale": "craving_mean_100 is 0-100 VAS; craving_weight is normalised to 0-10",
+  "n": 360,
+  "entries": [
+    {
+      "file": "Slide001.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 14.25,
+      "craving_weight": 1.425,
+      "arousal_mean": 2.36,
+      "valence_mean": 5.07,
+      "typicality_mean": 11.14
+    },
+    {
+      "file": "Slide002.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 13.93,
+      "craving_weight": 1.393,
+      "arousal_mean": 2.67,
+      "valence_mean": 4.96,
+      "typicality_mean": 16.11
+    },
+    {
+      "file": "Slide003.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 13.5,
+      "craving_weight": 1.35,
+      "arousal_mean": 2.68,
+      "valence_mean": 4.96,
+      "typicality_mean": 14.57
+    },
+    {
+      "file": "Slide004.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 7.78,
+      "craving_weight": 0.778,
+      "arousal_mean": 2.37,
+      "valence_mean": 4.59,
+      "typicality_mean": 8.48
+    },
+    {
+      "file": "Slide005.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 6.71,
+      "craving_weight": 0.671,
+      "arousal_mean": 1.93,
+      "valence_mean": 4.61,
+      "typicality_mean": 7.54
+    },
+    {
+      "file": "Slide006.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 12.96,
+      "craving_weight": 1.296,
+      "arousal_mean": 2.11,
+      "valence_mean": 4.96,
+      "typicality_mean": 12.11
+    },
+    {
+      "file": "Slide007.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 13.89,
+      "craving_weight": 1.389,
+      "arousal_mean": 2.89,
+      "valence_mean": 5.11,
+      "typicality_mean": 15.67
+    },
+    {
+      "file": "Slide008.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 12.74,
+      "craving_weight": 1.274,
+      "arousal_mean": 3.37,
+      "valence_mean": 4.81,
+      "typicality_mean": 14.15
+    },
+    {
+      "file": "Slide009.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 16.63,
+      "craving_weight": 1.663,
+      "arousal_mean": 2.67,
+      "valence_mean": 4.74,
+      "typicality_mean": 11.19
+    },
+    {
+      "file": "Slide010.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 13.0,
+      "craving_weight": 1.3,
+      "arousal_mean": 2.63,
+      "valence_mean": 4.96,
+      "typicality_mean": 12.0
+    },
+    {
+      "file": "Slide011.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 11.29,
+      "craving_weight": 1.129,
+      "arousal_mean": 2.46,
+      "valence_mean": 4.93,
+      "typicality_mean": 12.43
+    },
+    {
+      "file": "Slide012.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 15.46,
+      "craving_weight": 1.546,
+      "arousal_mean": 2.39,
+      "valence_mean": 5.25,
+      "typicality_mean": 9.43
+    },
+    {
+      "file": "Slide013.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 10.25,
+      "craving_weight": 1.025,
+      "arousal_mean": 2.29,
+      "valence_mean": 4.79,
+      "typicality_mean": 14.0
+    },
+    {
+      "file": "Slide014.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 13.86,
+      "craving_weight": 1.386,
+      "arousal_mean": 2.11,
+      "valence_mean": 5.04,
+      "typicality_mean": 10.54
+    },
+    {
+      "file": "Slide015.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 12.78,
+      "craving_weight": 1.278,
+      "arousal_mean": 2.48,
+      "valence_mean": 4.74,
+      "typicality_mean": 9.67
+    },
+    {
+      "file": "Slide016.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 12.37,
+      "craving_weight": 1.237,
+      "arousal_mean": 2.93,
+      "valence_mean": 5.15,
+      "typicality_mean": 10.04
+    },
+    {
+      "file": "Slide017.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 11.19,
+      "craving_weight": 1.119,
+      "arousal_mean": 2.48,
+      "valence_mean": 4.85,
+      "typicality_mean": 12.15
+    },
+    {
+      "file": "Slide018.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 10.71,
+      "craving_weight": 1.071,
+      "arousal_mean": 2.36,
+      "valence_mean": 5.0,
+      "typicality_mean": 10.54
+    },
+    {
+      "file": "Slide019.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 13.04,
+      "craving_weight": 1.304,
+      "arousal_mean": 2.46,
+      "valence_mean": 4.79,
+      "typicality_mean": 13.79
+    },
+    {
+      "file": "Slide020.jpeg",
+      "image_set": "control",
+      "category": "control_objects",
+      "craving_mean_100": 8.26,
+      "craving_weight": 0.826,
+      "arousal_mean": 2.48,
+      "valence_mean": 4.85,
+      "typicality_mean": 8.11
+    },
+    {
+      "file": "Slide021.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 11.43,
+      "craving_weight": 1.143,
+      "arousal_mean": 2.39,
+      "valence_mean": 4.96,
+      "typicality_mean": 12.18
+    },
+    {
+      "file": "Slide022.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 18.19,
+      "craving_weight": 1.819,
+      "arousal_mean": 2.7,
+      "valence_mean": 5.04,
+      "typicality_mean": 15.0
+    },
+    {
+      "file": "Slide023.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 9.18,
+      "craving_weight": 0.918,
+      "arousal_mean": 2.54,
+      "valence_mean": 5.04,
+      "typicality_mean": 8.79
+    },
+    {
+      "file": "Slide024.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 7.37,
+      "craving_weight": 0.737,
+      "arousal_mean": 2.7,
+      "valence_mean": 5.19,
+      "typicality_mean": 8.33
+    },
+    {
+      "file": "Slide025.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 10.78,
+      "craving_weight": 1.078,
+      "arousal_mean": 2.89,
+      "valence_mean": 4.89,
+      "typicality_mean": 10.93
+    },
+    {
+      "file": "Slide026.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 20.0,
+      "craving_weight": 2.0,
+      "arousal_mean": 2.36,
+      "valence_mean": 4.93,
+      "typicality_mean": 11.71
+    },
+    {
+      "file": "Slide027.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 19.67,
+      "craving_weight": 1.967,
+      "arousal_mean": 2.89,
+      "valence_mean": 5.04,
+      "typicality_mean": 12.63
+    },
+    {
+      "file": "Slide028.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 13.15,
+      "craving_weight": 1.315,
+      "arousal_mean": 2.67,
+      "valence_mean": 4.96,
+      "typicality_mean": 14.07
+    },
+    {
+      "file": "Slide029.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 13.43,
+      "craving_weight": 1.343,
+      "arousal_mean": 2.36,
+      "valence_mean": 4.86,
+      "typicality_mean": 15.18
+    },
+    {
+      "file": "Slide030.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 10.64,
+      "craving_weight": 1.064,
+      "arousal_mean": 2.43,
+      "valence_mean": 5.04,
+      "typicality_mean": 13.54
+    },
+    {
+      "file": "Slide031.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 11.71,
+      "craving_weight": 1.171,
+      "arousal_mean": 2.25,
+      "valence_mean": 4.82,
+      "typicality_mean": 9.07
+    },
+    {
+      "file": "Slide032.jpeg",
+      "image_set": "control",
+      "category": "control_objects_hand",
+      "craving_mean_100": 15.15,
+      "craving_weight": 1.515,
+      "arousal_mean": 2.63,
+      "valence_mean": 4.63,
+      "typicality_mean": 15.0
+    },
+    {
+      "file": "Slide033.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 7.78,
+      "craving_weight": 0.778,
+      "arousal_mean": 2.52,
+      "valence_mean": 4.78,
+      "typicality_mean": 10.81
+    },
+    {
+      "file": "Slide034.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 13.25,
+      "craving_weight": 1.325,
+      "arousal_mean": 2.93,
+      "valence_mean": 5.0,
+      "typicality_mean": 12.79
+    },
+    {
+      "file": "Slide035.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 5.32,
+      "craving_weight": 0.532,
+      "arousal_mean": 2.11,
+      "valence_mean": 4.68,
+      "typicality_mean": 8.04
+    },
+    {
+      "file": "Slide036.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 15.78,
+      "craving_weight": 1.578,
+      "arousal_mean": 2.85,
+      "valence_mean": 5.0,
+      "typicality_mean": 15.89
+    },
+    {
+      "file": "Slide037.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 6.46,
+      "craving_weight": 0.646,
+      "arousal_mean": 2.14,
+      "valence_mean": 4.75,
+      "typicality_mean": 7.18
+    },
+    {
+      "file": "Slide038.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 9.11,
+      "craving_weight": 0.911,
+      "arousal_mean": 2.36,
+      "valence_mean": 4.86,
+      "typicality_mean": 9.11
+    },
+    {
+      "file": "Slide039.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 9.63,
+      "craving_weight": 0.963,
+      "arousal_mean": 2.37,
+      "valence_mean": 4.85,
+      "typicality_mean": 10.04
+    },
+    {
+      "file": "Slide040.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 12.59,
+      "craving_weight": 1.259,
+      "arousal_mean": 2.59,
+      "valence_mean": 4.78,
+      "typicality_mean": 14.93
+    },
+    {
+      "file": "Slide041.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 11.33,
+      "craving_weight": 1.133,
+      "arousal_mean": 2.44,
+      "valence_mean": 4.7,
+      "typicality_mean": 13.81
+    },
+    {
+      "file": "Slide042.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 14.19,
+      "craving_weight": 1.419,
+      "arousal_mean": 2.7,
+      "valence_mean": 4.96,
+      "typicality_mean": 12.56
+    },
+    {
+      "file": "Slide043.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 8.64,
+      "craving_weight": 0.864,
+      "arousal_mean": 2.39,
+      "valence_mean": 4.89,
+      "typicality_mean": 10.21
+    },
+    {
+      "file": "Slide044.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 11.96,
+      "craving_weight": 1.196,
+      "arousal_mean": 2.52,
+      "valence_mean": 5.15,
+      "typicality_mean": 12.19
+    },
+    {
+      "file": "Slide045.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 11.59,
+      "craving_weight": 1.159,
+      "arousal_mean": 2.67,
+      "valence_mean": 4.93,
+      "typicality_mean": 12.11
+    },
+    {
+      "file": "Slide046.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 7.5,
+      "craving_weight": 0.75,
+      "arousal_mean": 2.04,
+      "valence_mean": 4.5,
+      "typicality_mean": 6.96
+    },
+    {
+      "file": "Slide047.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 10.07,
+      "craving_weight": 1.007,
+      "arousal_mean": 2.46,
+      "valence_mean": 4.86,
+      "typicality_mean": 12.54
+    },
+    {
+      "file": "Slide048.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 7.57,
+      "craving_weight": 0.757,
+      "arousal_mean": 2.21,
+      "valence_mean": 5.0,
+      "typicality_mean": 8.04
+    },
+    {
+      "file": "Slide049.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 13.18,
+      "craving_weight": 1.318,
+      "arousal_mean": 2.43,
+      "valence_mean": 5.21,
+      "typicality_mean": 10.61
+    },
+    {
+      "file": "Slide050.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 7.33,
+      "craving_weight": 0.733,
+      "arousal_mean": 2.37,
+      "valence_mean": 4.89,
+      "typicality_mean": 12.19
+    },
+    {
+      "file": "Slide051.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 5.89,
+      "craving_weight": 0.589,
+      "arousal_mean": 2.39,
+      "valence_mean": 5.07,
+      "typicality_mean": 7.32
+    },
+    {
+      "file": "Slide052.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 8.85,
+      "craving_weight": 0.885,
+      "arousal_mean": 2.63,
+      "valence_mean": 4.89,
+      "typicality_mean": 10.67
+    },
+    {
+      "file": "Slide053.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 12.0,
+      "craving_weight": 1.2,
+      "arousal_mean": 2.29,
+      "valence_mean": 4.79,
+      "typicality_mean": 12.79
+    },
+    {
+      "file": "Slide054.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 9.71,
+      "craving_weight": 0.971,
+      "arousal_mean": 2.54,
+      "valence_mean": 4.32,
+      "typicality_mean": 9.25
+    },
+    {
+      "file": "Slide055.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 10.0,
+      "craving_weight": 1.0,
+      "arousal_mean": 2.26,
+      "valence_mean": 4.93,
+      "typicality_mean": 9.59
+    },
+    {
+      "file": "Slide056.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 6.33,
+      "craving_weight": 0.633,
+      "arousal_mean": 2.26,
+      "valence_mean": 4.85,
+      "typicality_mean": 7.48
+    },
+    {
+      "file": "Slide057.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 51.18,
+      "craving_weight": 5.118,
+      "arousal_mean": 3.75,
+      "valence_mean": 5.07,
+      "typicality_mean": 55.43
+    },
+    {
+      "file": "Slide058.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 7.39,
+      "craving_weight": 0.739,
+      "arousal_mean": 2.21,
+      "valence_mean": 4.86,
+      "typicality_mean": 14.18
+    },
+    {
+      "file": "Slide059.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 9.37,
+      "craving_weight": 0.937,
+      "arousal_mean": 2.41,
+      "valence_mean": 4.7,
+      "typicality_mean": 7.81
+    },
+    {
+      "file": "Slide060.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 7.14,
+      "craving_weight": 0.714,
+      "arousal_mean": 2.29,
+      "valence_mean": 5.07,
+      "typicality_mean": 13.36
+    },
+    {
+      "file": "Slide061.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 10.81,
+      "craving_weight": 1.081,
+      "arousal_mean": 2.96,
+      "valence_mean": 4.89,
+      "typicality_mean": 16.22
+    },
+    {
+      "file": "Slide062.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 10.18,
+      "craving_weight": 1.018,
+      "arousal_mean": 2.64,
+      "valence_mean": 5.04,
+      "typicality_mean": 11.43
+    },
+    {
+      "file": "Slide063.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 11.33,
+      "craving_weight": 1.133,
+      "arousal_mean": 2.7,
+      "valence_mean": 4.81,
+      "typicality_mean": 18.67
+    },
+    {
+      "file": "Slide064.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 13.48,
+      "craving_weight": 1.348,
+      "arousal_mean": 2.7,
+      "valence_mean": 4.7,
+      "typicality_mean": 14.26
+    },
+    {
+      "file": "Slide065.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 7.26,
+      "craving_weight": 0.726,
+      "arousal_mean": 2.26,
+      "valence_mean": 4.74,
+      "typicality_mean": 10.3
+    },
+    {
+      "file": "Slide066.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 5.57,
+      "craving_weight": 0.557,
+      "arousal_mean": 2.14,
+      "valence_mean": 4.79,
+      "typicality_mean": 6.46
+    },
+    {
+      "file": "Slide067.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 6.96,
+      "craving_weight": 0.696,
+      "arousal_mean": 2.52,
+      "valence_mean": 4.7,
+      "typicality_mean": 7.15
+    },
+    {
+      "file": "Slide068.jpeg",
+      "image_set": "control",
+      "category": "control_tool",
+      "craving_mean_100": 11.68,
+      "craving_weight": 1.168,
+      "arousal_mean": 2.79,
+      "valence_mean": 5.0,
+      "typicality_mean": 13.32
+    },
+    {
+      "file": "Slide069.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 13.86,
+      "craving_weight": 1.386,
+      "arousal_mean": 2.25,
+      "valence_mean": 4.86,
+      "typicality_mean": 10.93
+    },
+    {
+      "file": "Slide070.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 12.93,
+      "craving_weight": 1.293,
+      "arousal_mean": 2.89,
+      "valence_mean": 4.67,
+      "typicality_mean": 11.52
+    },
+    {
+      "file": "Slide071.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 10.26,
+      "craving_weight": 1.026,
+      "arousal_mean": 2.56,
+      "valence_mean": 4.85,
+      "typicality_mean": 11.11
+    },
+    {
+      "file": "Slide072.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 12.78,
+      "craving_weight": 1.278,
+      "arousal_mean": 2.7,
+      "valence_mean": 4.93,
+      "typicality_mean": 15.19
+    },
+    {
+      "file": "Slide073.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 12.68,
+      "craving_weight": 1.268,
+      "arousal_mean": 2.32,
+      "valence_mean": 4.89,
+      "typicality_mean": 11.57
+    },
+    {
+      "file": "Slide074.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 13.15,
+      "craving_weight": 1.315,
+      "arousal_mean": 2.74,
+      "valence_mean": 4.93,
+      "typicality_mean": 19.3
+    },
+    {
+      "file": "Slide075.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 7.43,
+      "craving_weight": 0.743,
+      "arousal_mean": 2.21,
+      "valence_mean": 4.61,
+      "typicality_mean": 9.57
+    },
+    {
+      "file": "Slide076.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 9.68,
+      "craving_weight": 0.968,
+      "arousal_mean": 2.46,
+      "valence_mean": 4.79,
+      "typicality_mean": 9.07
+    },
+    {
+      "file": "Slide077.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 16.96,
+      "craving_weight": 1.696,
+      "arousal_mean": 2.75,
+      "valence_mean": 5.21,
+      "typicality_mean": 16.57
+    },
+    {
+      "file": "Slide078.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 10.59,
+      "craving_weight": 1.059,
+      "arousal_mean": 2.3,
+      "valence_mean": 5.07,
+      "typicality_mean": 12.7
+    },
+    {
+      "file": "Slide079.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 8.96,
+      "craving_weight": 0.896,
+      "arousal_mean": 2.44,
+      "valence_mean": 4.44,
+      "typicality_mean": 9.56
+    },
+    {
+      "file": "Slide080.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 11.11,
+      "craving_weight": 1.111,
+      "arousal_mean": 2.36,
+      "valence_mean": 5.07,
+      "typicality_mean": 13.5
+    },
+    {
+      "file": "Slide081.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 12.11,
+      "craving_weight": 1.211,
+      "arousal_mean": 2.25,
+      "valence_mean": 4.96,
+      "typicality_mean": 13.21
+    },
+    {
+      "file": "Slide082.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 8.64,
+      "craving_weight": 0.864,
+      "arousal_mean": 2.14,
+      "valence_mean": 4.82,
+      "typicality_mean": 10.04
+    },
+    {
+      "file": "Slide083.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 7.85,
+      "craving_weight": 0.785,
+      "arousal_mean": 2.56,
+      "valence_mean": 4.85,
+      "typicality_mean": 11.26
+    },
+    {
+      "file": "Slide084.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 16.41,
+      "craving_weight": 1.641,
+      "arousal_mean": 2.63,
+      "valence_mean": 4.56,
+      "typicality_mean": 15.04
+    },
+    {
+      "file": "Slide085.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 6.79,
+      "craving_weight": 0.679,
+      "arousal_mean": 2.39,
+      "valence_mean": 4.64,
+      "typicality_mean": 7.71
+    },
+    {
+      "file": "Slide086.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 13.68,
+      "craving_weight": 1.368,
+      "arousal_mean": 2.29,
+      "valence_mean": 4.93,
+      "typicality_mean": 16.64
+    },
+    {
+      "file": "Slide087.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 41.81,
+      "craving_weight": 4.181,
+      "arousal_mean": 2.93,
+      "valence_mean": 4.96,
+      "typicality_mean": 42.0
+    },
+    {
+      "file": "Slide088.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_simple",
+      "craving_mean_100": 8.85,
+      "craving_weight": 0.885,
+      "arousal_mean": 2.44,
+      "valence_mean": 4.74,
+      "typicality_mean": 9.78
+    },
+    {
+      "file": "Slide089.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 7.7,
+      "craving_weight": 0.77,
+      "arousal_mean": 2.33,
+      "valence_mean": 4.85,
+      "typicality_mean": 7.19
+    },
+    {
+      "file": "Slide090.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 10.07,
+      "craving_weight": 1.007,
+      "arousal_mean": 2.52,
+      "valence_mean": 4.89,
+      "typicality_mean": 10.74
+    },
+    {
+      "file": "Slide091.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 5.5,
+      "craving_weight": 0.55,
+      "arousal_mean": 2.14,
+      "valence_mean": 5.11,
+      "typicality_mean": 7.96
+    },
+    {
+      "file": "Slide092.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 7.56,
+      "craving_weight": 0.756,
+      "arousal_mean": 2.37,
+      "valence_mean": 4.48,
+      "typicality_mean": 8.74
+    },
+    {
+      "file": "Slide093.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 20.29,
+      "craving_weight": 2.029,
+      "arousal_mean": 2.32,
+      "valence_mean": 4.93,
+      "typicality_mean": 10.96
+    },
+    {
+      "file": "Slide094.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 10.5,
+      "craving_weight": 1.05,
+      "arousal_mean": 2.39,
+      "valence_mean": 5.14,
+      "typicality_mean": 11.82
+    },
+    {
+      "file": "Slide095.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 15.81,
+      "craving_weight": 1.581,
+      "arousal_mean": 2.81,
+      "valence_mean": 4.85,
+      "typicality_mean": 12.11
+    },
+    {
+      "file": "Slide096.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 13.21,
+      "craving_weight": 1.321,
+      "arousal_mean": 2.57,
+      "valence_mean": 4.96,
+      "typicality_mean": 12.61
+    },
+    {
+      "file": "Slide097.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 6.89,
+      "craving_weight": 0.689,
+      "arousal_mean": 2.11,
+      "valence_mean": 4.64,
+      "typicality_mean": 8.61
+    },
+    {
+      "file": "Slide098.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 5.54,
+      "craving_weight": 0.554,
+      "arousal_mean": 2.21,
+      "valence_mean": 4.79,
+      "typicality_mean": 6.61
+    },
+    {
+      "file": "Slide099.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 9.93,
+      "craving_weight": 0.993,
+      "arousal_mean": 2.7,
+      "valence_mean": 4.78,
+      "typicality_mean": 9.37
+    },
+    {
+      "file": "Slide100.jpeg",
+      "image_set": "control",
+      "category": "control_tool_hand_complex",
+      "craving_mean_100": 8.85,
+      "craving_weight": 0.885,
+      "arousal_mean": 2.33,
+      "valence_mean": 4.78,
+      "typicality_mean": 16.37
+    },
+    {
+      "file": "Slide101.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 14.32,
+      "craving_weight": 1.432,
+      "arousal_mean": 2.46,
+      "valence_mean": 4.93,
+      "typicality_mean": 14.89
+    },
+    {
+      "file": "Slide102.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 11.96,
+      "craving_weight": 1.196,
+      "arousal_mean": 2.89,
+      "valence_mean": 4.78,
+      "typicality_mean": 15.07
+    },
+    {
+      "file": "Slide103.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 8.71,
+      "craving_weight": 0.871,
+      "arousal_mean": 2.54,
+      "valence_mean": 5.04,
+      "typicality_mean": 10.82
+    },
+    {
+      "file": "Slide104.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 9.33,
+      "craving_weight": 0.933,
+      "arousal_mean": 2.52,
+      "valence_mean": 4.85,
+      "typicality_mean": 11.26
+    },
+    {
+      "file": "Slide105.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 8.32,
+      "craving_weight": 0.832,
+      "arousal_mean": 2.14,
+      "valence_mean": 4.86,
+      "typicality_mean": 10.86
+    },
+    {
+      "file": "Slide106.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 8.85,
+      "craving_weight": 0.885,
+      "arousal_mean": 2.67,
+      "valence_mean": 4.85,
+      "typicality_mean": 9.44
+    },
+    {
+      "file": "Slide107.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 12.52,
+      "craving_weight": 1.252,
+      "arousal_mean": 2.74,
+      "valence_mean": 5.04,
+      "typicality_mean": 13.11
+    },
+    {
+      "file": "Slide108.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 9.11,
+      "craving_weight": 0.911,
+      "arousal_mean": 2.63,
+      "valence_mean": 4.81,
+      "typicality_mean": 9.89
+    },
+    {
+      "file": "Slide109.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 12.5,
+      "craving_weight": 1.25,
+      "arousal_mean": 2.29,
+      "valence_mean": 4.93,
+      "typicality_mean": 13.71
+    },
+    {
+      "file": "Slide110.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 10.61,
+      "craving_weight": 1.061,
+      "arousal_mean": 2.25,
+      "valence_mean": 4.79,
+      "typicality_mean": 11.25
+    },
+    {
+      "file": "Slide111.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 12.59,
+      "craving_weight": 1.259,
+      "arousal_mean": 2.7,
+      "valence_mean": 4.93,
+      "typicality_mean": 11.37
+    },
+    {
+      "file": "Slide112.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 7.56,
+      "craving_weight": 0.756,
+      "arousal_mean": 2.56,
+      "valence_mean": 4.7,
+      "typicality_mean": 11.19
+    },
+    {
+      "file": "Slide113.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 10.0,
+      "craving_weight": 1.0,
+      "arousal_mean": 2.79,
+      "valence_mean": 4.96,
+      "typicality_mean": 9.93
+    },
+    {
+      "file": "Slide114.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 14.36,
+      "craving_weight": 1.436,
+      "arousal_mean": 2.18,
+      "valence_mean": 4.75,
+      "typicality_mean": 16.07
+    },
+    {
+      "file": "Slide115.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 17.93,
+      "craving_weight": 1.793,
+      "arousal_mean": 2.52,
+      "valence_mean": 4.78,
+      "typicality_mean": 20.56
+    },
+    {
+      "file": "Slide116.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 16.56,
+      "craving_weight": 1.656,
+      "arousal_mean": 2.93,
+      "valence_mean": 4.89,
+      "typicality_mean": 20.26
+    },
+    {
+      "file": "Slide117.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 9.81,
+      "craving_weight": 0.981,
+      "arousal_mean": 2.56,
+      "valence_mean": 4.89,
+      "typicality_mean": 10.81
+    },
+    {
+      "file": "Slide118.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 9.57,
+      "craving_weight": 0.957,
+      "arousal_mean": 2.32,
+      "valence_mean": 4.89,
+      "typicality_mean": 11.96
+    },
+    {
+      "file": "Slide119.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 8.32,
+      "craving_weight": 0.832,
+      "arousal_mean": 2.14,
+      "valence_mean": 4.79,
+      "typicality_mean": 10.29
+    },
+    {
+      "file": "Slide120.jpeg",
+      "image_set": "control",
+      "category": "control_tool_face",
+      "craving_mean_100": 6.89,
+      "craving_weight": 0.689,
+      "arousal_mean": 2.54,
+      "valence_mean": 4.82,
+      "typicality_mean": 7.64
+    },
+    {
+      "file": "Slide001.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 92.07,
+      "craving_weight": 9.207,
+      "arousal_mean": 4.5,
+      "valence_mean": 4.5,
+      "typicality_mean": 93.32
+    },
+    {
+      "file": "Slide002.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 91.26,
+      "craving_weight": 9.126,
+      "arousal_mean": 4.7,
+      "valence_mean": 4.7,
+      "typicality_mean": 89.93
+    },
+    {
+      "file": "Slide003.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 88.75,
+      "craving_weight": 8.875,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.64,
+      "typicality_mean": 91.36
+    },
+    {
+      "file": "Slide004.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 85.22,
+      "craving_weight": 8.522,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.52,
+      "typicality_mean": 84.59
+    },
+    {
+      "file": "Slide005.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 91.43,
+      "craving_weight": 9.143,
+      "arousal_mean": 4.96,
+      "valence_mean": 4.5,
+      "typicality_mean": 93.11
+    },
+    {
+      "file": "Slide006.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 91.79,
+      "craving_weight": 9.179,
+      "arousal_mean": 4.68,
+      "valence_mean": 4.39,
+      "typicality_mean": 94.32
+    },
+    {
+      "file": "Slide007.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 91.41,
+      "craving_weight": 9.141,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.74,
+      "typicality_mean": 92.67
+    },
+    {
+      "file": "Slide008.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 85.0,
+      "craving_weight": 8.5,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.48,
+      "typicality_mean": 84.89
+    },
+    {
+      "file": "Slide009.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 90.41,
+      "craving_weight": 9.041,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.56,
+      "typicality_mean": 91.44
+    },
+    {
+      "file": "Slide010.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 90.19,
+      "craving_weight": 9.019,
+      "arousal_mean": 4.81,
+      "valence_mean": 4.3,
+      "typicality_mean": 90.26
+    },
+    {
+      "file": "Slide011.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 94.0,
+      "craving_weight": 9.4,
+      "arousal_mean": 4.82,
+      "valence_mean": 4.25,
+      "typicality_mean": 94.57
+    },
+    {
+      "file": "Slide012.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 91.79,
+      "craving_weight": 9.179,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.46,
+      "typicality_mean": 93.36
+    },
+    {
+      "file": "Slide013.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 94.14,
+      "craving_weight": 9.414,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.29,
+      "typicality_mean": 94.89
+    },
+    {
+      "file": "Slide014.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 89.96,
+      "craving_weight": 8.996,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.29,
+      "typicality_mean": 91.71
+    },
+    {
+      "file": "Slide015.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 88.11,
+      "craving_weight": 8.811,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.41,
+      "typicality_mean": 88.15
+    },
+    {
+      "file": "Slide016.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 87.89,
+      "craving_weight": 8.789,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.41,
+      "typicality_mean": 87.3
+    },
+    {
+      "file": "Slide017.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 88.41,
+      "craving_weight": 8.841,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.48,
+      "typicality_mean": 88.96
+    },
+    {
+      "file": "Slide018.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 88.32,
+      "craving_weight": 8.832,
+      "arousal_mean": 4.82,
+      "valence_mean": 4.25,
+      "typicality_mean": 90.11
+    },
+    {
+      "file": "Slide019.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 88.89,
+      "craving_weight": 8.889,
+      "arousal_mean": 4.68,
+      "valence_mean": 4.68,
+      "typicality_mean": 92.0
+    },
+    {
+      "file": "Slide020.jpeg",
+      "image_set": "meth",
+      "category": "meth",
+      "craving_mean_100": 87.19,
+      "craving_weight": 8.719,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.37,
+      "typicality_mean": 84.81
+    },
+    {
+      "file": "Slide021.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 90.5,
+      "craving_weight": 9.05,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.57,
+      "typicality_mean": 95.07
+    },
+    {
+      "file": "Slide022.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 89.19,
+      "craving_weight": 8.919,
+      "arousal_mean": 4.74,
+      "valence_mean": 4.59,
+      "typicality_mean": 89.11
+    },
+    {
+      "file": "Slide023.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 93.93,
+      "craving_weight": 9.393,
+      "arousal_mean": 4.79,
+      "valence_mean": 4.43,
+      "typicality_mean": 94.14
+    },
+    {
+      "file": "Slide024.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 87.93,
+      "craving_weight": 8.793,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.63,
+      "typicality_mean": 84.52
+    },
+    {
+      "file": "Slide025.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 85.15,
+      "craving_weight": 8.515,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.41,
+      "typicality_mean": 88.26
+    },
+    {
+      "file": "Slide026.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 81.82,
+      "craving_weight": 8.182,
+      "arousal_mean": 4.54,
+      "valence_mean": 4.46,
+      "typicality_mean": 88.86
+    },
+    {
+      "file": "Slide027.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 88.96,
+      "craving_weight": 8.896,
+      "arousal_mean": 4.96,
+      "valence_mean": 4.89,
+      "typicality_mean": 87.56
+    },
+    {
+      "file": "Slide028.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 82.63,
+      "craving_weight": 8.263,
+      "arousal_mean": 4.26,
+      "valence_mean": 4.56,
+      "typicality_mean": 85.93
+    },
+    {
+      "file": "Slide029.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 88.21,
+      "craving_weight": 8.821,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.46,
+      "typicality_mean": 89.39
+    },
+    {
+      "file": "Slide030.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 90.61,
+      "craving_weight": 9.061,
+      "arousal_mean": 5.04,
+      "valence_mean": 4.68,
+      "typicality_mean": 93.5
+    },
+    {
+      "file": "Slide031.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 91.71,
+      "craving_weight": 9.171,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.41,
+      "typicality_mean": 93.29
+    },
+    {
+      "file": "Slide032.jpeg",
+      "image_set": "meth",
+      "category": "meth_hand",
+      "craving_mean_100": 82.56,
+      "craving_weight": 8.256,
+      "arousal_mean": 4.19,
+      "valence_mean": 4.41,
+      "typicality_mean": 83.89
+    },
+    {
+      "file": "Slide033.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 84.89,
+      "craving_weight": 8.489,
+      "arousal_mean": 4.22,
+      "valence_mean": 4.59,
+      "typicality_mean": 88.48
+    },
+    {
+      "file": "Slide034.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 87.14,
+      "craving_weight": 8.714,
+      "arousal_mean": 4.11,
+      "valence_mean": 4.11,
+      "typicality_mean": 91.64
+    },
+    {
+      "file": "Slide035.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 91.68,
+      "craving_weight": 9.168,
+      "arousal_mean": 4.61,
+      "valence_mean": 4.29,
+      "typicality_mean": 92.64
+    },
+    {
+      "file": "Slide036.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 84.56,
+      "craving_weight": 8.456,
+      "arousal_mean": 4.74,
+      "valence_mean": 4.3,
+      "typicality_mean": 86.67
+    },
+    {
+      "file": "Slide037.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 87.54,
+      "craving_weight": 8.754,
+      "arousal_mean": 4.54,
+      "valence_mean": 4.71,
+      "typicality_mean": 89.21
+    },
+    {
+      "file": "Slide038.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 89.57,
+      "craving_weight": 8.957,
+      "arousal_mean": 4.71,
+      "valence_mean": 4.43,
+      "typicality_mean": 91.46
+    },
+    {
+      "file": "Slide039.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 88.0,
+      "craving_weight": 8.8,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.48,
+      "typicality_mean": 89.41
+    },
+    {
+      "file": "Slide040.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 87.26,
+      "craving_weight": 8.726,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.59,
+      "typicality_mean": 88.04
+    },
+    {
+      "file": "Slide041.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 87.3,
+      "craving_weight": 8.73,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.44,
+      "typicality_mean": 87.67
+    },
+    {
+      "file": "Slide042.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 87.85,
+      "craving_weight": 8.785,
+      "arousal_mean": 4.81,
+      "valence_mean": 4.41,
+      "typicality_mean": 88.78
+    },
+    {
+      "file": "Slide043.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 93.79,
+      "craving_weight": 9.379,
+      "arousal_mean": 4.43,
+      "valence_mean": 4.59,
+      "typicality_mean": 94.54
+    },
+    {
+      "file": "Slide044.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 80.22,
+      "craving_weight": 8.022,
+      "arousal_mean": 4.74,
+      "valence_mean": 4.11,
+      "typicality_mean": 79.81
+    },
+    {
+      "file": "Slide045.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 90.63,
+      "craving_weight": 9.063,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.33,
+      "typicality_mean": 90.78
+    },
+    {
+      "file": "Slide046.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 92.43,
+      "craving_weight": 9.243,
+      "arousal_mean": 5.0,
+      "valence_mean": 4.54,
+      "typicality_mean": 93.21
+    },
+    {
+      "file": "Slide047.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 93.0,
+      "craving_weight": 9.3,
+      "arousal_mean": 4.5,
+      "valence_mean": 4.57,
+      "typicality_mean": 93.04
+    },
+    {
+      "file": "Slide048.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 92.54,
+      "craving_weight": 9.254,
+      "arousal_mean": 4.61,
+      "valence_mean": 4.43,
+      "typicality_mean": 91.04
+    },
+    {
+      "file": "Slide049.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 91.39,
+      "craving_weight": 9.139,
+      "arousal_mean": 4.71,
+      "valence_mean": 3.93,
+      "typicality_mean": 94.79
+    },
+    {
+      "file": "Slide050.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 86.44,
+      "craving_weight": 8.644,
+      "arousal_mean": 5.0,
+      "valence_mean": 4.59,
+      "typicality_mean": 87.44
+    },
+    {
+      "file": "Slide051.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 62.39,
+      "craving_weight": 6.239,
+      "arousal_mean": 3.5,
+      "valence_mean": 4.43,
+      "typicality_mean": 73.39
+    },
+    {
+      "file": "Slide052.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 54.7,
+      "craving_weight": 5.47,
+      "arousal_mean": 3.41,
+      "valence_mean": 4.56,
+      "typicality_mean": 64.48
+    },
+    {
+      "file": "Slide053.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 83.71,
+      "craving_weight": 8.371,
+      "arousal_mean": 4.21,
+      "valence_mean": 4.25,
+      "typicality_mean": 85.89
+    },
+    {
+      "file": "Slide054.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 89.18,
+      "craving_weight": 8.918,
+      "arousal_mean": 4.5,
+      "valence_mean": 4.82,
+      "typicality_mean": 92.75
+    },
+    {
+      "file": "Slide055.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 88.11,
+      "craving_weight": 8.811,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.48,
+      "typicality_mean": 86.3
+    },
+    {
+      "file": "Slide056.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 86.63,
+      "craving_weight": 8.663,
+      "arousal_mean": 4.52,
+      "valence_mean": 4.41,
+      "typicality_mean": 84.78
+    },
+    {
+      "file": "Slide057.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 91.18,
+      "craving_weight": 9.118,
+      "arousal_mean": 5.04,
+      "valence_mean": 4.32,
+      "typicality_mean": 90.57
+    },
+    {
+      "file": "Slide058.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 90.29,
+      "craving_weight": 9.029,
+      "arousal_mean": 4.82,
+      "valence_mean": 4.46,
+      "typicality_mean": 91.79
+    },
+    {
+      "file": "Slide059.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 86.3,
+      "craving_weight": 8.63,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.48,
+      "typicality_mean": 86.44
+    },
+    {
+      "file": "Slide060.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 91.96,
+      "craving_weight": 9.196,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.61,
+      "typicality_mean": 93.0
+    },
+    {
+      "file": "Slide061.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 81.44,
+      "craving_weight": 8.144,
+      "arousal_mean": 4.44,
+      "valence_mean": 4.26,
+      "typicality_mean": 84.89
+    },
+    {
+      "file": "Slide062.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 93.11,
+      "craving_weight": 9.311,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.5,
+      "typicality_mean": 93.54
+    },
+    {
+      "file": "Slide063.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 88.33,
+      "craving_weight": 8.833,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.3,
+      "typicality_mean": 89.96
+    },
+    {
+      "file": "Slide064.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 83.48,
+      "craving_weight": 8.348,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.63,
+      "typicality_mean": 82.0
+    },
+    {
+      "file": "Slide065.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 81.63,
+      "craving_weight": 8.163,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.56,
+      "typicality_mean": 83.33
+    },
+    {
+      "file": "Slide066.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 92.04,
+      "craving_weight": 9.204,
+      "arousal_mean": 4.68,
+      "valence_mean": 4.46,
+      "typicality_mean": 94.39
+    },
+    {
+      "file": "Slide067.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 80.67,
+      "craving_weight": 8.067,
+      "arousal_mean": 4.52,
+      "valence_mean": 4.67,
+      "typicality_mean": 84.44
+    },
+    {
+      "file": "Slide068.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument",
+      "craving_mean_100": 92.46,
+      "craving_weight": 9.246,
+      "arousal_mean": 4.82,
+      "valence_mean": 4.32,
+      "typicality_mean": 94.0
+    },
+    {
+      "file": "Slide069.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 92.18,
+      "craving_weight": 9.218,
+      "arousal_mean": 5.04,
+      "valence_mean": 4.36,
+      "typicality_mean": 95.0
+    },
+    {
+      "file": "Slide070.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 89.04,
+      "craving_weight": 8.904,
+      "arousal_mean": 5.07,
+      "valence_mean": 4.3,
+      "typicality_mean": 88.07
+    },
+    {
+      "file": "Slide071.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 86.0,
+      "craving_weight": 8.6,
+      "arousal_mean": 4.78,
+      "valence_mean": 4.52,
+      "typicality_mean": 87.85
+    },
+    {
+      "file": "Slide072.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 83.26,
+      "craving_weight": 8.326,
+      "arousal_mean": 4.48,
+      "valence_mean": 4.48,
+      "typicality_mean": 83.81
+    },
+    {
+      "file": "Slide073.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 92.21,
+      "craving_weight": 9.221,
+      "arousal_mean": 4.79,
+      "valence_mean": 4.32,
+      "typicality_mean": 93.18
+    },
+    {
+      "file": "Slide074.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 81.67,
+      "craving_weight": 8.167,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.3,
+      "typicality_mean": 81.3
+    },
+    {
+      "file": "Slide075.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 90.14,
+      "craving_weight": 9.014,
+      "arousal_mean": 4.75,
+      "valence_mean": 4.25,
+      "typicality_mean": 91.43
+    },
+    {
+      "file": "Slide076.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 89.29,
+      "craving_weight": 8.929,
+      "arousal_mean": 4.61,
+      "valence_mean": 4.07,
+      "typicality_mean": 90.5
+    },
+    {
+      "file": "Slide077.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 93.64,
+      "craving_weight": 9.364,
+      "arousal_mean": 5.11,
+      "valence_mean": 4.25,
+      "typicality_mean": 95.43
+    },
+    {
+      "file": "Slide078.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 85.41,
+      "craving_weight": 8.541,
+      "arousal_mean": 4.3,
+      "valence_mean": 4.07,
+      "typicality_mean": 87.89
+    },
+    {
+      "file": "Slide079.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 82.85,
+      "craving_weight": 8.285,
+      "arousal_mean": 4.48,
+      "valence_mean": 4.63,
+      "typicality_mean": 86.48
+    },
+    {
+      "file": "Slide080.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 87.32,
+      "craving_weight": 8.732,
+      "arousal_mean": 4.46,
+      "valence_mean": 4.61,
+      "typicality_mean": 84.64
+    },
+    {
+      "file": "Slide081.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 65.39,
+      "craving_weight": 6.539,
+      "arousal_mean": 3.71,
+      "valence_mean": 4.93,
+      "typicality_mean": 77.46
+    },
+    {
+      "file": "Slide082.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 90.57,
+      "craving_weight": 9.057,
+      "arousal_mean": 4.5,
+      "valence_mean": 4.54,
+      "typicality_mean": 89.39
+    },
+    {
+      "file": "Slide083.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 85.89,
+      "craving_weight": 8.589,
+      "arousal_mean": 4.96,
+      "valence_mean": 4.59,
+      "typicality_mean": 86.85
+    },
+    {
+      "file": "Slide084.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 82.56,
+      "craving_weight": 8.256,
+      "arousal_mean": 4.41,
+      "valence_mean": 4.78,
+      "typicality_mean": 82.89
+    },
+    {
+      "file": "Slide085.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 88.21,
+      "craving_weight": 8.821,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.46,
+      "typicality_mean": 91.68
+    },
+    {
+      "file": "Slide086.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 90.18,
+      "craving_weight": 9.018,
+      "arousal_mean": 4.68,
+      "valence_mean": 4.54,
+      "typicality_mean": 91.68
+    },
+    {
+      "file": "Slide087.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 86.15,
+      "craving_weight": 8.615,
+      "arousal_mean": 4.44,
+      "valence_mean": 4.26,
+      "typicality_mean": 86.59
+    },
+    {
+      "file": "Slide088.jpeg",
+      "image_set": "meth",
+      "category": "meth_instrument_hand",
+      "craving_mean_100": 87.41,
+      "craving_weight": 8.741,
+      "arousal_mean": 4.81,
+      "valence_mean": 4.37,
+      "typicality_mean": 90.63
+    },
+    {
+      "file": "Slide089.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 84.56,
+      "craving_weight": 8.456,
+      "arousal_mean": 4.78,
+      "valence_mean": 4.44,
+      "typicality_mean": 86.56
+    },
+    {
+      "file": "Slide090.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 84.74,
+      "craving_weight": 8.474,
+      "arousal_mean": 4.59,
+      "valence_mean": 3.96,
+      "typicality_mean": 85.41
+    },
+    {
+      "file": "Slide091.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 91.18,
+      "craving_weight": 9.118,
+      "arousal_mean": 5.07,
+      "valence_mean": 4.14,
+      "typicality_mean": 92.79
+    },
+    {
+      "file": "Slide092.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 84.89,
+      "craving_weight": 8.489,
+      "arousal_mean": 4.85,
+      "valence_mean": 3.85,
+      "typicality_mean": 86.52
+    },
+    {
+      "file": "Slide093.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 90.75,
+      "craving_weight": 9.075,
+      "arousal_mean": 4.79,
+      "valence_mean": 4.14,
+      "typicality_mean": 92.75
+    },
+    {
+      "file": "Slide094.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 92.21,
+      "craving_weight": 9.221,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.36,
+      "typicality_mean": 94.25
+    },
+    {
+      "file": "Slide095.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 88.19,
+      "craving_weight": 8.819,
+      "arousal_mean": 4.7,
+      "valence_mean": 4.19,
+      "typicality_mean": 89.19
+    },
+    {
+      "file": "Slide096.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 91.68,
+      "craving_weight": 9.168,
+      "arousal_mean": 4.86,
+      "valence_mean": 4.21,
+      "typicality_mean": 93.18
+    },
+    {
+      "file": "Slide097.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 84.86,
+      "craving_weight": 8.486,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.11,
+      "typicality_mean": 85.75
+    },
+    {
+      "file": "Slide098.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 93.21,
+      "craving_weight": 9.321,
+      "arousal_mean": 4.96,
+      "valence_mean": 3.93,
+      "typicality_mean": 92.21
+    },
+    {
+      "file": "Slide099.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 90.89,
+      "craving_weight": 9.089,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.3,
+      "typicality_mean": 88.81
+    },
+    {
+      "file": "Slide100.jpeg",
+      "image_set": "meth",
+      "category": "meth_injection_hand",
+      "craving_mean_100": 88.78,
+      "craving_weight": 8.878,
+      "arousal_mean": 4.7,
+      "valence_mean": 4.33,
+      "typicality_mean": 90.41
+    },
+    {
+      "file": "Slide101.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 92.5,
+      "craving_weight": 9.25,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.5,
+      "typicality_mean": 95.25
+    },
+    {
+      "file": "Slide102.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 87.81,
+      "craving_weight": 8.781,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.38,
+      "typicality_mean": 90.78
+    },
+    {
+      "file": "Slide103.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 91.14,
+      "craving_weight": 9.114,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.75,
+      "typicality_mean": 92.61
+    },
+    {
+      "file": "Slide104.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 89.85,
+      "craving_weight": 8.985,
+      "arousal_mean": 4.74,
+      "valence_mean": 4.3,
+      "typicality_mean": 90.78
+    },
+    {
+      "file": "Slide105.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 89.18,
+      "craving_weight": 8.918,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.43,
+      "typicality_mean": 94.29
+    },
+    {
+      "file": "Slide106.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 87.63,
+      "craving_weight": 8.763,
+      "arousal_mean": 4.78,
+      "valence_mean": 4.52,
+      "typicality_mean": 90.85
+    },
+    {
+      "file": "Slide107.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 88.19,
+      "craving_weight": 8.819,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.52,
+      "typicality_mean": 89.7
+    },
+    {
+      "file": "Slide108.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 82.44,
+      "craving_weight": 8.244,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.48,
+      "typicality_mean": 85.78
+    },
+    {
+      "file": "Slide109.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 91.89,
+      "craving_weight": 9.189,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.29,
+      "typicality_mean": 91.89
+    },
+    {
+      "file": "Slide110.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 90.18,
+      "craving_weight": 9.018,
+      "arousal_mean": 4.54,
+      "valence_mean": 4.54,
+      "typicality_mean": 91.07
+    },
+    {
+      "file": "Slide111.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 86.85,
+      "craving_weight": 8.685,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.37,
+      "typicality_mean": 86.11
+    },
+    {
+      "file": "Slide112.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 86.63,
+      "craving_weight": 8.663,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.37,
+      "typicality_mean": 87.7
+    },
+    {
+      "file": "Slide113.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 91.93,
+      "craving_weight": 9.193,
+      "arousal_mean": 4.75,
+      "valence_mean": 4.32,
+      "typicality_mean": 94.68
+    },
+    {
+      "file": "Slide114.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 89.57,
+      "craving_weight": 8.957,
+      "arousal_mean": 4.79,
+      "valence_mean": 4.39,
+      "typicality_mean": 93.68
+    },
+    {
+      "file": "Slide115.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 86.11,
+      "craving_weight": 8.611,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.63,
+      "typicality_mean": 86.56
+    },
+    {
+      "file": "Slide116.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 85.78,
+      "craving_weight": 8.578,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.48,
+      "typicality_mean": 84.3
+    },
+    {
+      "file": "Slide117.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 88.04,
+      "craving_weight": 8.804,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.33,
+      "typicality_mean": 87.37
+    },
+    {
+      "file": "Slide118.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 86.29,
+      "craving_weight": 8.629,
+      "arousal_mean": 4.5,
+      "valence_mean": 4.75,
+      "typicality_mean": 90.29
+    },
+    {
+      "file": "Slide119.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 86.25,
+      "craving_weight": 8.625,
+      "arousal_mean": 4.71,
+      "valence_mean": 4.43,
+      "typicality_mean": 90.14
+    },
+    {
+      "file": "Slide120.jpeg",
+      "image_set": "meth",
+      "category": "meth_face_activities",
+      "craving_mean_100": 87.71,
+      "craving_weight": 8.771,
+      "arousal_mean": 4.75,
+      "valence_mean": 4.54,
+      "typicality_mean": 93.29
+    },
+    {
+      "file": "Slide001.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 88.04,
+      "craving_weight": 8.804,
+      "arousal_mean": 4.39,
+      "valence_mean": 4.68,
+      "typicality_mean": 92.14
+    },
+    {
+      "file": "Slide002.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 81.81,
+      "craving_weight": 8.181,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.74,
+      "typicality_mean": 83.26
+    },
+    {
+      "file": "Slide003.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 89.25,
+      "craving_weight": 8.925,
+      "arousal_mean": 4.46,
+      "valence_mean": 4.64,
+      "typicality_mean": 94.11
+    },
+    {
+      "file": "Slide004.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 89.74,
+      "craving_weight": 8.974,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.48,
+      "typicality_mean": 90.22
+    },
+    {
+      "file": "Slide005.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 87.61,
+      "craving_weight": 8.761,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.43,
+      "typicality_mean": 90.32
+    },
+    {
+      "file": "Slide006.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 84.43,
+      "craving_weight": 8.443,
+      "arousal_mean": 4.46,
+      "valence_mean": 4.75,
+      "typicality_mean": 88.96
+    },
+    {
+      "file": "Slide007.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 84.41,
+      "craving_weight": 8.441,
+      "arousal_mean": 4.44,
+      "valence_mean": 4.89,
+      "typicality_mean": 85.81
+    },
+    {
+      "file": "Slide008.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 83.44,
+      "craving_weight": 8.344,
+      "arousal_mean": 4.3,
+      "valence_mean": 4.85,
+      "typicality_mean": 84.48
+    },
+    {
+      "file": "Slide009.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 85.78,
+      "craving_weight": 8.578,
+      "arousal_mean": 4.41,
+      "valence_mean": 4.59,
+      "typicality_mean": 87.67
+    },
+    {
+      "file": "Slide010.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 82.96,
+      "craving_weight": 8.296,
+      "arousal_mean": 4.15,
+      "valence_mean": 4.85,
+      "typicality_mean": 84.56
+    },
+    {
+      "file": "Slide011.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 89.14,
+      "craving_weight": 8.914,
+      "arousal_mean": 4.61,
+      "valence_mean": 4.89,
+      "typicality_mean": 89.86
+    },
+    {
+      "file": "Slide012.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 85.93,
+      "craving_weight": 8.593,
+      "arousal_mean": 4.46,
+      "valence_mean": 4.21,
+      "typicality_mean": 89.18
+    },
+    {
+      "file": "Slide013.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 85.86,
+      "craving_weight": 8.586,
+      "arousal_mean": 4.36,
+      "valence_mean": 4.82,
+      "typicality_mean": 86.68
+    },
+    {
+      "file": "Slide014.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 89.46,
+      "craving_weight": 8.946,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.46,
+      "typicality_mean": 90.11
+    },
+    {
+      "file": "Slide015.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 86.15,
+      "craving_weight": 8.615,
+      "arousal_mean": 4.37,
+      "valence_mean": 4.59,
+      "typicality_mean": 84.7
+    },
+    {
+      "file": "Slide016.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 84.85,
+      "craving_weight": 8.485,
+      "arousal_mean": 4.37,
+      "valence_mean": 4.59,
+      "typicality_mean": 83.96
+    },
+    {
+      "file": "Slide017.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 89.37,
+      "craving_weight": 8.937,
+      "arousal_mean": 4.78,
+      "valence_mean": 4.7,
+      "typicality_mean": 90.78
+    },
+    {
+      "file": "Slide018.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 84.75,
+      "craving_weight": 8.475,
+      "arousal_mean": 4.61,
+      "valence_mean": 4.82,
+      "typicality_mean": 88.89
+    },
+    {
+      "file": "Slide019.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 92.21,
+      "craving_weight": 9.221,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.43,
+      "typicality_mean": 94.25
+    },
+    {
+      "file": "Slide020.jpeg",
+      "image_set": "opioid",
+      "category": "opioid",
+      "craving_mean_100": 83.3,
+      "craving_weight": 8.33,
+      "arousal_mean": 4.48,
+      "valence_mean": 4.63,
+      "typicality_mean": 88.33
+    },
+    {
+      "file": "Slide021.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 84.75,
+      "craving_weight": 8.475,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.82,
+      "typicality_mean": 88.75
+    },
+    {
+      "file": "Slide022.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 77.11,
+      "craving_weight": 7.711,
+      "arousal_mean": 4.37,
+      "valence_mean": 4.85,
+      "typicality_mean": 74.74
+    },
+    {
+      "file": "Slide023.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 87.68,
+      "craving_weight": 8.768,
+      "arousal_mean": 4.32,
+      "valence_mean": 4.93,
+      "typicality_mean": 86.21
+    },
+    {
+      "file": "Slide024.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 87.3,
+      "craving_weight": 8.73,
+      "arousal_mean": 4.52,
+      "valence_mean": 4.7,
+      "typicality_mean": 88.26
+    },
+    {
+      "file": "Slide025.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 82.22,
+      "craving_weight": 8.222,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.52,
+      "typicality_mean": 84.63
+    },
+    {
+      "file": "Slide026.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 87.46,
+      "craving_weight": 8.746,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.79,
+      "typicality_mean": 91.82
+    },
+    {
+      "file": "Slide027.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 85.85,
+      "craving_weight": 8.585,
+      "arousal_mean": 4.41,
+      "valence_mean": 4.41,
+      "typicality_mean": 85.85
+    },
+    {
+      "file": "Slide028.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 80.81,
+      "craving_weight": 8.081,
+      "arousal_mean": 4.07,
+      "valence_mean": 4.44,
+      "typicality_mean": 83.07
+    },
+    {
+      "file": "Slide029.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 90.57,
+      "craving_weight": 9.057,
+      "arousal_mean": 4.75,
+      "valence_mean": 4.71,
+      "typicality_mean": 91.04
+    },
+    {
+      "file": "Slide030.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 85.96,
+      "craving_weight": 8.596,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.89,
+      "typicality_mean": 89.25
+    },
+    {
+      "file": "Slide031.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 91.32,
+      "craving_weight": 9.132,
+      "arousal_mean": 4.61,
+      "valence_mean": 4.64,
+      "typicality_mean": 94.14
+    },
+    {
+      "file": "Slide032.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_hand",
+      "craving_mean_100": 83.33,
+      "craving_weight": 8.333,
+      "arousal_mean": 4.37,
+      "valence_mean": 4.63,
+      "typicality_mean": 85.48
+    },
+    {
+      "file": "Slide033.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 59.19,
+      "craving_weight": 5.919,
+      "arousal_mean": 4.04,
+      "valence_mean": 4.85,
+      "typicality_mean": 75.96
+    },
+    {
+      "file": "Slide034.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 70.18,
+      "craving_weight": 7.018,
+      "arousal_mean": 3.96,
+      "valence_mean": 4.57,
+      "typicality_mean": 79.36
+    },
+    {
+      "file": "Slide035.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 89.79,
+      "craving_weight": 8.979,
+      "arousal_mean": 4.71,
+      "valence_mean": 4.18,
+      "typicality_mean": 86.5
+    },
+    {
+      "file": "Slide036.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 89.04,
+      "craving_weight": 8.904,
+      "arousal_mean": 4.81,
+      "valence_mean": 4.33,
+      "typicality_mean": 90.07
+    },
+    {
+      "file": "Slide037.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 93.54,
+      "craving_weight": 9.354,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.5,
+      "typicality_mean": 95.11
+    },
+    {
+      "file": "Slide038.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 89.0,
+      "craving_weight": 8.9,
+      "arousal_mean": 4.71,
+      "valence_mean": 4.29,
+      "typicality_mean": 91.71
+    },
+    {
+      "file": "Slide039.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 87.63,
+      "craving_weight": 8.763,
+      "arousal_mean": 4.26,
+      "valence_mean": 4.26,
+      "typicality_mean": 87.44
+    },
+    {
+      "file": "Slide040.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 85.67,
+      "craving_weight": 8.567,
+      "arousal_mean": 4.22,
+      "valence_mean": 4.26,
+      "typicality_mean": 87.22
+    },
+    {
+      "file": "Slide041.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 83.85,
+      "craving_weight": 8.385,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.44,
+      "typicality_mean": 86.07
+    },
+    {
+      "file": "Slide042.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 86.85,
+      "craving_weight": 8.685,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.56,
+      "typicality_mean": 85.93
+    },
+    {
+      "file": "Slide043.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 90.75,
+      "craving_weight": 9.075,
+      "arousal_mean": 4.68,
+      "valence_mean": 4.43,
+      "typicality_mean": 91.75
+    },
+    {
+      "file": "Slide044.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 81.81,
+      "craving_weight": 8.181,
+      "arousal_mean": 4.52,
+      "valence_mean": 4.81,
+      "typicality_mean": 87.41
+    },
+    {
+      "file": "Slide045.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 83.15,
+      "craving_weight": 8.315,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.52,
+      "typicality_mean": 84.89
+    },
+    {
+      "file": "Slide046.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 87.18,
+      "craving_weight": 8.718,
+      "arousal_mean": 4.5,
+      "valence_mean": 4.46,
+      "typicality_mean": 88.75
+    },
+    {
+      "file": "Slide047.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 93.68,
+      "craving_weight": 9.368,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.29,
+      "typicality_mean": 95.36
+    },
+    {
+      "file": "Slide048.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 91.89,
+      "craving_weight": 9.189,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.29,
+      "typicality_mean": 90.11
+    },
+    {
+      "file": "Slide049.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 92.79,
+      "craving_weight": 9.279,
+      "arousal_mean": 4.86,
+      "valence_mean": 4.39,
+      "typicality_mean": 92.64
+    },
+    {
+      "file": "Slide050.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 88.56,
+      "craving_weight": 8.856,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.41,
+      "typicality_mean": 89.67
+    },
+    {
+      "file": "Slide051.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 86.04,
+      "craving_weight": 8.604,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.39,
+      "typicality_mean": 88.86
+    },
+    {
+      "file": "Slide052.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 84.19,
+      "craving_weight": 8.419,
+      "arousal_mean": 4.74,
+      "valence_mean": 4.15,
+      "typicality_mean": 86.07
+    },
+    {
+      "file": "Slide053.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 93.71,
+      "craving_weight": 9.371,
+      "arousal_mean": 5.11,
+      "valence_mean": 4.5,
+      "typicality_mean": 95.14
+    },
+    {
+      "file": "Slide054.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 92.93,
+      "craving_weight": 9.293,
+      "arousal_mean": 4.71,
+      "valence_mean": 4.25,
+      "typicality_mean": 94.07
+    },
+    {
+      "file": "Slide055.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 88.93,
+      "craving_weight": 8.893,
+      "arousal_mean": 4.85,
+      "valence_mean": 4.44,
+      "typicality_mean": 89.44
+    },
+    {
+      "file": "Slide056.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 83.96,
+      "craving_weight": 8.396,
+      "arousal_mean": 4.52,
+      "valence_mean": 4.59,
+      "typicality_mean": 89.41
+    },
+    {
+      "file": "Slide057.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 95.43,
+      "craving_weight": 9.543,
+      "arousal_mean": 4.96,
+      "valence_mean": 4.14,
+      "typicality_mean": 95.0
+    },
+    {
+      "file": "Slide058.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 93.96,
+      "craving_weight": 9.396,
+      "arousal_mean": 4.86,
+      "valence_mean": 4.46,
+      "typicality_mean": 94.79
+    },
+    {
+      "file": "Slide059.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 87.0,
+      "craving_weight": 8.7,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.33,
+      "typicality_mean": 86.48
+    },
+    {
+      "file": "Slide060.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 95.0,
+      "craving_weight": 9.5,
+      "arousal_mean": 5.18,
+      "valence_mean": 4.25,
+      "typicality_mean": 96.75
+    },
+    {
+      "file": "Slide061.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 86.93,
+      "craving_weight": 8.693,
+      "arousal_mean": 4.74,
+      "valence_mean": 4.44,
+      "typicality_mean": 87.19
+    },
+    {
+      "file": "Slide062.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 89.93,
+      "craving_weight": 8.993,
+      "arousal_mean": 4.68,
+      "valence_mean": 4.29,
+      "typicality_mean": 91.0
+    },
+    {
+      "file": "Slide063.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 84.67,
+      "craving_weight": 8.467,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.41,
+      "typicality_mean": 85.81
+    },
+    {
+      "file": "Slide064.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 89.67,
+      "craving_weight": 8.967,
+      "arousal_mean": 4.7,
+      "valence_mean": 4.41,
+      "typicality_mean": 91.63
+    },
+    {
+      "file": "Slide065.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 86.67,
+      "craving_weight": 8.667,
+      "arousal_mean": 4.96,
+      "valence_mean": 4.26,
+      "typicality_mean": 87.3
+    },
+    {
+      "file": "Slide066.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 92.46,
+      "craving_weight": 9.246,
+      "arousal_mean": 4.71,
+      "valence_mean": 4.54,
+      "typicality_mean": 94.18
+    },
+    {
+      "file": "Slide067.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 76.96,
+      "craving_weight": 7.696,
+      "arousal_mean": 4.52,
+      "valence_mean": 4.56,
+      "typicality_mean": 82.19
+    },
+    {
+      "file": "Slide068.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_instrument",
+      "craving_mean_100": 93.54,
+      "craving_weight": 9.354,
+      "arousal_mean": 4.79,
+      "valence_mean": 4.14,
+      "typicality_mean": 93.79
+    },
+    {
+      "file": "Slide069.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 91.29,
+      "craving_weight": 9.129,
+      "arousal_mean": 4.71,
+      "valence_mean": 4.36,
+      "typicality_mean": 92.0
+    },
+    {
+      "file": "Slide070.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 88.85,
+      "craving_weight": 8.885,
+      "arousal_mean": 4.85,
+      "valence_mean": 4.44,
+      "typicality_mean": 89.7
+    },
+    {
+      "file": "Slide071.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 89.44,
+      "craving_weight": 8.944,
+      "arousal_mean": 4.74,
+      "valence_mean": 4.15,
+      "typicality_mean": 88.96
+    },
+    {
+      "file": "Slide072.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 81.33,
+      "craving_weight": 8.133,
+      "arousal_mean": 4.41,
+      "valence_mean": 4.3,
+      "typicality_mean": 82.15
+    },
+    {
+      "file": "Slide073.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 91.32,
+      "craving_weight": 9.132,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.07,
+      "typicality_mean": 92.57
+    },
+    {
+      "file": "Slide074.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 85.44,
+      "craving_weight": 8.544,
+      "arousal_mean": 4.81,
+      "valence_mean": 4.56,
+      "typicality_mean": 88.37
+    },
+    {
+      "file": "Slide075.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 91.18,
+      "craving_weight": 9.118,
+      "arousal_mean": 4.82,
+      "valence_mean": 4.36,
+      "typicality_mean": 92.89
+    },
+    {
+      "file": "Slide076.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 92.79,
+      "craving_weight": 9.279,
+      "arousal_mean": 4.75,
+      "valence_mean": 4.36,
+      "typicality_mean": 94.14
+    },
+    {
+      "file": "Slide077.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 91.61,
+      "craving_weight": 9.161,
+      "arousal_mean": 4.79,
+      "valence_mean": 4.5,
+      "typicality_mean": 94.32
+    },
+    {
+      "file": "Slide078.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 85.67,
+      "craving_weight": 8.567,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.41,
+      "typicality_mean": 86.93
+    },
+    {
+      "file": "Slide079.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 90.37,
+      "craving_weight": 9.037,
+      "arousal_mean": 4.85,
+      "valence_mean": 4.56,
+      "typicality_mean": 92.7
+    },
+    {
+      "file": "Slide080.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 90.29,
+      "craving_weight": 9.029,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.5,
+      "typicality_mean": 92.18
+    },
+    {
+      "file": "Slide081.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 90.57,
+      "craving_weight": 9.057,
+      "arousal_mean": 4.46,
+      "valence_mean": 4.46,
+      "typicality_mean": 90.07
+    },
+    {
+      "file": "Slide082.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 91.64,
+      "craving_weight": 9.164,
+      "arousal_mean": 4.79,
+      "valence_mean": 4.29,
+      "typicality_mean": 93.36
+    },
+    {
+      "file": "Slide083.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 85.78,
+      "craving_weight": 8.578,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.63,
+      "typicality_mean": 85.67
+    },
+    {
+      "file": "Slide084.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 91.07,
+      "craving_weight": 9.107,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.52,
+      "typicality_mean": 89.93
+    },
+    {
+      "file": "Slide085.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 90.61,
+      "craving_weight": 9.061,
+      "arousal_mean": 4.75,
+      "valence_mean": 4.14,
+      "typicality_mean": 89.36
+    },
+    {
+      "file": "Slide086.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 93.93,
+      "craving_weight": 9.393,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.39,
+      "typicality_mean": 93.93
+    },
+    {
+      "file": "Slide087.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 88.52,
+      "craving_weight": 8.852,
+      "arousal_mean": 4.63,
+      "valence_mean": 4.3,
+      "typicality_mean": 88.78
+    },
+    {
+      "file": "Slide088.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_instrument_hand",
+      "craving_mean_100": 89.67,
+      "craving_weight": 8.967,
+      "arousal_mean": 4.7,
+      "valence_mean": 4.22,
+      "typicality_mean": 88.33
+    },
+    {
+      "file": "Slide089.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 90.0,
+      "craving_weight": 9.0,
+      "arousal_mean": 4.78,
+      "valence_mean": 4.22,
+      "typicality_mean": 89.85
+    },
+    {
+      "file": "Slide090.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 87.52,
+      "craving_weight": 8.752,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.3,
+      "typicality_mean": 88.89
+    },
+    {
+      "file": "Slide091.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 95.39,
+      "craving_weight": 9.539,
+      "arousal_mean": 5.25,
+      "valence_mean": 4.43,
+      "typicality_mean": 94.82
+    },
+    {
+      "file": "Slide092.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 87.19,
+      "craving_weight": 8.719,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.07,
+      "typicality_mean": 89.48
+    },
+    {
+      "file": "Slide093.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 95.5,
+      "craving_weight": 9.55,
+      "arousal_mean": 5.36,
+      "valence_mean": 4.0,
+      "typicality_mean": 94.25
+    },
+    {
+      "file": "Slide094.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 92.82,
+      "craving_weight": 9.282,
+      "arousal_mean": 4.82,
+      "valence_mean": 3.86,
+      "typicality_mean": 93.82
+    },
+    {
+      "file": "Slide095.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 88.0,
+      "craving_weight": 8.8,
+      "arousal_mean": 4.81,
+      "valence_mean": 3.85,
+      "typicality_mean": 89.59
+    },
+    {
+      "file": "Slide096.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 89.46,
+      "craving_weight": 8.946,
+      "arousal_mean": 4.86,
+      "valence_mean": 4.11,
+      "typicality_mean": 92.75
+    },
+    {
+      "file": "Slide097.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 93.86,
+      "craving_weight": 9.386,
+      "arousal_mean": 4.61,
+      "valence_mean": 4.43,
+      "typicality_mean": 92.07
+    },
+    {
+      "file": "Slide098.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 90.79,
+      "craving_weight": 9.079,
+      "arousal_mean": 5.18,
+      "valence_mean": 4.29,
+      "typicality_mean": 92.07
+    },
+    {
+      "file": "Slide099.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 84.85,
+      "craving_weight": 8.485,
+      "arousal_mean": 4.33,
+      "valence_mean": 4.15,
+      "typicality_mean": 85.7
+    },
+    {
+      "file": "Slide100.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_injection_hand",
+      "craving_mean_100": 90.59,
+      "craving_weight": 9.059,
+      "arousal_mean": 5.11,
+      "valence_mean": 4.19,
+      "typicality_mean": 91.04
+    },
+    {
+      "file": "Slide101.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 88.86,
+      "craving_weight": 8.886,
+      "arousal_mean": 4.93,
+      "valence_mean": 4.04,
+      "typicality_mean": 90.39
+    },
+    {
+      "file": "Slide102.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 89.93,
+      "craving_weight": 8.993,
+      "arousal_mean": 4.78,
+      "valence_mean": 4.63,
+      "typicality_mean": 89.63
+    },
+    {
+      "file": "Slide103.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 91.0,
+      "craving_weight": 9.1,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.07,
+      "typicality_mean": 92.14
+    },
+    {
+      "file": "Slide104.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 87.59,
+      "craving_weight": 8.759,
+      "arousal_mean": 4.56,
+      "valence_mean": 4.19,
+      "typicality_mean": 88.63
+    },
+    {
+      "file": "Slide105.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 85.57,
+      "craving_weight": 8.557,
+      "arousal_mean": 4.39,
+      "valence_mean": 4.61,
+      "typicality_mean": 91.46
+    },
+    {
+      "file": "Slide106.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 87.96,
+      "craving_weight": 8.796,
+      "arousal_mean": 4.81,
+      "valence_mean": 4.33,
+      "typicality_mean": 87.89
+    },
+    {
+      "file": "Slide107.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 87.37,
+      "craving_weight": 8.737,
+      "arousal_mean": 4.48,
+      "valence_mean": 4.41,
+      "typicality_mean": 89.93
+    },
+    {
+      "file": "Slide108.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 86.26,
+      "craving_weight": 8.626,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.07,
+      "typicality_mean": 84.52
+    },
+    {
+      "file": "Slide109.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 92.54,
+      "craving_weight": 9.254,
+      "arousal_mean": 4.86,
+      "valence_mean": 4.25,
+      "typicality_mean": 94.36
+    },
+    {
+      "file": "Slide110.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 89.75,
+      "craving_weight": 8.975,
+      "arousal_mean": 4.75,
+      "valence_mean": 4.43,
+      "typicality_mean": 91.5
+    },
+    {
+      "file": "Slide111.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 90.78,
+      "craving_weight": 9.078,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.07,
+      "typicality_mean": 89.78
+    },
+    {
+      "file": "Slide112.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 90.81,
+      "craving_weight": 9.081,
+      "arousal_mean": 4.67,
+      "valence_mean": 4.37,
+      "typicality_mean": 91.85
+    },
+    {
+      "file": "Slide113.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 93.11,
+      "craving_weight": 9.311,
+      "arousal_mean": 4.46,
+      "valence_mean": 4.39,
+      "typicality_mean": 94.11
+    },
+    {
+      "file": "Slide114.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 86.46,
+      "craving_weight": 8.646,
+      "arousal_mean": 4.57,
+      "valence_mean": 4.25,
+      "typicality_mean": 91.71
+    },
+    {
+      "file": "Slide115.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 86.56,
+      "craving_weight": 8.656,
+      "arousal_mean": 4.89,
+      "valence_mean": 4.3,
+      "typicality_mean": 88.22
+    },
+    {
+      "file": "Slide116.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 87.44,
+      "craving_weight": 8.744,
+      "arousal_mean": 4.59,
+      "valence_mean": 4.37,
+      "typicality_mean": 86.48
+    },
+    {
+      "file": "Slide117.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 88.3,
+      "craving_weight": 8.83,
+      "arousal_mean": 4.78,
+      "valence_mean": 4.33,
+      "typicality_mean": 86.93
+    },
+    {
+      "file": "Slide118.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 90.96,
+      "craving_weight": 9.096,
+      "arousal_mean": 5.07,
+      "valence_mean": 4.18,
+      "typicality_mean": 92.54
+    },
+    {
+      "file": "Slide119.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 92.86,
+      "craving_weight": 9.286,
+      "arousal_mean": 4.64,
+      "valence_mean": 4.46,
+      "typicality_mean": 93.32
+    },
+    {
+      "file": "Slide120.jpeg",
+      "image_set": "opioid",
+      "category": "opioid_face_activities",
+      "craving_mean_100": 93.82,
+      "craving_weight": 9.382,
+      "arousal_mean": 5.0,
+      "valence_mean": 4.36,
+      "typicality_mean": 94.36
+    }
+  ]
+}

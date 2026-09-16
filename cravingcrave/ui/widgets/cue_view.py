@@ -51,6 +51,7 @@ def _audio_placeholder(label: str) -> QPixmap:
 
 class CueView(QGraphicsView):
     mediaError = Signal(str)
+    videoLoopCompleted = Signal()          # emitted each time a video finishes one full loop
 
     def __init__(self, parent: QWidget | None = None) -> None:
         self._scene = QGraphicsScene()
@@ -76,6 +77,7 @@ class CueView(QGraphicsView):
 
         self._player: QMediaPlayer | None = None
         self._audio: QAudioOutput | None = None
+        self._video_loops_completed: int = 0   # how many full loops the current video has finished
 
         # Ambient bed: an independent looping sound layered UNDER the visual cue,
         # persisting across cue changes (session-level). Separate mute from the cue.
@@ -113,6 +115,7 @@ class CueView(QGraphicsView):
 
     def show_video(self, path: str) -> None:
         self.clear_content()
+        self._video_loops_completed = 0
         self._video_item = QGraphicsVideoItem()
         self._video_item.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self._scene.addItem(self._video_item)
@@ -121,6 +124,7 @@ class CueView(QGraphicsView):
             self._audio = QAudioOutput(self)
             self._player.setAudioOutput(self._audio)
             self._player.errorOccurred.connect(lambda *_: self.mediaError.emit(path))
+            self._player.mediaStatusChanged.connect(self._on_media_status)
         self._player.setVideoOutput(self._video_item)
         self._player.setLoops(QMediaPlayer.Loops.Infinite)
         self._player.setSource(QUrl.fromLocalFile(str(Path(path).resolve())))
@@ -167,6 +171,33 @@ class CueView(QGraphicsView):
         self._ambient_muted = muted
         if self._ambient_audio is not None:
             self._ambient_audio.setMuted(muted)
+
+    # --- playback control (video/audio) --------------------------------------
+    def _on_media_status(self, status) -> None:
+        if status == QMediaPlayer.MediaStatus.EndOfMedia:
+            self._video_loops_completed += 1
+            self.videoLoopCompleted.emit()
+
+    def video_has_played_once(self) -> bool:
+        """True if the current video has completed at least one full loop."""
+        return self._video_loops_completed >= 1
+
+    def pause(self) -> None:
+        """Pause video/audio playback (e.g. while VAS overlay is open)."""
+        if self._player is not None:
+            if self._player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
+                self._player.pause()
+
+    def resume(self) -> None:
+        """Resume video/audio playback after a pause."""
+        if self._player is not None:
+            if self._player.playbackState() == QMediaPlayer.PlaybackState.PausedState:
+                self._player.play()
+
+    def set_loop(self, loop: bool) -> None:
+        """Set whether the current media loops (True = infinite, False = play once)."""
+        if self._player is not None:
+            self._player.setLoops(QMediaPlayer.Loops.Infinite if loop else 1)
 
     # --- intensity ----------------------------------------------------------
     def set_intensity(self, scale_pct: int, blur_pct: int, dim_pct: int, muted: bool) -> None:

@@ -61,7 +61,7 @@ CATEGORIES = [
     d.name
     for d in sorted(MEDIA_ROOT.iterdir())
     if d.is_dir() and not d.name.startswith(".")
-] if MEDIA_ROOT.is_dir() else ["alcohol", "cigarettes", "cocaina", "meth", "positive", "sounds"]
+] if MEDIA_ROOT.is_dir() else ["alcohol", "cigarettes", "cocaina", "meth", "neutral", "opioid", "positive", "sounds"]
 
 # ---------------------------------------------------------------------------
 # Palette (mirrors cravingcrave/ui/theme.py)

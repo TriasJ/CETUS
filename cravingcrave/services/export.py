@@ -14,11 +14,11 @@ from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-from ..domain.models import CopingEvent, CravingRating, CueDwell, IntensityEvent, Session
+from ..domain.models import CopingEvent, CravingRating, IntensityEvent, Session
 
 # Explicit allowlist — PII columns (display_name/birth_year/notes) are NOT here.
 SESSION_COLUMNS = [
-    "session_id", "patient_code", "substance", "started_at", "ended_at",
+    "session_id", "patient_code", "substance", "mode", "started_at", "ended_at",
     "end_reason", "consent_given", "baseline_vas", "peak_vas", "endpoint_vas",
     "habituation_slope", "app_version",
 ]
@@ -42,6 +42,7 @@ def export_sessions_summary(path: Path, patient_code: str, sessions: Sequence[Se
                 "session_id": s.id,
                 "patient_code": patient_code,
                 "substance": s.substance,
+                "mode": getattr(s, "mode", "intense"),
                 "started_at": s.started_at,
                 "ended_at": s.ended_at or "",
                 "end_reason": s.end_reason or "",

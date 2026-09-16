@@ -1,0 +1,157 @@
+{
+  "_note": "Evidence-based citations for the Patient Setup Wizard. Numbered [1]-[N] in wizard pages; full references shown via the References button. Sources: PubMed, docs/research/Repository.txt, docs/Módulo 5/ articles.",
+  "citations": [
+    {
+      "id": 1,
+      "short": "Monti & Rohsenow, 1999",
+      "en": "Monti PM, Rohsenow DJ. Coping-skills training and cue-exposure therapy in the treatment of alcoholism. Alcohol Res Health. 1999;23(2):107-115.",
+      "es": "Monti PM, Rohsenow DJ. Entrenamiento en habilidades de afrontamiento y terapia de exposición a señales en el tratamiento del alcoholismo. Alcohol Res Health. 1999;23(2):107-115.",
+      "pmid": "10890804",
+      "pmc": "PMC6760423",
+      "context": "session_mode",
+      "recommendation": "CET with urge-specific coping skills (USCS) reduces heavy drinking days. Supports the Intense mode with USCS coping panel."
+    },
+    {
+      "id": 2,
+      "short": "Rohsenow et al., 2001",
+      "en": "Rohsenow DJ, Monti PM, Rubonis AV, et al. Cue exposure with coping skills training and communication skills training for alcohol dependence: 6- and 12-month outcomes. Addiction. 2001;96(8):1161-1174.",
+      "es": "Rohsenow DJ, Monti PM, Rubonis AV, et al. Exposición a señales con entrenamiento en habilidades de afrontamiento y comunicación para dependencia al alcohol: resultados a 6 y 12 meses. Addiction. 2001;96(8):1161-1174.",
+      "pmid": "11487422",
+      "doi": "10.1046/j.1360-0443.2001.96811619.x",
+      "context": "session_mode",
+      "recommendation": "CET resulted in fewer heavy drinking days and greater use of coping strategies. Validates graded cue exposure with USCS."
+    },
+    {
+      "id": 3,
+      "short": "Powell et al., 1993",
+      "en": "Powell J, Gray J, Bradley B. Subjective craving for opiates: evaluation of a cue exposure protocol for use with detoxified opiate addicts. Br J Clin Psychol. 1993;32(1):39-53.",
+      "es": "Powell J, Gray J, Bradley B. Deseo subjetivo de opiáceos: evaluación de un protocolo de exposición a señales para adictos a opiáceos desintoxicados. Br J Clin Psychol. 1993;32(1):39-53.",
+      "pmid": "8467273",
+      "doi": "10.1111/j.2044-8260.1993.tb01026.x",
+      "context": "habituation",
+      "recommendation": "Each stimulus exposure should be continued until within-session habituation has occurred. Supports the habituation stopping rule."
+    },
+    {
+      "id": 4,
+      "short": "Mellentin et al., 2017",
+      "en": "Mellentin AI, Stenager E, Nielsen B, Nielsen AS, Yu F. A Smarter Pathway for Delivering Cue Exposure Therapy? The Design and Development of a Smartphone App Targeting Alcohol Use Disorder. JMIR Mhealth Uhealth. 2017;5(1):e5.",
+      "es": "Mellentin AI, Stenager E, Nielsen B, Nielsen AS, Yu F. ¿Un camino más inteligente para administrar la terapia de exposición a señales? Diseño y desarrollo de una app para trastorno por uso de alcohol. JMIR Mhealth Uhealth. 2017;5(1):e5.",
+      "pmid": "28137701",
+      "doi": "10.2196/mhealth.6500",
+      "context": "app_design",
+      "recommendation": "CETUS follows Mellentin's CET-USCS app design: graded alcohol exposure videos with 4 USCS coping skills and real-time VAS measurement."
+    },
+    {
+      "id": 5,
+      "short": "Mellentin et al., 2019",
+      "en": "Mellentin AI, Nielsen B, Nielsen AS, et al. A Mobile Phone App Featuring Cue Exposure Therapy As Aftercare for Alcohol Use Disorders: An Investigator-Blinded Randomized Controlled Trial. JMIR Mhealth Uhealth. 2019;7(8):e13793.",
+      "es": "Mellentin AI, Nielsen B, Nielsen AS, et al. App de exposición a señales como tratamiento posterior para trastornos por uso de alcohol: ensayo controlado aleatorizado. JMIR Mhealth Uhealth. 2019;7(8):e13793.",
+      "pmid": "31420960",
+      "doi": "10.2196/13793",
+      "context": "evidence_caution",
+      "recommendation": "CET-USCS did not outperform standard aftercare on drinking outcomes, though USCS use increased. Results should be interpreted with caution."
+    },
+    {
+      "id": 6,
+      "short": "Franken et al., 1999",
+      "en": "Franken IH, de Haan HA, van der Meer CW, Haffmans PM, Hendriks VM. Cue reactivity and effects of cue exposure in abstinent posttreatment drug users. J Subst Abuse Treat. 1999;16(1):81-85.",
+      "es": "Franken IH, de Haan HA, van der Meer CW, Haffmans PM, Hendriks VM. Reactividad a señales y efectos de la exposición en usuarios de drogas abstinentes postratamiento. J Subst Abuse Treat. 1999;16(1):81-85.",
+      "pmid": "9888125",
+      "doi": "10.1016/s0740-5472(98)00004-x",
+      "context": "cue_reactivity",
+      "recommendation": "Cue reactivity persists after 12 months of treatment. Protocolized cue exposure reduces reactivity with effects lasting ≥6 weeks."
+    },
+    {
+      "id": 7,
+      "short": "Chen et al., 2018",
+      "en": "Chen XJ, Wang DM, Zhou LD, et al. Mindfulness-based relapse prevention combined with virtual reality cue exposure for methamphetamine use disorder. Contemp Clin Trials. 2018;70:99-105.",
+      "es": "Chen XJ, Wang DM, Zhou LD, et al. Prevención de recaídas basada en mindfulness combinada con exposición a señales en realidad virtual para trastorno por uso de metanfetamina. Contemp Clin Trials. 2018;70:99-105.",
+      "pmid": "29679670",
+      "doi": "10.1016/j.cct.2018.04.006",
+      "context": "meth_protocol",
+      "recommendation": "VR cue exposure allows controlled, graded presentations of high-risk situations. Supports the graded escalation approach for methamphetamine."
+    },
+    {
+      "id": 8,
+      "short": "Nègre et al., 2024",
+      "en": "Nègre F, Lemercier-Dugarin M, Gomet R, et al. Study on the efficiency of virtual reality in the treatment of alcohol use disorder: study protocol for a randomized controlled trial (E-Reva). Trials. 2024;25(1):417.",
+      "es": "Nègre F, Lemercier-Dugarin M, Gomet R, et al. Estudio sobre la eficiencia de la realidad virtual en el tratamiento del trastorno por uso de alcohol: protocolo de ensayo controlado aleatorizado (E-Reva). Trials. 2024;25(1):417.",
+      "pmid": "38937776",
+      "doi": "10.1186/s13063-024-08271-x",
+      "context": "vr_cet",
+      "recommendation": "VR-CET combined with CBT may reduce consumption and craving. Incorporates neutral environments as controls — supports the interspersed neutral approach."
+    },
+    {
+      "id": 9,
+      "short": "Sayette, 2016",
+      "en": "Sayette MA. The Role of Craving in Substance Use Disorders: Theoretical and Methodological Issues. Annu Rev Clin Psychol. 2016;12:407-433.",
+      "es": "Sayette MA. El rol del deseo en los trastornos por uso de sustancias: cuestiones teóricas y metodológicas. Annu Rev Clin Psychol. 2016;12:407-433.",
+      "doi": "10.1146/annurev-clinpsy-021815-093351",
+      "context": "vas_measurement",
+      "recommendation": "VAS is the most widely used single-item craving measure. Validates CETUS's VAS-based craving assessment during cue exposure."
+    },
+    {
+      "id": 10,
+      "short": "Gu, Zheng et al., 2021",
+      "en": "Gu Z, Zheng H, Yin Z, et al. Pictures Library of Smoking Cravings: Development and Verification of Smokers and Non-smokers. Front Psychiatry. 2021;12:719782.",
+      "es": "Gu Z, Zheng H, Yin Z, et al. Biblioteca de imágenes de deseo de fumar: desarrollo y verificación en fumadores y no fumadores. Front Psychiatry. 2021;12:719782.",
+      "pmid": "34393849",
+      "doi": "10.3389/fpsyt.2021.719782",
+      "context": "cue_database",
+      "recommendation": "Standardized smoking pictures library with 109 cigarette + 115 neutral images. CETUS ships the neutral images as control stimuli."
+    },
+    {
+      "id": 11,
+      "short": "MOCIS, 2020",
+      "en": "Laureate Institute for Brain Research. Methamphetamine and Opioid Craving Image Set (MOCIS). Drug Alcohol Depend. 2020. 360 images with craving, arousal, valence, and typicality ratings.",
+      "es": "Laureate Institute for Brain Research. Conjunto de imágenes de deseo de metanfetamina y opioides (MOCIS). Drug Alcohol Depend. 2020. 360 imágenes con calificaciones de deseo, activación, valencia y tipicidad.",
+      "context": "cue_database",
+      "recommendation": "360 validated cue images (120 meth + 120 opioid + 120 neutral) with empirical craving weights. CETUS ships all images with research-backed weights."
+    },
+    {
+      "id": 12,
+      "short": "Wang et al., 2026",
+      "en": "Wang K, Li Y, Yang Y, Zhang T, Luo J. Effects of High-Frequency rTMS Combined With Physical Exercise on Mood Disorders in Patients With Methamphetamine Use Disorder: A Randomized Clinical Trial. 2026.",
+      "es": "Wang K, Li Y, Yang Y, Zhang T, Luo J. Efectos de la EMTr de alta frecuencia combinada con ejercicio físico sobre los trastornos del estado de ánimo en pacientes con trastorno por uso de metanfetamina: ensayo clínico aleatorizado. 2026.",
+      "context": "multimodal",
+      "recommendation": "Combined rTMS (10 Hz, left DLPFC) + physical exercise showed greater improvement in mood disorders than either alone in MUD patients. CET can be part of multimodal treatment alongside neuromodulation."
+    },
+    {
+      "id": 13,
+      "short": "Santa Ana et al., 2015",
+      "en": "Santa Ana EJ, Prisciandaro JJ, Saladin ME, et al. D-cycloserine combined with cue exposure therapy fails to attenuate subjective and physiological craving in cocaine dependence. Am J Addict. 2015;24(3):217-224.",
+      "es": "Santa Ana EJ, Prisciandaro JJ, Saladin ME, et al. D-cicloserina combinada con terapia de exposición a señales no atenúa el deseo subjetivo y fisiológico en dependencia de cocaína. Am J Addict. 2015;24(3):217-224.",
+      "pmid": "25808169",
+      "doi": "10.1111/ajad.12191",
+      "context": "cet_protocol",
+      "recommendation": "Repeated cue exposure combined with skills training produced extinction to cocaine cues with decreased craving within and between sessions. Validates the within-session habituation model."
+    },
+    {
+      "id": 14,
+      "short": "Thaysen-Petersen et al., 2025",
+      "en": "Thaysen-Petersen D, et al. Technology-assisted cue exposure therapy for substance use disorders: a systematic review. Front Psychiatry. 2025;16:1544763.",
+      "es": "Thaysen-Petersen D, et al. Terapia de exposición a señales asistida por tecnología para trastornos por uso de sustancias: revisión sistemática. Front Psychiatry. 2025;16:1544763.",
+      "doi": "10.3389/fpsyt.2025.1544763",
+      "context": "evidence_review",
+      "recommendation": "Systematic review of 44 CET trials: technology-assisted CET reduced craving (60% of studies) and consumption (80%) more than non-tech CET (17%/38%), driven primarily by VR studies. Non-VR digital CET is promising but not yet evidence-based as standalone."
+    },
+    {
+      "id": 15,
+      "short": "Kang et al., 2019 (meta-analysis)",
+      "en": "Kang N, et al. Effects of transcranial direct current stimulation on craving and smoking: a meta-analysis. Addict Behav. 2019;96:133-139.",
+      "es": "Kang N, et al. Efectos de la estimulación transcraneal de corriente directa sobre el deseo y el tabaquismo: metaanálisis. Addict Behav. 2019;96:133-139.",
+      "doi": "10.1016/j.addbeh.2019.05.006",
+      "context": "neuromodulation",
+      "recommendation": "Meta-analysis of 12 tDCS trials: moderate effect on cue-provoked craving (d=0.422) and smoking intake (d=0.557). Right anodal DLPFC most efficacious. Relevant for clinics combining CETUS with tDCS."
+    },
+    {
+      "id": 16,
+      "short": "Huang et al., 2025 (VR-CET meth)",
+      "en": "Huang Q, Chen X, Tang Y, Wang X, et al. Effects of virtual reality cue exposure therapy on tonic craving in methamphetamine use disorder: an RCT. Transl Psychiatry. 2025;15:318.",
+      "es": "Huang Q, Chen X, Tang Y, Wang X, et al. Efectos de la terapia de exposición a señales en realidad virtual sobre el deseo tónico en trastorno por uso de metanfetamina: un ECA. Transl Psychiatry. 2025;15:318.",
+      "doi": "10.1038/s41398-025-03553-7",
+      "context": "vr_cet_meth",
+      "recommendation": "VR-CET (16 sessions over 8 weeks) significantly reduced tonic craving in methamphetamine users (p=.001). Validates graded cue exposure protocol for stimulant disorders."
+    }
+  ]
+}

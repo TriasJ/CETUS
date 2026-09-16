@@ -28,6 +28,7 @@ from ...services.i18n import tr
 from ...session.session_controller import SessionController
 from .. import hotkeys
 from ..context import AppContext
+from ..emoji_icon import emoji_icon
 from ..hotkeys import AccessibilityInput
 from ..widgets.craving_chart import CravingChart
 from ..widgets.cue_view import CueView
@@ -35,7 +36,6 @@ from ..widgets.gallery_panel import GalleryPanel
 from ..widgets.intensity_controls import IntensityControls
 from ..widgets.uscs_panel import UscsPanel
 from ..widgets.vas_slider import VasPrompt
-from ..emoji_icon import emoji_icon
 
 
 class ExposureScreen(QWidget):
@@ -63,6 +63,12 @@ class ExposureScreen(QWidget):
         # Subtle reminder that F11 goes fullscreen (hidden while already immersive/fullscreen).
         self.fs_reminder = QLabel(tr("exposure.fullscreen_reminder"))
         self.fs_reminder.setObjectName("Muted")
+        # Discrete min-exposure countdown (shown near cue counter when advance is blocked).
+        self._countdown_label = QLabel("")
+        self._countdown_label.setStyleSheet(
+            "color:#2a9d8f; font-size:12px; background:rgba(42,157,143,0.1); "
+            "padding:2px 8px; border-radius:4px;")
+        self._countdown_label.setVisible(False)
         self.hint = QLabel(tr("exposure.waiting"))
         self.hint.setObjectName("Muted")
         self.hint.setWordWrap(True)
@@ -117,6 +123,7 @@ class ExposureScreen(QWidget):
         # --- center ---------------------------------------------------------
         top_row = QHBoxLayout()
         top_row.addWidget(self.cue_counter)
+        top_row.addWidget(self._countdown_label)
         top_row.addStretch(1)
         top_row.addWidget(self.fs_reminder)
         center = QVBoxLayout()
@@ -177,7 +184,8 @@ class ExposureScreen(QWidget):
         self._chrome_timer.timeout.connect(self._hide_chrome)
 
         # --- overlays (children of this screen; panic button stays above) ---
-        self.vas_prompt = VasPrompt(self, context.config.vas_max)
+        self.vas_prompt = VasPrompt(self, context.config.vas_max,
+                                    mode=context.config.vas_display_mode)
         self.vas_prompt.submitted.connect(self._on_vas_submitted)
         self.coping_panel = UscsPanel(self)
         # Keep the raw text (even empty) so "skill used, no text" is distinguishable
@@ -196,9 +204,12 @@ class ExposureScreen(QWidget):
         controller.habituationReached.connect(self._on_habituation)
 
         # Optional timed auto-scroll: advance the cue every N seconds, hands-free.
+        # Clamp to at least the min-exposure time so the timers never conflict.
         self._autoscroll_timer = QTimer(self)
         if context.config.autoscroll_timed_seconds > 0:
-            self._autoscroll_timer.setInterval(context.config.autoscroll_timed_seconds * 1000)
+            interval = max(context.config.autoscroll_timed_seconds,
+                           context.config.interspersed_min_exposure_sec)
+            self._autoscroll_timer.setInterval(interval * 1000)
             self._autoscroll_timer.timeout.connect(self._on_autoscroll_tick)
 
         # Per-cue dwell timer: prompt craving after N seconds on the SAME cue.
@@ -212,6 +223,11 @@ class ExposureScreen(QWidget):
         self._downreg_timer.setInterval(1000)  # tick every second for smooth ramping
         self._downreg_timer.timeout.connect(self._on_downreg_tick)
         self._downreg_floor = 0
+
+        # Min-exposure countdown display timer (1s ticks).
+        self._countdown_timer = QTimer(self)
+        self._countdown_timer.setInterval(1000)
+        self._countdown_timer.timeout.connect(self._update_countdown)
 
         # --- input: standard shortcuts OR keyboard-only accessibility mode --
         self._shortcuts: list[QShortcut] = []
@@ -295,7 +311,7 @@ class ExposureScreen(QWidget):
         self.setPalette(pal); self.setAutoFillBackground(True)
         self._right_box.hide()
         self.cue_counter.hide(); self.hint.hide(); self.legend.hide(); self.banner.hide()
-        self.fs_reminder.hide()   # already fullscreen — no need to advertise F11
+        self.fs_reminder.hide(); self._countdown_label.hide()
         self._bar_counter.show()
         self._actionbar.setProperty("immersive", True)
         self._repolish(self._actionbar)
@@ -467,6 +483,7 @@ class ExposureScreen(QWidget):
             self.cue_view.show_audio(abs_path, Path(cue.media_path).name)
         elif cue.media_type == "video":
             self.cue_view.show_video(abs_path)
+            self.cue_view.set_loop(self.context.config.video_loop)
         else:
             self.cue_view.show_image(abs_path)
         self.intensity.reset()
@@ -484,13 +501,59 @@ class ExposureScreen(QWidget):
         counter = tr("exposure.cue_counter",
                      current=self.controller.current_cue_index() + 1,
                      total=self.controller.cue_count)
+        if cue.is_neutral:
+            counter += " " + tr("exposure.neutral_indicator")
         self.cue_counter.setText(counter)
         self._bar_counter.setText(counter)
+        # Start countdown display for min-exposure (interspersed/custom modes).
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec > 0 and self.context.config.show_min_exposure_hint:
+            self._countdown_timer.start()
+            self._update_countdown()
+        else:
+            self._countdown_label.setVisible(False)
+
+    def _update_countdown(self) -> None:
+        """Update the discrete countdown indicator for min-exposure enforcement."""
+        if not self.context.config.show_min_exposure_hint:
+            self._countdown_label.setVisible(False)
+            self._countdown_timer.stop()
+            return
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec <= 0:
+            self._countdown_label.setVisible(False)
+            self._countdown_timer.stop()
+            return
+        remaining = max(0, min_sec - self.controller.current_cue_dwell())
+        if remaining > 0:
+            self._countdown_label.setText(f"⏱ {remaining}s")
+            self._countdown_label.setVisible(True)
+        else:
+            self._countdown_label.setVisible(False)
+            self._countdown_timer.stop()
 
     def _next_cue(self) -> None:
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec > 0 and self.controller.current_cue_dwell() < min_sec:
+            if self.context.config.show_min_exposure_hint:
+                self._countdown_timer.start()
+                self._update_countdown()
+            return  # enforce minimum viewing time
+        # Dynamic neutral increase: if craving is still high, skip to next neutral.
+        if self.controller.should_skip_craving_cue():
+            self._advance_to_next_neutral()
+            return
         self.controller.advance_cue()
         self._load_cue()
         self._maybe_prompt_after_n_cues()
+
+    def _advance_to_next_neutral(self) -> None:
+        """Skip craving cues until a neutral one is found (dynamic neutral increase)."""
+        for _ in range(self.controller.cue_count):
+            cue = self.controller.advance_cue()
+            if cue is None or cue.is_neutral:
+                break
+        self._load_cue()
 
     def _maybe_prompt_after_n_cues(self) -> None:
         """If configured, ask for a craving score after every N forward cue changes."""
@@ -498,10 +561,16 @@ class ExposureScreen(QWidget):
         if n <= 0:
             return
         self._cue_advances += 1
-        if self._cue_advances % n == 0:
+        if self._cue_advances % n == 0 and self.controller.should_prompt_vas():
             self._open_periodic_vas()
 
     def _prev_cue(self) -> None:
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec > 0 and self.controller.current_cue_dwell() < min_sec:
+            if self.context.config.show_min_exposure_hint:
+                self._countdown_timer.start()
+                self._update_countdown()
+            return  # enforce minimum viewing time
         self.controller.previous_cue()
         self._load_cue()
 
@@ -535,6 +604,17 @@ class ExposureScreen(QWidget):
         if self.controller.check_time_cap():
             self._request_end(EndReason.TIME_CAP)
             return
+        # Max cue exposure: force advance if the cue has been shown too long.
+        max_sec = self.context.config.max_cue_exposure_sec
+        if max_sec > 0 and self.controller.current_cue_dwell() >= max_sec:
+            self._next_cue()
+            return
+        if not self.controller.should_prompt_vas():
+            return  # neutral cue in interspersed/custom mode — skip VAS
+        # Defer VAS until the video has played fully at least once.
+        cue = self.controller.current_cue()
+        if cue and cue.media_type == "video" and not self.cue_view.video_has_played_once():
+            return  # wait for at least one full video loop
         self._open_periodic_vas()
 
     def _open_periodic_vas(self) -> None:
@@ -543,6 +623,8 @@ class ExposureScreen(QWidget):
         if self._prompt_open or self.coping_panel.isVisible() or self.gallery.isVisible():
             return
         self._per_cue_timer.stop()   # pause dwell counter while rating
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self.controller.mark_due_periodic()
         self._vas_mode = RatingKind.PERIODIC
         self._prompt_open = True
@@ -550,6 +632,8 @@ class ExposureScreen(QWidget):
 
     def _after_coping(self) -> None:
         """Coping (afrontamiento) panel closed — optionally re-check craving."""
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.resume()
         if self.context.config.vas_prompt_after_coping:
             self._open_periodic_vas()
         elif self.context.config.vas_prompt_per_cue_seconds > 0:
@@ -561,12 +645,16 @@ class ExposureScreen(QWidget):
         if self._prompt_open:
             return
         self._per_cue_timer.stop()   # pause dwell counter while rating
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self._vas_mode = RatingKind.PEAK
         self._prompt_open = True
         self.vas_prompt.ask(tr("vas.peak_title"))
 
     def _on_vas_submitted(self, value: int) -> None:
         self._prompt_open = False
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.resume()
         kind = self._vas_mode
         self.controller.record_rating(value, kind)
         self.chart.add_point(self.controller.elapsed_sec(), value)
@@ -597,6 +685,8 @@ class ExposureScreen(QWidget):
     # --- per-cue dwell timer ------------------------------------------------
     def _on_per_cue_timeout(self) -> None:
         """Per-cue dwell timer fired: prompt craving for this specific cue."""
+        if not self.controller.should_prompt_vas():
+            return  # neutral cue — skip VAS
         self._open_periodic_vas()
 
     # --- progressive down-regulation ----------------------------------------
@@ -669,15 +759,21 @@ class ExposureScreen(QWidget):
     # --- coping & gallery ---------------------------------------------------
     def _open_coping(self) -> None:
         self._per_cue_timer.stop()   # pause dwell counter — patient is coping, not viewing cue
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self.coping_panel.start()
 
     def _open_gallery(self) -> None:
         self._per_cue_timer.stop()   # pause dwell counter — patient is viewing positive images
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self.controller.record_intensity("gallery_open")
         self.gallery.open_with(self.positive_paths)
 
     def _on_gallery_closed(self) -> None:
         self.controller.record_intensity("gallery_close")
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.resume()
         # Resume per-cue dwell timer — patient is back to the cue.
         if self.context.config.vas_prompt_per_cue_seconds > 0:
             self._per_cue_timer.start()
@@ -716,6 +812,7 @@ class ExposureScreen(QWidget):
         self._autoscroll_timer.stop()
         self._per_cue_timer.stop()
         self._downreg_timer.stop()
+        self._countdown_timer.stop()
         self._chrome_timer.stop()
         self.remove_access_filter()
         self.cue_view.fade_to_black()

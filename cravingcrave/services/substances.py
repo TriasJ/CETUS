@@ -18,7 +18,7 @@ import unicodedata
 from ..data.repositories import SettingRepo
 from .i18n import tr
 
-BUILTIN_KEYS = ("alcohol", "cigarettes", "meth")
+BUILTIN_KEYS = ("alcohol", "cigarettes", "meth", "opioid")
 SETTING_KEY = "custom_substances"
 
 

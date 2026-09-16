@@ -52,6 +52,14 @@ class CopingSkill(str, Enum):
     ALTERNATIVE_ACTION = "alternative_action"
 
 
+class SessionMode(str, Enum):
+    """Exposure session mode — determines how craving and neutral cues are mixed."""
+
+    INTENSE = "intense"                  # pure craving cues, graded escalation
+    INTERSPERSED = "interspersed"        # craving cues interspersed among neutral stimuli
+    CUSTOM = "custom"                    # clinician-configured mix
+
+
 class IntensityAction(str, Enum):
     SHRINK = "shrink"
     BLUR = "blur"
@@ -95,6 +103,9 @@ class CueConfig:
     appetitive_rank: int = 0             # graded-escalation order within a session
     enabled: bool = True
     is_personal_reason: bool = False     # patient's "reasons for recovery" image
+    is_neutral: bool = False             # neutral cue (no craving induction)
+    craving_weight: float | None = None  # research-backed craving weight (0..10 scale)
+    exposure_count: int = 0              # times shown across sessions (backlog rotation)
     created_at: str = field(default_factory=utc_now_iso)
 
 
@@ -114,6 +125,7 @@ class Session:
     habituation_slope: float | None = None
     app_version: str = ""
     clinician_notes: str | None = None
+    mode: str = SessionMode.INTENSE.value
 
 
 @dataclass
