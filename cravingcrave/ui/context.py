@@ -112,6 +112,9 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     # Min-exposure countdown hint.
     config.show_min_exposure_hint = as_bool("show_min_exposure_hint", config.show_min_exposure_hint)
 
+    # Backlog rotation.
+    config.max_cue_repeats = as_int("max_cue_repeats", config.max_cue_repeats)
+
     # VAS display mode.
     vas_display = s.get("vas_display_mode")
     if vas_display in ("slider", "circles", "stars"):

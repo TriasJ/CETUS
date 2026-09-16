@@ -535,6 +535,9 @@
 
   "exposure.neutral_indicator": "[neutra]",
 
+  "settings.max_cue_repeats": "Máx. repeticiones de señal antes de rotación (0 = desactivado)",
+  "settings.max_cue_repeats_hint": "Las señales mostradas más de este número de veces se mueven al final de la lista.",
+
   "settings.media_title": "Señales de imagen y video",
   "settings.media_hint": "Cómo se muestran y cronometran las señales de imagen y video durante la exposición.",
   "settings.video_section": "Comportamiento de señales de video",

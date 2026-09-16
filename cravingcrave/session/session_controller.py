@@ -268,6 +268,12 @@ class SessionController(QObject):
         if self._finalized or self.session is None:
             return self.session
         self._record_cue_dwell()   # flush the last cue's dwell
+        # Increment exposure counts for cues shown in this session.
+        seen_ids: set[int] = set()
+        for cue in self.exposure_cues:
+            if cue.id is not None and cue.id not in seen_ids:
+                self.repos.cues.increment_exposure(cue.id)
+                seen_ids.add(cue.id)
         if endpoint_value is not None:
             self.session.endpoint_vas = max(0, min(self.config.vas_max, int(endpoint_value)))
         ratings = self.repos.ratings.list_for_session(self.session.id)

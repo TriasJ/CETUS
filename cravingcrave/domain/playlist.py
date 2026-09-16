@@ -24,16 +24,28 @@ from collections.abc import Sequence
 from .models import CueConfig, MediaItem
 
 
-def build_exposure_playlist(cues: Sequence[CueConfig]) -> list[CueConfig]:
+def build_exposure_playlist(
+    cues: Sequence[CueConfig],
+    max_repeats: int = 0,
+) -> list[CueConfig]:
     """Enabled, non-positive cues ordered by ascending appetitive rank.
 
     Ties broken by ``id`` (then media_path) for a stable, deterministic order.
+
+    If *max_repeats* > 0, cues shown more than that many times across sessions
+    are moved to the end of the playlist (backlog rotation), preserving their
+    relative order within the backlog.
     """
     exposure = [c for c in cues if c.enabled and not c.is_personal_reason]
-    return sorted(
+    sorted_cues = sorted(
         exposure,
         key=lambda c: (c.appetitive_rank, c.id if c.id is not None else 1 << 30, c.media_path),
     )
+    if max_repeats <= 0:
+        return sorted_cues
+    fresh = [c for c in sorted_cues if c.exposure_count <= max_repeats]
+    backlog = [c for c in sorted_cues if c.exposure_count > max_repeats]
+    return fresh + backlog
 
 
 def positive_cues(cues: Sequence[CueConfig]) -> list[CueConfig]:

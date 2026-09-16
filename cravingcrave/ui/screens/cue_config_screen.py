@@ -181,7 +181,8 @@ class CueConfigScreen(QWidget):
                 marks.append("⚠")
                 missing_count += 1
             weight_str = f"  w={c.craving_weight:.1f}" if c.craving_weight is not None else ""
-            label = (f"[{c.appetitive_rank}]{weight_str} {c.media_path}"
+            exposure_str = f" ×{c.exposure_count}" if c.exposure_count > 0 else ""
+            label = (f"[{c.appetitive_rank}]{weight_str}{exposure_str} {c.media_path}"
                      f"  ({c.media_type})  {' '.join(marks)}")
             item = QListWidgetItem(label)
             item.setData(Qt.ItemDataRole.UserRole, c.id)

@@ -121,6 +121,10 @@ class AppConfig:
     # Discrete countdown hint shown while minimum exposure time blocks cue advance.
     show_min_exposure_hint: bool = True
 
+    # Backlog rotation: cues shown more than this many times are deprioritized.
+    # 0 = off (no backlog rotation).
+    max_cue_repeats: int = 0
+
     # VAS display mode: how the 0-10 craving rating is presented to the patient.
     # "slider"  = horizontal drag slider (default, current behaviour)
     # "circles" = 11 circles of increasing size

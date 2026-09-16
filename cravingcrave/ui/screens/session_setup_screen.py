@@ -186,7 +186,8 @@ class SessionSetupScreen(QWidget):
         substance = self.substance.currentData()
         cues = [c for c in self.context.repos.cues.list_for_patient(self.patient.id)
                 if c.substance == substance]
-        return playlist_rules.build_exposure_playlist(cues)
+        return playlist_rules.build_exposure_playlist(
+            cues, max_repeats=self.context.config.max_cue_repeats)
 
     def _positive_paths(self) -> list[str]:
         paths = [m.absolute_path for m in self.context.media.by_category("positive")]

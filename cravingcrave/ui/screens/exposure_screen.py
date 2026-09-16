@@ -63,6 +63,12 @@ class ExposureScreen(QWidget):
         # Subtle reminder that F11 goes fullscreen (hidden while already immersive/fullscreen).
         self.fs_reminder = QLabel(tr("exposure.fullscreen_reminder"))
         self.fs_reminder.setObjectName("Muted")
+        # Discrete min-exposure countdown (shown near cue counter when advance is blocked).
+        self._countdown_label = QLabel("")
+        self._countdown_label.setStyleSheet(
+            "color:#2a9d8f; font-size:12px; background:rgba(42,157,143,0.1); "
+            "padding:2px 8px; border-radius:4px;")
+        self._countdown_label.setVisible(False)
         self.hint = QLabel(tr("exposure.waiting"))
         self.hint.setObjectName("Muted")
         self.hint.setWordWrap(True)
@@ -117,6 +123,7 @@ class ExposureScreen(QWidget):
         # --- center ---------------------------------------------------------
         top_row = QHBoxLayout()
         top_row.addWidget(self.cue_counter)
+        top_row.addWidget(self._countdown_label)
         top_row.addStretch(1)
         top_row.addWidget(self.fs_reminder)
         center = QVBoxLayout()
@@ -197,9 +204,12 @@ class ExposureScreen(QWidget):
         controller.habituationReached.connect(self._on_habituation)
 
         # Optional timed auto-scroll: advance the cue every N seconds, hands-free.
+        # Clamp to at least the min-exposure time so the timers never conflict.
         self._autoscroll_timer = QTimer(self)
         if context.config.autoscroll_timed_seconds > 0:
-            self._autoscroll_timer.setInterval(context.config.autoscroll_timed_seconds * 1000)
+            interval = max(context.config.autoscroll_timed_seconds,
+                           context.config.interspersed_min_exposure_sec)
+            self._autoscroll_timer.setInterval(interval * 1000)
             self._autoscroll_timer.timeout.connect(self._on_autoscroll_tick)
 
         # Per-cue dwell timer: prompt craving after N seconds on the SAME cue.
@@ -213,6 +223,11 @@ class ExposureScreen(QWidget):
         self._downreg_timer.setInterval(1000)  # tick every second for smooth ramping
         self._downreg_timer.timeout.connect(self._on_downreg_tick)
         self._downreg_floor = 0
+
+        # Min-exposure countdown display timer (1s ticks).
+        self._countdown_timer = QTimer(self)
+        self._countdown_timer.setInterval(1000)
+        self._countdown_timer.timeout.connect(self._update_countdown)
 
         # --- input: standard shortcuts OR keyboard-only accessibility mode --
         self._shortcuts: list[QShortcut] = []
@@ -296,7 +311,7 @@ class ExposureScreen(QWidget):
         self.setPalette(pal); self.setAutoFillBackground(True)
         self._right_box.hide()
         self.cue_counter.hide(); self.hint.hide(); self.legend.hide(); self.banner.hide()
-        self.fs_reminder.hide()   # already fullscreen — no need to advertise F11
+        self.fs_reminder.hide(); self._countdown_label.hide()
         self._bar_counter.show()
         self._actionbar.setProperty("immersive", True)
         self._repolish(self._actionbar)
@@ -490,11 +505,39 @@ class ExposureScreen(QWidget):
             counter += " " + tr("exposure.neutral_indicator")
         self.cue_counter.setText(counter)
         self._bar_counter.setText(counter)
+        # Start countdown display for min-exposure (interspersed/custom modes).
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec > 0 and self.context.config.show_min_exposure_hint:
+            self._countdown_timer.start()
+            self._update_countdown()
+        else:
+            self._countdown_label.setVisible(False)
+
+    def _update_countdown(self) -> None:
+        """Update the discrete countdown indicator for min-exposure enforcement."""
+        if not self.context.config.show_min_exposure_hint:
+            self._countdown_label.setVisible(False)
+            self._countdown_timer.stop()
+            return
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec <= 0:
+            self._countdown_label.setVisible(False)
+            self._countdown_timer.stop()
+            return
+        remaining = max(0, min_sec - self.controller.current_cue_dwell())
+        if remaining > 0:
+            self._countdown_label.setText(f"⏱ {remaining}s")
+            self._countdown_label.setVisible(True)
+        else:
+            self._countdown_label.setVisible(False)
+            self._countdown_timer.stop()
 
     def _next_cue(self) -> None:
         min_sec = self.controller.min_cue_seconds()
         if min_sec > 0 and self.controller.current_cue_dwell() < min_sec:
-            self.hint.setText(tr("setup.min_exposure_hint"))
+            if self.context.config.show_min_exposure_hint:
+                self._countdown_timer.start()
+                self._update_countdown()
             return  # enforce minimum viewing time
         # Dynamic neutral increase: if craving is still high, skip to next neutral.
         if self.controller.should_skip_craving_cue():
@@ -524,7 +567,9 @@ class ExposureScreen(QWidget):
     def _prev_cue(self) -> None:
         min_sec = self.controller.min_cue_seconds()
         if min_sec > 0 and self.controller.current_cue_dwell() < min_sec:
-            self.hint.setText(tr("setup.min_exposure_hint"))
+            if self.context.config.show_min_exposure_hint:
+                self._countdown_timer.start()
+                self._update_countdown()
             return  # enforce minimum viewing time
         self.controller.previous_cue()
         self._load_cue()
@@ -767,6 +812,7 @@ class ExposureScreen(QWidget):
         self._autoscroll_timer.stop()
         self._per_cue_timer.stop()
         self._downreg_timer.stop()
+        self._countdown_timer.stop()
         self._chrome_timer.stop()
         self.remove_access_filter()
         self.cue_view.fade_to_black()

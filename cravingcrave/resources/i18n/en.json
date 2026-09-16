@@ -535,6 +535,9 @@
 
   "exposure.neutral_indicator": "[neutral]",
 
+  "settings.max_cue_repeats": "Max cue repeats before backlog (0 = off)",
+  "settings.max_cue_repeats_hint": "Cues shown more than this many times are moved to the end of the playlist.",
+
   "settings.media_title": "Image & Video Cues",
   "settings.media_hint": "How image and video cues are displayed and timed during exposure.",
   "settings.video_section": "Video cue behavior",
