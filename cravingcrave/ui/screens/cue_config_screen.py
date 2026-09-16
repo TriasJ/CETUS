@@ -330,6 +330,11 @@ class CueConfigScreen(QWidget):
         form.addRow(tr("cueconfig.weight_label"), path_label)
         form.addRow(tr("cueconfig.weight_label") + " (0–10)", weight_spin)
         form.addRow("Rank", rank_spin)
+        warning = QLabel(tr("cueconfig.edit_weight_warning"))
+        warning.setWordWrap(True)
+        warning.setStyleSheet("color:#8a5a00; font-size:12px; padding:6px; "
+                              "background:#fef9e7; border-radius:4px;")
+        form.addRow(warning)
         hint = QLabel(tr("cueconfig.weight_hint"))
         hint.setWordWrap(True); hint.setObjectName("Muted")
         form.addRow(hint)

@@ -531,6 +531,7 @@
   "cueconfig.weight_hint": "Peso basado en investigación de bases de datos validadas (MOCIS, Tabaco). Mayor = más deseo.",
   "cueconfig.neutral_flag": "Señal neutra (sin deseo)",
   "cueconfig.edit_weight": "Editar peso / rango",
+  "cueconfig.edit_weight_warning": "⚠ Los pesos manuales son estimaciones subjetivas. Cuando hay bases de datos de señales validadas (MOCIS, PLSC), use «Sugerir pesos» — los pesos basados en investigación derivados de calificaciones empíricas de deseo son más confiables que la intuición clínica para el orden graduado.",
   "cueconfig.file_missing": "⚠ Archivo de medios no encontrado — pudo haber sido renombrado o eliminado.",
   "cueconfig.files_missing": "⚠ {n} archivo(s) de señales faltante(s) — revisa la carpeta de medios.",
 

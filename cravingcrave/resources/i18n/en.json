@@ -531,6 +531,7 @@
   "cueconfig.weight_hint": "Research-based weight from validated datasets (MOCIS, Tobacco). Higher = more craving.",
   "cueconfig.neutral_flag": "Neutral cue (no craving)",
   "cueconfig.edit_weight": "Edit Weight / Rank",
+  "cueconfig.edit_weight_warning": "⚠ Manual weights are subjective estimates. When validated cue databases are available (MOCIS, PLSC), use \"Suggest Weights\" instead — research-based weights derived from empirical craving ratings are more reliable than clinical intuition for graded ordering.",
   "cueconfig.file_missing": "⚠ Media file not found — it may have been renamed or deleted.",
   "cueconfig.files_missing": "⚠ {n} cue file(s) missing — check the media folder.",
 
