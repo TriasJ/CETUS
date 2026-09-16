@@ -293,6 +293,7 @@ class SessionSetupScreen(QWidget):
                 mode, cues, neutral_pool=neutral_pool,
                 craving_pct=self.craving_pct_spin.value(),
                 craving_count=self.craving_count_spin.value(),
+                max_repeats=self.context.config.max_cue_repeats,
             )
         elif self._random_order:
             cues = playlist_rules.randomized(cues)

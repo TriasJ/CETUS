@@ -97,6 +97,7 @@ def build_interspersed_playlist(
     neutral_pool: Sequence[CueConfig],
     craving_pct: int = 5,
     craving_count: int = 0,
+    max_repeats: int = 0,
     rng: random.Random | None = None,
 ) -> list[CueConfig]:
     """Build a mixed playlist of craving and neutral cues.
@@ -123,7 +124,9 @@ def build_interspersed_playlist(
     _rng = rng or random.Random()
 
     # 1. Prepare the graded craving cues (ascending appetitive rank).
-    graded = build_exposure_playlist(list(craving_cues))
+    #    Backlog rotation applies here too — over-exposed craving cues are
+    #    deprioritized even when interspersed among neutrals.
+    graded = build_exposure_playlist(list(craving_cues), max_repeats=max_repeats)
     if not graded:
         # No craving cues — return shuffled neutrals only.
         neutrals = list(neutral_pool)
@@ -215,6 +218,7 @@ def build_playlist_for_mode(
     neutral_pool: Sequence[CueConfig] | None = None,
     craving_pct: int = 5,
     craving_count: int = 0,
+    max_repeats: int = 0,
     use_weights: bool = False,
     rng: random.Random | None = None,
 ) -> list[CueConfig]:
@@ -237,9 +241,10 @@ def build_playlist_for_mode(
     """
     if mode == "interspersed":
         return build_interspersed_playlist(
-            craving_cues, neutral_pool or [], craving_pct, craving_count, rng,
+            craving_cues, neutral_pool or [], craving_pct, craving_count,
+            max_repeats, rng,
         )
     # intense and custom both start from the standard graded playlist
     if use_weights:
         return build_weighted_playlist(craving_cues)
-    return build_exposure_playlist(craving_cues)
+    return build_exposure_playlist(craving_cues, max_repeats=max_repeats)
