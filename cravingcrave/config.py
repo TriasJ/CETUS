@@ -123,5 +123,5 @@ class AppConfig:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.media_root.mkdir(parents=True, exist_ok=True)
-        for sub in ("alcohol", "cigarettes", "meth", "positive", "sounds", "neutral"):
+        for sub in ("alcohol", "cigarettes", "meth", "opioid", "positive", "sounds", "neutral"):
             (self.media_root / sub).mkdir(parents=True, exist_ok=True)

@@ -18,7 +18,7 @@ AUDIO_EXTS = {".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac"}
 
 # Built-in cue/aux folders. Custom-substance folders (created at runtime) are
 # discovered from disk by ``MediaLibrary.category_folders()`` and appended.
-BUILTIN_CATEGORIES = ("alcohol", "cigarettes", "meth", "positive", "sounds", "neutral")
+BUILTIN_CATEGORIES = ("alcohol", "cigarettes", "meth", "opioid", "positive", "sounds", "neutral")
 # Back-compat alias (older callers import CATEGORIES).
 CATEGORIES = BUILTIN_CATEGORIES
 
