@@ -468,6 +468,7 @@ class ExposureScreen(QWidget):
             self.cue_view.show_audio(abs_path, Path(cue.media_path).name)
         elif cue.media_type == "video":
             self.cue_view.show_video(abs_path)
+            self.cue_view.set_loop(self.context.config.video_loop)
         else:
             self.cue_view.show_image(abs_path)
         self.intensity.reset()
@@ -495,9 +496,21 @@ class ExposureScreen(QWidget):
         if min_sec > 0 and self.controller.current_cue_dwell() < min_sec:
             self.hint.setText(tr("setup.min_exposure_hint"))
             return  # enforce minimum viewing time
+        # Dynamic neutral increase: if craving is still high, skip to next neutral.
+        if self.controller.should_skip_craving_cue():
+            self._advance_to_next_neutral()
+            return
         self.controller.advance_cue()
         self._load_cue()
         self._maybe_prompt_after_n_cues()
+
+    def _advance_to_next_neutral(self) -> None:
+        """Skip craving cues until a neutral one is found (dynamic neutral increase)."""
+        for _ in range(self.controller.cue_count):
+            cue = self.controller.advance_cue()
+            if cue is None or cue.is_neutral:
+                break
+        self._load_cue()
 
     def _maybe_prompt_after_n_cues(self) -> None:
         """If configured, ask for a craving score after every N forward cue changes."""
@@ -509,6 +522,10 @@ class ExposureScreen(QWidget):
             self._open_periodic_vas()
 
     def _prev_cue(self) -> None:
+        min_sec = self.controller.min_cue_seconds()
+        if min_sec > 0 and self.controller.current_cue_dwell() < min_sec:
+            self.hint.setText(tr("setup.min_exposure_hint"))
+            return  # enforce minimum viewing time
         self.controller.previous_cue()
         self._load_cue()
 
@@ -542,8 +559,17 @@ class ExposureScreen(QWidget):
         if self.controller.check_time_cap():
             self._request_end(EndReason.TIME_CAP)
             return
+        # Max cue exposure: force advance if the cue has been shown too long.
+        max_sec = self.context.config.max_cue_exposure_sec
+        if max_sec > 0 and self.controller.current_cue_dwell() >= max_sec:
+            self._next_cue()
+            return
         if not self.controller.should_prompt_vas():
             return  # neutral cue in interspersed/custom mode — skip VAS
+        # Defer VAS until the video has played fully at least once.
+        cue = self.controller.current_cue()
+        if cue and cue.media_type == "video" and not self.cue_view.video_has_played_once():
+            return  # wait for at least one full video loop
         self._open_periodic_vas()
 
     def _open_periodic_vas(self) -> None:
@@ -552,6 +578,8 @@ class ExposureScreen(QWidget):
         if self._prompt_open or self.coping_panel.isVisible() or self.gallery.isVisible():
             return
         self._per_cue_timer.stop()   # pause dwell counter while rating
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self.controller.mark_due_periodic()
         self._vas_mode = RatingKind.PERIODIC
         self._prompt_open = True
@@ -559,6 +587,8 @@ class ExposureScreen(QWidget):
 
     def _after_coping(self) -> None:
         """Coping (afrontamiento) panel closed — optionally re-check craving."""
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.resume()
         if self.context.config.vas_prompt_after_coping:
             self._open_periodic_vas()
         elif self.context.config.vas_prompt_per_cue_seconds > 0:
@@ -570,12 +600,16 @@ class ExposureScreen(QWidget):
         if self._prompt_open:
             return
         self._per_cue_timer.stop()   # pause dwell counter while rating
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self._vas_mode = RatingKind.PEAK
         self._prompt_open = True
         self.vas_prompt.ask(tr("vas.peak_title"))
 
     def _on_vas_submitted(self, value: int) -> None:
         self._prompt_open = False
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.resume()
         kind = self._vas_mode
         self.controller.record_rating(value, kind)
         self.chart.add_point(self.controller.elapsed_sec(), value)
@@ -680,15 +714,21 @@ class ExposureScreen(QWidget):
     # --- coping & gallery ---------------------------------------------------
     def _open_coping(self) -> None:
         self._per_cue_timer.stop()   # pause dwell counter — patient is coping, not viewing cue
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self.coping_panel.start()
 
     def _open_gallery(self) -> None:
         self._per_cue_timer.stop()   # pause dwell counter — patient is viewing positive images
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.pause()
         self.controller.record_intensity("gallery_open")
         self.gallery.open_with(self.positive_paths)
 
     def _on_gallery_closed(self) -> None:
         self.controller.record_intensity("gallery_close")
+        if self.context.config.pause_video_on_rating:
+            self.cue_view.resume()
         # Resume per-cue dwell timer — patient is back to the cue.
         if self.context.config.vas_prompt_per_cue_seconds > 0:
             self._per_cue_timer.start()

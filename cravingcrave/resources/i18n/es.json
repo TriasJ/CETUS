@@ -533,5 +533,13 @@
   "cueconfig.file_missing": "⚠ Archivo de medios no encontrado — pudo haber sido renombrado o eliminado.",
   "cueconfig.files_missing": "⚠ {n} archivo(s) de señales faltante(s) — revisa la carpeta de medios.",
 
-  "exposure.neutral_indicator": "[neutra]"
+  "exposure.neutral_indicator": "[neutra]",
+
+  "settings.media_title": "Señales de imagen y video",
+  "settings.media_hint": "Cómo se muestran y cronometran las señales de imagen y video durante la exposición.",
+  "settings.video_section": "Comportamiento de señales de video",
+  "settings.pause_video_on_rating": "Pausar video al calificar deseo",
+  "settings.video_loop": "Reproducir videos en bucle (predeterminado)",
+  "settings.max_cue_exposure_sec": "Tiempo máx. de exposición por señal (seg, 0 = desactivado)",
+  "settings.show_min_exposure_hint": "Mostrar cuenta regresiva discreta durante espera mínima"
 }

@@ -14,9 +14,12 @@ from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFormLayout,
+    QFrame,
     QLabel,
+    QScrollArea,
     QSpinBox,
     QVBoxLayout,
+    QWidget,
 )
 
 from ...services.i18n import tr
@@ -62,6 +65,14 @@ class SessionParamsDialog(QDialog):
         self.vas_on_neutral = QCheckBox(tr("setup.vas_on_neutral"))
         self.vas_on_neutral.setChecked(config.interspersed_vas_on_neutral)
 
+        # Dynamic neutral increase: extend neutral runs when craving is high.
+        self.dynamic_neutral = QCheckBox(tr("setup.dynamic_neutral"))
+        self.dynamic_neutral.setChecked(config.dynamic_neutral_enabled)
+        self.dynamic_neutral.setToolTip(tr("setup.dynamic_neutral_hint"))
+        self.dynamic_threshold = QSpinBox(); self.dynamic_threshold.setRange(1, 10)
+        self.dynamic_threshold.setMinimumWidth(120)
+        self.dynamic_threshold.setValue(config.dynamic_neutral_threshold)
+
         # Progressive down-regulation
         self.progressive_enabled = QCheckBox(tr("settings.progressive_enabled"))
         self.progressive_enabled.setChecked(config.progressive_downreg_enabled)
@@ -99,6 +110,8 @@ class SessionParamsDialog(QDialog):
         form.addRow(self.start_fullscreen)
         form.addRow(tr("settings.vas_per_cue_seconds"), self.vas_per_cue)
         form.addRow(self.vas_on_neutral)
+        form.addRow(self.dynamic_neutral)
+        form.addRow(tr("setup.dynamic_neutral_threshold"), self.dynamic_threshold)
         form.addRow(self.progressive_enabled)
         form.addRow(tr("settings.progressive_target"), self.progressive_target)
         form.addRow(self.auto_coping)
@@ -113,10 +126,19 @@ class SessionParamsDialog(QDialog):
         buttons.button(QDialogButtonBox.StandardButton.Help).setText(tr("common.help"))
 
         intro = QLabel(tr("setup.params_intro")); intro.setWordWrap(True)
+
+        # Wrap the form in a scroll area so it remains usable on small screens.
+        form_widget = QWidget()
+        form_widget.setLayout(form)
+        scroll = QScrollArea()
+        scroll.setWidget(form_widget)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 20); v.setSpacing(14)
         v.addWidget(intro)
-        v.addLayout(form)
+        v.addWidget(scroll, 1)
         v.addWidget(buttons)
 
     def _open_help(self) -> None:
@@ -139,6 +161,8 @@ class SessionParamsDialog(QDialog):
             "auto_coping_enabled": self.auto_coping.isChecked(),
             "cue_audio_mode": self.cue_audio_mode.currentData(),
             "interspersed_vas_on_neutral": self.vas_on_neutral.isChecked(),
+            "dynamic_neutral_enabled": self.dynamic_neutral.isChecked(),
+            "dynamic_neutral_threshold": self.dynamic_threshold.value(),
         }
 
     def wants_fullscreen(self) -> bool:

@@ -73,6 +73,9 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     cue_audio = s.get("cue_audio_mode")
     if cue_audio in ("auto", "always", "muted", "audio_only"):
         config.cue_audio_mode = cue_audio
+    config.pause_video_on_rating = as_bool("pause_video_on_rating", config.pause_video_on_rating)
+    config.video_loop = as_bool("video_loop", config.video_loop)
+    config.max_cue_exposure_sec = as_int("max_cue_exposure_sec", config.max_cue_exposure_sec)
     config.default_random_order = as_bool("default_random_order", config.default_random_order)
     config.default_loop = as_bool("default_loop", config.default_loop)
     config.default_start_fullscreen = as_bool("default_start_fullscreen", config.default_start_fullscreen)
@@ -105,6 +108,9 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     # Dynamic neutral increase.
     config.dynamic_neutral_enabled = as_bool("dynamic_neutral_enabled", config.dynamic_neutral_enabled)
     config.dynamic_neutral_threshold = as_int("dynamic_neutral_threshold", config.dynamic_neutral_threshold)
+
+    # Min-exposure countdown hint.
+    config.show_min_exposure_hint = as_bool("show_min_exposure_hint", config.show_min_exposure_hint)
 
     # VAS display mode.
     vas_display = s.get("vas_display_mode")

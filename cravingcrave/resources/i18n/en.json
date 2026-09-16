@@ -533,5 +533,13 @@
   "cueconfig.file_missing": "⚠ Media file not found — it may have been renamed or deleted.",
   "cueconfig.files_missing": "⚠ {n} cue file(s) missing — check the media folder.",
 
-  "exposure.neutral_indicator": "[neutral]"
+  "exposure.neutral_indicator": "[neutral]",
+
+  "settings.media_title": "Image & Video Cues",
+  "settings.media_hint": "How image and video cues are displayed and timed during exposure.",
+  "settings.video_section": "Video cue behavior",
+  "settings.pause_video_on_rating": "Pause video when rating craving",
+  "settings.video_loop": "Loop videos indefinitely (default)",
+  "settings.max_cue_exposure_sec": "Max. exposure time per cue (sec, 0 = off)",
+  "settings.show_min_exposure_hint": "Show discrete countdown during min. exposure wait"
 }

@@ -68,6 +68,11 @@ class AppConfig:
     # "audio_only" = play audio only for audio-type cues, mute video audio
     cue_audio_mode: str = "auto"
 
+    # Video behavior during exposure.
+    pause_video_on_rating: bool = True        # pause video when VAS/coping/gallery opens
+    video_loop: bool = True                   # videos loop indefinitely; False = play once
+    max_cue_exposure_sec: int = 0             # 0 = off; >0 = force VAS/advance after N seconds
+
     # Per-session run defaults (also overridable per session in the Parameters popup).
     default_random_order: bool = False         # randomize the cue order
     default_loop: bool = False                 # loop the cue list at the ends
@@ -112,6 +117,9 @@ class AppConfig:
     # drops below the threshold. This dynamically stretches neutral runs.
     dynamic_neutral_enabled: bool = False
     dynamic_neutral_threshold: int = 4            # craving must drop ≤ this before next craving cue
+
+    # Discrete countdown hint shown while minimum exposure time blocks cue advance.
+    show_min_exposure_hint: bool = True
 
     # VAS display mode: how the 0-10 craving rating is presented to the patient.
     # "slider"  = horizontal drag slider (default, current behaviour)

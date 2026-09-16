@@ -228,6 +228,7 @@ class SettingsScreen(QWidget):
 
     def _session_page(self) -> QScrollArea:
         return self._page([self._build_clinical_card(), self._build_session_options_card(),
+                           self._build_media_card(),
                            self._build_autoscroll_card(), self._build_accessibility_card(),
                            self._build_advanced_card(), self._build_progressive_card()])
 
@@ -278,6 +279,29 @@ class SettingsScreen(QWidget):
         form.addRow(tr("settings.cue_audio_label"), self.cue_audio_mode)
         form.addRow(tr("settings.vas_display_mode"), self.vas_display_mode)
         form.addRow(tr("settings.session_mode"), self.default_session_mode)
+        v.addLayout(form)
+        return box
+
+    # --- image / video cue behaviour (Session) ---------------------------------
+    def _build_media_card(self) -> QGroupBox:
+        """Separate settings for image and video cue behaviour during exposure."""
+        cfg = self.context.config
+        box, v = self._card("settings.media_title", "settings.media_hint")
+        v.addWidget(QLabel(tr("settings.video_section")))
+        self.pause_video_on_rating = QCheckBox(tr("settings.pause_video_on_rating"))
+        self.pause_video_on_rating.setChecked(cfg.pause_video_on_rating)
+        self.video_loop = QCheckBox(tr("settings.video_loop"))
+        self.video_loop.setChecked(cfg.video_loop)
+        self.max_cue_exposure = QSpinBox(); self.max_cue_exposure.setRange(0, 600)
+        self.max_cue_exposure.setSuffix(" s"); self.max_cue_exposure.setMinimumWidth(120)
+        self.max_cue_exposure.setValue(cfg.max_cue_exposure_sec)
+        self.show_min_exposure_hint = QCheckBox(tr("settings.show_min_exposure_hint"))
+        self.show_min_exposure_hint.setChecked(cfg.show_min_exposure_hint)
+        v.addWidget(self.pause_video_on_rating)
+        v.addWidget(self.video_loop)
+        v.addWidget(self.show_min_exposure_hint)
+        form = QFormLayout(); form.setSpacing(10)
+        form.addRow(tr("settings.max_cue_exposure_sec"), self.max_cue_exposure)
         v.addLayout(form)
         return box
 
@@ -745,6 +769,15 @@ class SettingsScreen(QWidget):
         if hasattr(self, "default_session_mode"):
             cfg.default_session_mode = self.default_session_mode.currentData()
             s.set("default_session_mode", cfg.default_session_mode)
+        if hasattr(self, "pause_video_on_rating"):
+            cfg.pause_video_on_rating = self.pause_video_on_rating.isChecked()
+            cfg.video_loop = self.video_loop.isChecked()
+            cfg.max_cue_exposure_sec = self.max_cue_exposure.value()
+            cfg.show_min_exposure_hint = self.show_min_exposure_hint.isChecked()
+            s.set("pause_video_on_rating", "1" if cfg.pause_video_on_rating else "0")
+            s.set("video_loop", "1" if cfg.video_loop else "0")
+            s.set("max_cue_exposure_sec", str(cfg.max_cue_exposure_sec))
+            s.set("show_min_exposure_hint", "1" if cfg.show_min_exposure_hint else "0")
         if hasattr(self, "clinic_name"):
             s.set("clinic_name", self.clinic_name.text().strip())
         QMessageBox.information(self, tr("app.title"), tr("settings.saved"))
