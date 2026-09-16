@@ -11,7 +11,9 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
+    QDoubleSpinBox,
     QFileDialog,
+    QFormLayout,
     QHBoxLayout,
     QLabel,
     QListWidget,
@@ -127,8 +129,10 @@ class CueConfigScreen(QWidget):
         suggest_w = QPushButton(tr("cueconfig.suggest_weights"))
         suggest_w.setToolTip(tr("cueconfig.weight_hint"))
         suggest_w.clicked.connect(self._suggest_weights)
+        edit_weight = QPushButton(tr("cueconfig.edit_weight"))
+        edit_weight.clicked.connect(self._edit_weight)
 
-        buttons = [add_lib, add_files, add_folder, up, down, suggest_w]
+        buttons = [add_lib, add_files, add_folder, up, down, suggest_w, edit_weight]
         # Adaptive ordering (opt-in): suggest a low→high craving order the clinician reviews & applies.
         if self.context.config.adaptive_ordering:
             suggest = QPushButton(tr("cueconfig.suggest_order"))
@@ -302,6 +306,50 @@ class CueConfigScreen(QWidget):
         cue = self._selected_cue()
         if cue:
             self.context.repos.cues.delete(cue.id)
+            self._refresh()
+
+    def _edit_weight(self) -> None:
+        """Manually adjust the craving weight of the selected cue."""
+        cue = self._selected_cue()
+        if cue is None:
+            return
+        dlg = QDialog(self)
+        dlg.setWindowTitle(tr("cueconfig.edit_weight"))
+        dlg.setMinimumWidth(360)
+        form = QFormLayout()
+        path_label = QLabel(f"<b>{Path(cue.media_path).name}</b>")
+        weight_spin = QDoubleSpinBox()
+        weight_spin.setRange(0.0, 10.0)
+        weight_spin.setDecimals(1)
+        weight_spin.setSingleStep(0.5)
+        weight_spin.setValue(cue.craving_weight if cue.craving_weight is not None else 0.0)
+        rank_spin = QDoubleSpinBox()
+        rank_spin.setRange(0, 999)
+        rank_spin.setDecimals(0)
+        rank_spin.setValue(float(cue.appetitive_rank))
+        form.addRow(tr("cueconfig.weight_label"), path_label)
+        form.addRow(tr("cueconfig.weight_label") + " (0–10)", weight_spin)
+        form.addRow("Rank", rank_spin)
+        hint = QLabel(tr("cueconfig.weight_hint"))
+        hint.setWordWrap(True); hint.setObjectName("Muted")
+        form.addRow(hint)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(dlg.accept); buttons.rejected.connect(dlg.reject)
+        v = QVBoxLayout(dlg); v.addLayout(form); v.addWidget(buttons)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        new_weight = weight_spin.value()
+        new_rank = int(rank_spin.value())
+        changed = False
+        if cue.craving_weight != new_weight:
+            cue.craving_weight = new_weight
+            changed = True
+        if cue.appetitive_rank != new_rank:
+            cue.appetitive_rank = new_rank
+            changed = True
+        if changed:
+            self.context.repos.cues.update(cue)
             self._refresh()
 
     def _suggest_weights(self) -> None:
