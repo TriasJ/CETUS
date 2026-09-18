@@ -21,6 +21,12 @@ QPushButton:disabled { color: #6b7681; background-color: #1b2430; }
 QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
     background-color: #0f1620; color: #e6edf3; border: 1px solid #3a4757;
 }
+QSpinBox::up-button, QDoubleSpinBox::up-button,
+QSpinBox::down-button, QDoubleSpinBox::down-button { background: #1b2430; border-left: 1px solid #3a4757; }
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover { background: #263040; }
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow { border-bottom-color: #9fb0bd; }
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow { border-top-color: #9fb0bd; }
 
 QListWidget, QTableWidget { background-color: #1b2430; border: 1px solid #2b3644; }
 QListWidget::item:selected { background-color: #204b45; color: #eafaf6; }

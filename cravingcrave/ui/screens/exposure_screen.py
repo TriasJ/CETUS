@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
 from ...domain.models import EndReason, IntensityAction, RatingKind
 from ...services.i18n import tr
 from ...session.session_controller import SessionController
+from ...session.session_state import SessionState
 from .. import hotkeys
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
@@ -508,6 +509,15 @@ class ExposureScreen(QWidget):
             counter += " " + tr("exposure.neutral_indicator")
         self.cue_counter.setText(counter)
         self._bar_counter.setText(counter)
+        # In interspersed/custom mode, auto-prompt VAS when a craving cue appears
+        # (craving cues are sparse among neutrals, so the periodic timer may miss them).
+        if (self.controller.mode in ("interspersed", "custom")
+                and not cue.is_neutral
+                and self.controller.state is SessionState.EXPOSURE
+                and not self._prompt_open):
+            # Defer slightly so the cue is visible before the overlay appears.
+            from PySide6.QtCore import QTimer as _QT
+            _QT.singleShot(500, self._open_periodic_vas)
         # Start countdown display for min-exposure (interspersed/custom modes).
         min_sec = self.controller.min_cue_seconds()
         if min_sec > 0 and self.context.config.show_min_exposure_hint:
