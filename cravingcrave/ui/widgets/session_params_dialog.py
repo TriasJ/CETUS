@@ -112,6 +112,17 @@ class SessionParamsDialog(QDialog):
         form.addRow(self.start_fullscreen)
         form.addRow(tr("settings.vas_per_cue_seconds"), self.vas_per_cue)
         form.addRow(self.vas_on_neutral)
+        # VAS delay on craving cues (interspersed mode).
+        min_delay = config.interspersed_min_exposure_sec * 1000
+        self.vas_delay = QSpinBox(); self.vas_delay.setRange(min_delay, 10000)
+        self.vas_delay.setSuffix(" ms"); self.vas_delay.setSingleStep(100)
+        self.vas_delay.setMinimumWidth(_spin_w)
+        self.vas_delay.setValue(max(config.interspersed_vas_delay_ms, min_delay))
+        form.addRow(tr("settings.interspersed_vas_delay"), self.vas_delay)
+        # Video: wait for full loop before rating.
+        self.video_wait_loop = QCheckBox(tr("settings.video_wait_full_loop"))
+        self.video_wait_loop.setChecked(config.video_wait_full_loop)
+        form.addRow(self.video_wait_loop)
         form.addRow(self.dynamic_neutral)
         form.addRow(tr("setup.dynamic_neutral_threshold"), self.dynamic_threshold)
         form.addRow(self.progressive_enabled)
@@ -163,6 +174,8 @@ class SessionParamsDialog(QDialog):
             "auto_coping_enabled": self.auto_coping.isChecked(),
             "cue_audio_mode": self.cue_audio_mode.currentData(),
             "interspersed_vas_on_neutral": self.vas_on_neutral.isChecked(),
+            "interspersed_vas_delay_ms": self.vas_delay.value(),
+            "video_wait_full_loop": self.video_wait_loop.isChecked(),
             "dynamic_neutral_enabled": self.dynamic_neutral.isChecked(),
             "dynamic_neutral_threshold": self.dynamic_threshold.value(),
         }

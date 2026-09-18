@@ -548,6 +548,7 @@
   "settings.max_cue_exposure_sec": "Max. exposure time per cue (sec, 0 = off)",
   "settings.video_wait_full_loop": "Wait for video to play fully before rating",
   "settings.interspersed_vas_delay": "Delay before auto-rating on craving cues (ms)",
+  "settings.vas_delay_warning": "⚠ Cannot be less than the minimum exposure time ({ms} ms). The patient must see the cue before rating.",
   "settings.show_min_exposure_hint": "Show discrete countdown during min. exposure wait",
 
   "wizard.button": "Setup Wizard",

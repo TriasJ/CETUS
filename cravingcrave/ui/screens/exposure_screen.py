@@ -517,9 +517,7 @@ class ExposureScreen(QWidget):
                 and not cue.is_neutral
                 and self.controller.state is SessionState.EXPOSURE
                 and not self._prompt_open):
-            # Delay must be at least the minimum exposure time (in ms).
-            min_ms = self.controller.min_cue_seconds() * 1000
-            delay = max(self.context.config.interspersed_vas_delay_ms, min_ms)
+            delay = self.context.config.interspersed_vas_delay_ms
             is_video = cue.media_type == "video"
             if is_video and self.context.config.video_wait_full_loop:
                 pass  # let the periodic timer handle it after one full loop
@@ -627,17 +625,20 @@ class ExposureScreen(QWidget):
             self._request_end(EndReason.TIME_CAP)
             return
         # Max cue exposure: force advance if the cue has been shown too long.
+        # Exception: if video_wait_full_loop is ON and a video hasn't played once
+        # yet, don't cut it — let it finish at least one full playback.
         max_sec = self.context.config.max_cue_exposure_sec
-        if max_sec > 0 and self.controller.current_cue_dwell() >= max_sec:
+        cue = self.controller.current_cue()
+        is_video_waiting = (cue and cue.media_type == "video"
+                            and self.context.config.video_wait_full_loop
+                            and not self.cue_view.video_has_played_once())
+        if max_sec > 0 and self.controller.current_cue_dwell() >= max_sec and not is_video_waiting:
             self._next_cue()
             return
         if not self.controller.should_prompt_vas():
             return  # neutral cue in interspersed/custom mode — skip VAS
         # Defer VAS until the video has played fully at least once (if configured).
-        cue = self.controller.current_cue()
-        if (cue and cue.media_type == "video"
-                and self.context.config.video_wait_full_loop
-                and not self.cue_view.video_has_played_once()):
+        if is_video_waiting:
             return  # wait for at least one full video loop
         self._open_periodic_vas()
 

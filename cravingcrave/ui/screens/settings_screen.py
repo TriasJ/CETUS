@@ -306,10 +306,17 @@ class SettingsScreen(QWidget):
         v.addWidget(self.show_min_exposure_hint)
         form = QFormLayout(); form.setSpacing(10)
         form.addRow(tr("settings.max_cue_exposure_sec"), self.max_cue_exposure)
-        self.interspersed_vas_delay = QSpinBox(); self.interspersed_vas_delay.setRange(0, 5000)
-        self.interspersed_vas_delay.setSuffix(" ms")
-        self.interspersed_vas_delay.setValue(cfg.interspersed_vas_delay_ms)
+        # VAS delay: minimum is the min exposure time (in ms) so the patient
+        # always sees the cue before the rating overlay appears.
+        min_delay = cfg.interspersed_min_exposure_sec * 1000
+        self.interspersed_vas_delay = QSpinBox(); self.interspersed_vas_delay.setRange(min_delay, 10000)
+        self.interspersed_vas_delay.setSuffix(" ms"); self.interspersed_vas_delay.setSingleStep(100)
+        self.interspersed_vas_delay.setValue(max(cfg.interspersed_vas_delay_ms, min_delay))
+        vas_delay_hint = QLabel(tr("settings.vas_delay_warning", ms=min_delay))
+        vas_delay_hint.setStyleSheet("color:#8a5a00; font-size:11px;")
+        vas_delay_hint.setWordWrap(True)
         form.addRow(tr("settings.interspersed_vas_delay"), self.interspersed_vas_delay)
+        form.addRow("", vas_delay_hint)
         v.addLayout(form)
         return box
 
