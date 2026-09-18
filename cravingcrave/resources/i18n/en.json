@@ -546,6 +546,8 @@
   "settings.pause_video_on_rating": "Pause video when rating craving",
   "settings.video_loop": "Loop videos indefinitely (default)",
   "settings.max_cue_exposure_sec": "Max. exposure time per cue (sec, 0 = off)",
+  "settings.video_wait_full_loop": "Wait for video to play fully before rating",
+  "settings.interspersed_vas_delay": "Delay before auto-rating on craving cues (ms)",
   "settings.show_min_exposure_hint": "Show discrete countdown during min. exposure wait",
 
   "wizard.button": "Setup Wizard",

@@ -104,6 +104,10 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     config.interspersed_craving_count = as_int("interspersed_craving_count", config.interspersed_craving_count)
     config.interspersed_min_exposure_sec = as_int("interspersed_min_exposure_sec", config.interspersed_min_exposure_sec)
     config.interspersed_vas_on_neutral = as_bool("interspersed_vas_on_neutral", config.interspersed_vas_on_neutral)
+    config.interspersed_vas_delay_ms = as_int("interspersed_vas_delay_ms", config.interspersed_vas_delay_ms)
+
+    # Video cue behaviour.
+    config.video_wait_full_loop = as_bool("video_wait_full_loop", config.video_wait_full_loop)
 
     # Dynamic neutral increase.
     config.dynamic_neutral_enabled = as_bool("dynamic_neutral_enabled", config.dynamic_neutral_enabled)

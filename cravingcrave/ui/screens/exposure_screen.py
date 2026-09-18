@@ -511,13 +511,22 @@ class ExposureScreen(QWidget):
         self._bar_counter.setText(counter)
         # In interspersed/custom mode, auto-prompt VAS when a craving cue appears
         # (craving cues are sparse among neutrals, so the periodic timer may miss them).
+        # For video cues with video_wait_full_loop, the periodic timer's existing
+        # video-aware logic handles the deferral — skip the auto-prompt here.
         if (self.controller.mode in ("interspersed", "custom")
                 and not cue.is_neutral
                 and self.controller.state is SessionState.EXPOSURE
                 and not self._prompt_open):
-            # Defer slightly so the cue is visible before the overlay appears.
-            from PySide6.QtCore import QTimer as _QT
-            _QT.singleShot(500, self._open_periodic_vas)
+            # Delay must be at least the minimum exposure time (in ms).
+            min_ms = self.controller.min_cue_seconds() * 1000
+            delay = max(self.context.config.interspersed_vas_delay_ms, min_ms)
+            is_video = cue.media_type == "video"
+            if is_video and self.context.config.video_wait_full_loop:
+                pass  # let the periodic timer handle it after one full loop
+            elif delay > 0:
+                QTimer.singleShot(delay, self._open_periodic_vas)
+            else:
+                self._open_periodic_vas()
         # Start countdown display for min-exposure (interspersed/custom modes).
         min_sec = self.controller.min_cue_seconds()
         if min_sec > 0 and self.context.config.show_min_exposure_hint:
@@ -624,9 +633,11 @@ class ExposureScreen(QWidget):
             return
         if not self.controller.should_prompt_vas():
             return  # neutral cue in interspersed/custom mode — skip VAS
-        # Defer VAS until the video has played fully at least once.
+        # Defer VAS until the video has played fully at least once (if configured).
         cue = self.controller.current_cue()
-        if cue and cue.media_type == "video" and not self.cue_view.video_has_played_once():
+        if (cue and cue.media_type == "video"
+                and self.context.config.video_wait_full_loop
+                and not self.cue_view.video_has_played_once()):
             return  # wait for at least one full video loop
         self._open_periodic_vas()
 

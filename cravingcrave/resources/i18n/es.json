@@ -546,6 +546,8 @@
   "settings.pause_video_on_rating": "Pausar video al calificar deseo",
   "settings.video_loop": "Reproducir videos en bucle (predeterminado)",
   "settings.max_cue_exposure_sec": "Tiempo máx. de exposición por señal (seg, 0 = desactivado)",
+  "settings.video_wait_full_loop": "Esperar a que el video se reproduzca completo antes de calificar",
+  "settings.interspersed_vas_delay": "Retraso antes de calificación automática en señales de deseo (ms)",
   "settings.show_min_exposure_hint": "Mostrar cuenta regresiva discreta durante espera mínima",
 
   "wizard.button": "Asistente de configuración",

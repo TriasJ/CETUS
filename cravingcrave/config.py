@@ -71,7 +71,8 @@ class AppConfig:
     # Video behavior during exposure.
     pause_video_on_rating: bool = True        # pause video when VAS/coping/gallery opens
     video_loop: bool = True                   # videos loop indefinitely; False = play once
-    max_cue_exposure_sec: int = 0             # 0 = off; >0 = force VAS/advance after N seconds
+    video_wait_full_loop: bool = True         # wait for video to play fully once before VAS
+    max_cue_exposure_sec: int = 0             # 0 = off; >0 = force VAS/advance after N seconds (cuts video)
 
     # Per-session run defaults (also overridable per session in the Parameters popup).
     default_random_order: bool = False         # randomize the cue order
@@ -111,6 +112,7 @@ class AppConfig:
     interspersed_craving_count: int = 0            # 0 = use pct; >0 = exact count overrides pct
     interspersed_min_exposure_sec: int = 5         # min seconds each cue is shown before advance
     interspersed_vas_on_neutral: bool = False      # prompt VAS on neutral cues?
+    interspersed_vas_delay_ms: int = 500          # ms delay before auto-VAS on craving cues (0 = immediate)
 
     # Dynamic neutral increase: when enabled in interspersed/custom mode, extra
     # neutral cues are inserted after a craving cue until the patient's craving
