@@ -226,6 +226,7 @@ class ExposureScreen(QWidget):
         self._downreg_timer.setInterval(1000)  # tick every second for smooth ramping
         self._downreg_timer.timeout.connect(self._on_downreg_tick)
         self._downreg_floor = 0
+        self._downreg_craving_sec = 0  # craving-cue-only elapsed time for progressive regulation
 
         # Min-exposure countdown display timer (1s ticks).
         self._countdown_timer = QTimer(self)
@@ -456,6 +457,7 @@ class ExposureScreen(QWidget):
             self._per_cue_timer.start()
         if self.context.config.progressive_downreg_enabled:
             self._downreg_floor = 0
+            self._downreg_craving_sec = 0
             self._enforce_downreg_floor()
             self._downreg_timer.start()
 
@@ -722,12 +724,17 @@ class ExposureScreen(QWidget):
         self._open_periodic_vas()
 
     # --- progressive down-regulation ----------------------------------------
+    # Progressive regulation only runs on craving cues. Time spent on neutral
+    # cues does NOT count toward the progression — the timer is effectively
+    # frozen during neutral display. This is tracked via _downreg_craving_sec.
+
     def _compute_downreg_value(self) -> int:
-        """Current progressive floor percentage (0 … target)."""
+        """Current progressive floor percentage based on craving-cue time only."""
         cfg = self.context.config
         if not cfg.progressive_downreg_enabled:
             return 0
-        elapsed = self.controller.elapsed_sec()
+        # Use craving-cue-only elapsed time, not total session time.
+        elapsed = self._downreg_craving_sec
         target = cfg.progressive_downreg_target_pct
         cap = cfg.session_time_cap_seconds
         if cap <= 0:
@@ -742,14 +749,16 @@ class ExposureScreen(QWidget):
         return int(min(target, current_step * step_value))
 
     def _on_downreg_tick(self) -> None:
-        # Progressive down-regulation should not affect neutral cues — the patient
-        # should see neutral images at full clarity (no blur/dim/shrink floor).
         cue = self.controller.current_cue()
         if cue and cue.is_neutral:
+            # Neutral cue: don't accumulate craving time, remove any floor so
+            # the patient sees the neutral image at full clarity.
             if self._downreg_floor != 0:
                 self._downreg_floor = 0
                 self.intensity.reset()
             return
+        # Craving cue: accumulate 1 second of craving-cue exposure time.
+        self._downreg_craving_sec += 1
         new_floor = self._compute_downreg_value()
         if new_floor == self._downreg_floor:
             return
