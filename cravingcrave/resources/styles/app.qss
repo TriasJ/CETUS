@@ -66,49 +66,19 @@ QLineEdit, QComboBox, QPlainTextEdit, QTextEdit {
     selection-background-color: #2a9d8f;
     selection-color: #ffffff;
 }
-/* Spinboxes: border-radius on the parent clips Qt's native arrow buttons into dots,
-   so we style the sub-controls explicitly with text-based arrows (▲ ▼). */
+/* Spinboxes: use border-radius:0 so Qt's NATIVE up/down arrows render without
+   clipping.  Rounded corners (4px+) on the parent widget clip the right-side
+   buttons into dots because the sub-control corners are outside the radius curve.
+   With 0 radius the native arrows scale correctly at every DPI and resolution.
+   We keep the rest of the styling (background, border, padding) consistent. */
 QSpinBox, QDoubleSpinBox {
     background-color: #ffffff;
     border: 1px solid #c5ced6;
-    border-radius: 4px;
-    padding: 4px 8px;
-    padding-right: 24px;
+    border-radius: 0px;
+    padding: 6px 10px;
     min-height: 26px;
     selection-background-color: #2a9d8f;
     selection-color: #ffffff;
-}
-QSpinBox::up-button, QDoubleSpinBox::up-button {
-    subcontrol-origin: border;
-    subcontrol-position: top right;
-    width: 22px;
-    border-left: 1px solid #c5ced6;
-    border-top-right-radius: 4px;
-    background: #f0f3f6;
-}
-QSpinBox::down-button, QDoubleSpinBox::down-button {
-    subcontrol-origin: border;
-    subcontrol-position: bottom right;
-    width: 22px;
-    border-left: 1px solid #c5ced6;
-    border-bottom-right-radius: 4px;
-    background: #f0f3f6;
-}
-QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
-QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
-    background: #e0e6ec;
-}
-QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
-    width: 0; height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid #4a5568;
-}
-QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
-    width: 0; height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid #4a5568;
 }
 QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QPlainTextEdit:focus {
     border: 1px solid #2a9d8f;
