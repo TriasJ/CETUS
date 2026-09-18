@@ -584,5 +584,12 @@
   "wizard.view_references": "View references",
   "wizard.summary_differs": "Changed from default",
   "wizard.first_time": "This is the first session for this patient. The setup wizard will help configure optimal parameters based on clinical evidence.",
-  "wizard.no_cues_warning": "No cues are assigned to this patient. Configure cues before starting a session."
+  "wizard.no_cues_warning": "No cues are assigned to this patient. Configure cues before starting a session.",
+
+  "wizard.interspersed_evidence": "Standard cue-reactivity paradigms use 5–10% craving cues among neutrals. Clinical exposure typically uses fewer craving cues than research protocols.",
+  "wizard.habituation_group": "Habituation criterion",
+  "wizard.coping_group": "Coping skills (USCS)",
+  "wizard.coping_threshold_label": "Craving threshold",
+  "wizard.coping_consecutive_label": "Consecutive high ratings",
+  "wizard.dynamic_evidence": "When craving remains elevated, extending neutral cue runs provides a natural cooling-off period before the next craving cue."
 }

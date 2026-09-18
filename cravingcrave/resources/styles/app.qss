@@ -57,12 +57,24 @@ QPushButton#Panic:hover { background-color: #c92f3b; }
 
 QPushButton#Danger { color: #c92f3b; border-color: #e6a3a8; }
 
-QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QPlainTextEdit, QTextEdit {
+QLineEdit, QComboBox, QPlainTextEdit, QTextEdit {
     background-color: #ffffff;
     border: 1px solid #c5ced6;
     border-radius: 8px;
     padding: 6px 10px;
     min-height: 26px;              /* enough interior height so text is never clipped */
+    selection-background-color: #2a9d8f;
+    selection-color: #ffffff;
+}
+/* Spinboxes: smaller border-radius so the native +/- arrow buttons are not clipped
+   by rounded corners. The large radius (8px) on the parent widget clips the right-side
+   buttons into dots; 4px keeps the rounded look without hiding the arrows. */
+QSpinBox, QDoubleSpinBox {
+    background-color: #ffffff;
+    border: 1px solid #c5ced6;
+    border-radius: 4px;
+    padding: 6px 10px;
+    min-height: 26px;
     selection-background-color: #2a9d8f;
     selection-color: #ffffff;
 }

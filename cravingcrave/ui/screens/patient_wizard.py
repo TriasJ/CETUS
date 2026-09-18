@@ -208,9 +208,7 @@ class _CuePage(QWizardPage):
         self.craving_pct.setValue(context.config.interspersed_craving_pct)
         inter_form.addRow(tr("setup.interspersed_pct"), self.craving_pct)
         inter_evidence = _evidence_label(
-            "Standard cue-reactivity paradigms use 5–10% craving cues among neutrals "
-            + _cite_short(citations, 10, 11)
-            + ". Clinical exposure typically uses fewer craving cues than research protocols.")
+            tr("wizard.interspersed_evidence") + " " + _cite_short(citations, 10, 11))
         inter_form.addRow(inter_evidence)
 
         self.warning = QLabel(tr("wizard.no_cues_warning"))
@@ -278,7 +276,7 @@ class _TimingPage(QWizardPage):
         timing_form.addRow(self.pause_video)
 
         # Habituation
-        hab_box = QGroupBox(tr("habituacion" if tr("habituacion") != "habituacion" else "wizard.page4_title"))
+        hab_box = QGroupBox(tr("wizard.habituation_group"))
         hab_form = QFormLayout(hab_box)
         self.threshold = QSpinBox()
         self.threshold.setRange(0, 10)
@@ -333,7 +331,7 @@ class _SafetyPage(QWizardPage):
         contacts_form.addRow(tr("settings.crisis_line"), self.crisis_line)
         contacts_form.addRow(tr("settings.emergency"), self.emergency)
 
-        coping_box = QGroupBox(tr("uscs.title") if tr("uscs.title") != "uscs.title" else "USCS")
+        coping_box = QGroupBox(tr("wizard.coping_group"))
         coping_form = QFormLayout(coping_box)
         self.auto_coping = QCheckBox(tr("settings.auto_coping_enabled"))
         self.auto_coping.setChecked(True)
@@ -344,8 +342,8 @@ class _SafetyPage(QWizardPage):
         self.coping_consecutive.setRange(1, 10)
         self.coping_consecutive.setValue(3)
         coping_form.addRow(self.auto_coping)
-        coping_form.addRow(tr("settings.auto_coping_threshold") if tr("settings.auto_coping_threshold") != "settings.auto_coping_threshold" else "Threshold", self.coping_threshold)
-        coping_form.addRow("Consecutive", self.coping_consecutive)
+        coping_form.addRow(tr("wizard.coping_threshold_label"), self.coping_threshold)
+        coping_form.addRow(tr("wizard.coping_consecutive_label"), self.coping_consecutive)
         coping_form.addRow(_evidence_label(
             tr("wizard.coping_recommendation") + " " + _cite_short(citations, 1, 2)))
 
@@ -359,9 +357,7 @@ class _SafetyPage(QWizardPage):
         neutral_form.addRow(self.dynamic_neutral)
         neutral_form.addRow(tr("setup.dynamic_neutral_threshold"), self.dynamic_threshold)
         neutral_form.addRow(_evidence_label(
-            "When craving remains elevated, extending neutral cue runs provides a "
-            "natural cooling-off period before the next craving cue "
-            + _cite_short(citations, 8) + "."))
+            tr("wizard.dynamic_evidence") + " " + _cite_short(citations, 8)))
 
         v = QVBoxLayout(self)
         v.addWidget(contacts_box)
@@ -478,7 +474,11 @@ class PatientWizard(QWizard):
         self.setWindowTitle(tr("wizard.title"))
         self.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         sw, sh = screen_size()
-        self.setMinimumSize(min(680, sw - 40), min(560, sh - 40))
+        # Open at 75% of screen size (comfortable reading), capped at 820×660.
+        w = min(820, max(600, int(sw * 0.75)))
+        h = min(660, max(480, int(sh * 0.75)))
+        self.resize(w, h)
+        self.setMinimumSize(min(600, sw - 40), min(480, sh - 40))
         self.setOption(QWizard.WizardOption.NoBackButtonOnStartPage, True)
 
         self._profile = _ProfilePage(context, patient)

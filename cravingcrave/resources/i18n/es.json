@@ -584,5 +584,12 @@
   "wizard.view_references": "Ver referencias",
   "wizard.summary_differs": "Diferente del valor predeterminado",
   "wizard.first_time": "Esta es la primera sesión para este paciente. El asistente de configuración ayudará a establecer los parámetros óptimos basados en evidencia clínica.",
-  "wizard.no_cues_warning": "No hay señales asignadas a este paciente. Configura las señales antes de iniciar una sesión."
+  "wizard.no_cues_warning": "No hay señales asignadas a este paciente. Configura las señales antes de iniciar una sesión.",
+
+  "wizard.interspersed_evidence": "Los paradigmas estándar de reactividad a señales usan 5–10% de señales de deseo entre neutras. La exposición clínica típicamente usa menos señales de deseo que los protocolos de investigación.",
+  "wizard.habituation_group": "Criterio de habituación",
+  "wizard.coping_group": "Habilidades de afrontamiento (USCS)",
+  "wizard.coping_threshold_label": "Umbral de deseo",
+  "wizard.coping_consecutive_label": "Calificaciones altas consecutivas",
+  "wizard.dynamic_evidence": "Cuando el deseo permanece elevado, extender las secuencias de señales neutras proporciona un período de enfriamiento natural antes de la siguiente señal de deseo."
 }
