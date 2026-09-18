@@ -104,10 +104,14 @@ def main() -> int:
     apply_theme(app, config.theme)
     i18n.set_locale(config.locale)
     window = MainWindow(context)
-    window.show()
     if splash is not None:
-        # Keep the splash up briefly for a smooth launch even when the DB loads instantly.
-        QTimer.singleShot(800, lambda: splash.finish(window))
+        # Keep the splash visible while the DB loads; show the main window only after
+        # the splash finishes so the login screen doesn't cover the launch screen.
+        splash.raise_()
+        app.processEvents()
+        QTimer.singleShot(1200, lambda: (splash.finish(window), window.show()))
+    else:
+        window.show()
     return app.exec()
 
 
