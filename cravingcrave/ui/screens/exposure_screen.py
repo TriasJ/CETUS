@@ -709,7 +709,14 @@ class ExposureScreen(QWidget):
 
     # --- per-cue dwell timer ------------------------------------------------
     def _on_per_cue_timeout(self) -> None:
-        """Per-cue dwell timer fired: prompt craving for this specific cue."""
+        """Per-cue dwell timer fired: prompt craving for this specific cue.
+
+        Only active in Intense and Custom modes. In Interspersed mode, VAS is
+        auto-prompted on each craving cue via _load_cue(), so the per-cue dwell
+        timer is redundant and disabled.
+        """
+        if self.controller.mode == "interspersed":
+            return  # interspersed mode uses auto-VAS on craving cues instead
         if not self.controller.should_prompt_vas():
             return  # neutral cue — skip VAS
         self._open_periodic_vas()
@@ -735,6 +742,14 @@ class ExposureScreen(QWidget):
         return int(min(target, current_step * step_value))
 
     def _on_downreg_tick(self) -> None:
+        # Progressive down-regulation should not affect neutral cues — the patient
+        # should see neutral images at full clarity (no blur/dim/shrink floor).
+        cue = self.controller.current_cue()
+        if cue and cue.is_neutral:
+            if self._downreg_floor != 0:
+                self._downreg_floor = 0
+                self.intensity.reset()
+            return
         new_floor = self._compute_downreg_value()
         if new_floor == self._downreg_floor:
             return

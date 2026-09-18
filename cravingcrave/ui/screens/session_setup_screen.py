@@ -208,10 +208,19 @@ class SessionSetupScreen(QWidget):
             cue_reactivity=reactivity)
 
     def _positive_paths(self) -> list[str]:
+        """Positive/recovery images for the gallery overlay.
+
+        In Intense mode, neutral images are included alongside positive images
+        so the gallery provides a full-screen visual break with non-craving stimuli.
+        """
         paths = [m.absolute_path for m in self.context.media.by_category("positive")]
         for c in self.context.repos.cues.list_for_patient(self.patient.id):
             if c.is_personal_reason:
                 paths.append(str(self.context.media.absolute(c.media_path)))
+        # In intense mode, include neutral images as full-screen visual breaks.
+        mode = self.mode_selector.currentData()
+        if mode == "intense":
+            paths.extend(m.absolute_path for m in self.context.media.by_category("neutral"))
         return paths
 
     def _on_mode_changed(self) -> None:

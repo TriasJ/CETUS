@@ -185,12 +185,12 @@ class SessionController(QObject):
         still above the threshold.  The exposure screen should keep showing
         neutral cues until this returns False.
 
-        Only active when ``dynamic_neutral_enabled`` is True and the session
-        mode is interspersed or custom.
+        Available in all session modes when ``dynamic_neutral_enabled`` is True.
+        In Intense mode this requires neutral cues in the playlist (added via
+        the gallery or as filler); in Interspersed/Custom mode they are already
+        part of the playlist.
         """
         if not self.config.dynamic_neutral_enabled:
-            return False
-        if self.mode not in (SessionMode.INTERSPERSED.value, SessionMode.CUSTOM.value):
             return False
         if not self._values:
             return False
