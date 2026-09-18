@@ -481,6 +481,12 @@ class PatientWizard(QWizard):
         self.setMinimumSize(min(600, sw - 40), min(480, sh - 40))
         self.setOption(QWizard.WizardOption.NoBackButtonOnStartPage, True)
 
+        # Override QWizard's built-in English button labels with translated text.
+        self.setButtonText(QWizard.WizardButton.BackButton, tr("common.back"))
+        self.setButtonText(QWizard.WizardButton.NextButton, tr("common.next"))
+        self.setButtonText(QWizard.WizardButton.FinishButton, tr("common.finish"))
+        self.setButtonText(QWizard.WizardButton.CancelButton, tr("common.cancel"))
+
         self._profile = _ProfilePage(context, patient)
         self._mode = _ModePage(context, self._citations)
         self._cue = _CuePage(context, patient, self._citations)
