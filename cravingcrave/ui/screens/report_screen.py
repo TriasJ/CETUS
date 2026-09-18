@@ -58,6 +58,7 @@ from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
+from ..responsive import adaptive_margins
 
 _log = logging.getLogger(__name__)
 
@@ -159,17 +160,20 @@ class ReportScreen(QWidget):
         export_dwell = QPushButton(tr("report.export_dwell_csv"))
         export_dwell.setIcon(emoji_icon("\U0001F4CA"))
         export_dwell.clicked.connect(self._export_dwell_csv)
-        actions = QHBoxLayout()
-        actions.addWidget(self.include_notes); actions.addStretch(1)
-        actions.addWidget(export_dwell); actions.addWidget(export_png)
-        actions.addWidget(export_coping)
-        actions.addWidget(export_pdf); actions.addWidget(export_pdf_full)
+        actions_top = QHBoxLayout()
+        actions_top.addWidget(self.include_notes); actions_top.addStretch(1)
+        actions_top.addWidget(export_dwell); actions_top.addWidget(export_png)
+        actions_bot = QHBoxLayout()
+        actions_bot.addStretch(1)
+        actions_bot.addWidget(export_coping)
+        actions_bot.addWidget(export_pdf); actions_bot.addWidget(export_pdf_full)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 24, 36, 24)
+        layout.setContentsMargins(*adaptive_margins())
         layout.addLayout(header)
         layout.addWidget(self.tabs, 1)
-        layout.addLayout(actions)
+        layout.addLayout(actions_top)
+        layout.addLayout(actions_bot)
 
         self._populate()
 
@@ -412,33 +416,39 @@ class ReportScreen(QWidget):
 
     # ---- cross-session tab -------------------------------------------------
     def _build_progress_tab(self) -> QWidget:
-        w = QWidget(); v = QVBoxLayout(w)
+        inner = QWidget()
+        v = QVBoxLayout(inner)
 
         v.addWidget(QLabel(tr("patient.progress")))
         self.trends_view = QChartView(); self.trends_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        self.trends_view.setMinimumHeight(220)
+        self.trends_view.setMinimumHeight(160)
         v.addWidget(self.trends_view, 1)
 
         v.addWidget(QLabel(tr("report.slope_trend")))
         self.slope_view = QChartView(); self.slope_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        self.slope_view.setMinimumHeight(160)
+        self.slope_view.setMinimumHeight(120)
         v.addWidget(self.slope_view, 1)
 
         v.addWidget(QLabel(tr("report.recovery_trend")))
         self.recovery_view = QChartView(); self.recovery_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        self.recovery_view.setMinimumHeight(160)
+        self.recovery_view.setMinimumHeight(120)
         v.addWidget(self.recovery_view, 1)
 
         bottom = QHBoxLayout()
-        self.skills_view = QChartView(); self.skills_view.setMinimumHeight(180)
+        self.skills_view = QChartView(); self.skills_view.setMinimumHeight(140)
         self.skills_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        self.reasons_view = QChartView(); self.reasons_view.setMinimumHeight(180)
+        self.reasons_view = QChartView(); self.reasons_view.setMinimumHeight(140)
         self.reasons_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         left = QVBoxLayout(); left.addWidget(QLabel(tr("report.coping_mix"))); left.addWidget(self.skills_view, 1)
         right = QVBoxLayout(); right.addWidget(QLabel(tr("report.end_reasons"))); right.addWidget(self.reasons_view, 1)
         bottom.addLayout(left, 1); bottom.addLayout(right, 1)
         v.addLayout(bottom, 1)
-        return w
+
+        scroll = QScrollArea()
+        scroll.setWidget(inner)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        return scroll
 
     def _populate(self) -> None:
         sessions = self._finished_sessions()

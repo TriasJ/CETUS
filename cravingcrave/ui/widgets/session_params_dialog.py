@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
 )
 
 from ...services.i18n import tr
+from ..responsive import adaptive_dialog_width
 
 
 class SessionParamsDialog(QDialog):
@@ -30,7 +31,7 @@ class SessionParamsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle(tr("setup.params_title"))
         self.setModal(True)
-        self.setMinimumWidth(540)   # wide enough for the full-length toggle labels
+        self.setMinimumWidth(adaptive_dialog_width())
 
         # Cue-ordering flags (per-session, not AppConfig fields).
         self.random_order = QCheckBox(tr("setup.random_order"))
@@ -47,18 +48,19 @@ class SessionParamsDialog(QDialog):
         self.autoscroll_on_grading = QCheckBox(tr("settings.autoscroll_on_grading"))
         self.autoscroll_on_grading.setChecked(config.autoscroll_on_grading)
         self.autoscroll_timed = QSpinBox(); self.autoscroll_timed.setRange(0, 600)
-        self.autoscroll_timed.setSuffix(" s"); self.autoscroll_timed.setMinimumWidth(120)
+        _spin_w = 80 if adaptive_dialog_width() < 480 else 120
+        self.autoscroll_timed.setSuffix(" s"); self.autoscroll_timed.setMinimumWidth(_spin_w)
         self.autoscroll_timed.setValue(config.autoscroll_timed_seconds)
         self.accessibility = QCheckBox(tr("settings.accessibility_kbmode"))
         self.accessibility.setChecked(config.accessibility_kbmode)
         self.time_cap = QSpinBox(); self.time_cap.setRange(1, 120)
-        self.time_cap.setSuffix(" min"); self.time_cap.setMinimumWidth(120)
+        self.time_cap.setSuffix(" min"); self.time_cap.setMinimumWidth(_spin_w)
         self.time_cap.setValue(config.session_time_cap_seconds // 60)
         self.start_fullscreen = QCheckBox(tr("setup.start_fullscreen"))
 
         # Per-cue craving prompt
         self.vas_per_cue = QSpinBox(); self.vas_per_cue.setRange(0, 600)
-        self.vas_per_cue.setSuffix(" s"); self.vas_per_cue.setMinimumWidth(120)
+        self.vas_per_cue.setSuffix(" s"); self.vas_per_cue.setMinimumWidth(_spin_w)
         self.vas_per_cue.setValue(config.vas_prompt_per_cue_seconds)
 
         # Interspersed-mode: measure craving on neutral cues too?
@@ -70,14 +72,14 @@ class SessionParamsDialog(QDialog):
         self.dynamic_neutral.setChecked(config.dynamic_neutral_enabled)
         self.dynamic_neutral.setToolTip(tr("setup.dynamic_neutral_hint"))
         self.dynamic_threshold = QSpinBox(); self.dynamic_threshold.setRange(1, 10)
-        self.dynamic_threshold.setMinimumWidth(120)
+        self.dynamic_threshold.setMinimumWidth(_spin_w)
         self.dynamic_threshold.setValue(config.dynamic_neutral_threshold)
 
         # Progressive down-regulation
         self.progressive_enabled = QCheckBox(tr("settings.progressive_enabled"))
         self.progressive_enabled.setChecked(config.progressive_downreg_enabled)
         self.progressive_target = QSpinBox(); self.progressive_target.setRange(1, 100)
-        self.progressive_target.setSuffix(" %"); self.progressive_target.setMinimumWidth(120)
+        self.progressive_target.setSuffix(" %"); self.progressive_target.setMinimumWidth(_spin_w)
         self.progressive_target.setValue(config.progressive_downreg_target_pct)
 
         # Auto-coping

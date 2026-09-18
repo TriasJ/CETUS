@@ -22,6 +22,7 @@ from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
+from ..responsive import adaptive_card_margins, adaptive_margins
 from ..widgets.craving_chart import CravingChart
 
 _log = logging.getLogger(__name__)
@@ -62,7 +63,7 @@ class SummaryScreen(QWidget):
 
         card = QFrame(); card.setObjectName("Card")
         form = QFormLayout(card)
-        form.setContentsMargins(24, 20, 24, 20)
+        form.setContentsMargins(*adaptive_card_margins())
         form.setSpacing(10)
         form.addRow(tr("summary.baseline"), QLabel(str(base if base is not None else "—")))
         form.addRow(tr("summary.peak"), QLabel(str(session.peak_vas if session.peak_vas is not None else "—")))
@@ -83,7 +84,7 @@ class SummaryScreen(QWidget):
         curve_label = QLabel(tr("summary.curve"))
         curve_label.setObjectName("H2")
         chart = CravingChart(context.config.vas_max)
-        chart.setMinimumHeight(260)
+        chart.setMinimumHeight(180)
         ratings = context.repos.ratings.list_for_session(session.id)
         chart.set_points([(float(r.elapsed_sec), float(r.value)) for r in ratings])
 
@@ -118,7 +119,7 @@ class SummaryScreen(QWidget):
         body.addLayout(right, 1)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 24, 36, 24)
+        layout.setContentsMargins(*adaptive_margins())
         layout.addWidget(title)
         layout.addLayout(body, 1)
         layout.addLayout(buttons)

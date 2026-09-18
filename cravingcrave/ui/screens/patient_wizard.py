@@ -32,6 +32,7 @@ from PySide6.QtWidgets import (
 from ... import paths
 from ...services.i18n import tr
 from ..context import AppContext
+from ..responsive import screen_size
 
 # ---------------------------------------------------------------------------
 # Citation helpers
@@ -476,7 +477,8 @@ class PatientWizard(QWizard):
 
         self.setWindowTitle(tr("wizard.title"))
         self.setWizardStyle(QWizard.WizardStyle.ModernStyle)
-        self.setMinimumSize(680, 560)
+        sw, sh = screen_size()
+        self.setMinimumSize(min(680, sw - 40), min(560, sh - 40))
         self.setOption(QWizard.WizardOption.NoBackButtonOnStartPage, True)
 
         self._profile = _ProfilePage(context, patient)

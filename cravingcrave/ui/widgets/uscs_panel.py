@@ -28,7 +28,7 @@ class UscsPanel(Overlay):
 
         card = QWidget(self)
         card.setObjectName("OverlayCard")
-        card.setMinimumWidth(560)
+        card.setMinimumWidth(400)
 
         self._step_label = QLabel("")
         self._step_label.setObjectName("Muted")
@@ -53,7 +53,7 @@ class UscsPanel(Overlay):
         buttons.addWidget(self._next_btn)
 
         inner = QVBoxLayout(card)
-        inner.setContentsMargins(34, 28, 34, 28)
+        inner.setContentsMargins(20, 18, 20, 18)
         inner.setSpacing(14)
         inner.addWidget(self._step_label)
         inner.addWidget(self._title)

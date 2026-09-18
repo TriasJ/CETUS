@@ -42,6 +42,7 @@ from ...services.i18n import available_locales, current_locale, tr
 from .. import hotkeys, theme
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
+from ..responsive import adaptive_margins, adaptive_nav_width, screen_size
 from ..widgets.key_capture_button import KeyCaptureButton
 
 _NAV_INK = "#2f5d63"       # dark teal for an unselected row (on white)
@@ -154,7 +155,7 @@ class SettingsScreen(QWidget):
 
         # Left navigation (icons) drives the right-hand stacked pages.
         self.nav = QListWidget(); self.nav.setObjectName("SettingsNav")
-        self.nav.setFixedWidth(200)
+        self.nav.setFixedWidth(adaptive_nav_width())
         self.nav.setIconSize(QSize(24, 24))
         self.nav.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.stack = QStackedWidget()
@@ -185,7 +186,7 @@ class SettingsScreen(QWidget):
         save_row = QHBoxLayout(); save_row.addStretch(1); save_row.addWidget(save)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 24, 36, 20)
+        layout.setContentsMargins(*adaptive_margins())
         layout.addLayout(header)
         layout.addLayout(body, 1)
         layout.addLayout(save_row)
@@ -208,7 +209,7 @@ class SettingsScreen(QWidget):
         for c in cards:
             col.addWidget(c)
         col.addStretch(1)
-        content.setMaximumWidth(860)
+        content.setMaximumWidth(min(860, screen_size()[0] - adaptive_nav_width() - 80))
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)

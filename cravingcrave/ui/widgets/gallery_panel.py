@@ -31,7 +31,7 @@ class GalleryPanel(Overlay):
 
         card = QWidget(self)
         card.setObjectName("OverlayCard")
-        card.setMinimumSize(640, 520)
+        card.setMinimumSize(400, 320)
 
         title = QLabel(tr("gallery.title"))
         title.setObjectName("H2")
@@ -41,7 +41,7 @@ class GalleryPanel(Overlay):
 
         self._image = QLabel("")
         self._image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._image.setMinimumSize(580, 360)
+        self._image.setMinimumSize(300, 200)
         self._image.setStyleSheet("background:#0e1418; border-radius:10px; color:#eef2f5;")
 
         prev = QPushButton(tr("gallery.prev"))

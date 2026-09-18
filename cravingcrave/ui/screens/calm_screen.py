@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLay
 
 from ...services.i18n import tr
 from ..context import AppContext
+from ..responsive import adaptive_card_margins
 
 _BREATH_CYCLE = [
     ("calm.breathe_in", 4000),
@@ -39,7 +40,7 @@ class CalmScreen(QWidget):
         contacts = QFrame()
         contacts.setStyleSheet("background:#ffffff; border-radius:16px;")
         c = QVBoxLayout(contacts)
-        c.setContentsMargins(28, 22, 28, 22)
+        c.setContentsMargins(*adaptive_card_margins())
         for label_key, value in (
             ("calm.therapist", info.therapist_phone),
             ("calm.crisis", info.crisis_line),

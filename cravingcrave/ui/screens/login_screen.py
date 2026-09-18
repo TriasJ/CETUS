@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
 from ...services.i18n import available_locales, current_locale, tr
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
+from ..responsive import adaptive_card_margins, adaptive_card_max_width
 from .admin_dialog import AdminDialog
 
 
@@ -31,7 +32,7 @@ class LoginScreen(QWidget):
 
         card = QFrame()
         card.setObjectName("Card")
-        card.setMaximumWidth(460)
+        card.setMaximumWidth(adaptive_card_max_width())
 
         title = QLabel(tr("app.title"))
         title.setObjectName("H1")
@@ -75,7 +76,7 @@ class LoginScreen(QWidget):
         self.password.returnPressed.connect(self._submit)
 
         inner = QVBoxLayout(card)
-        inner.setContentsMargins(34, 30, 34, 30)
+        inner.setContentsMargins(*adaptive_card_margins())
         inner.setSpacing(16)
         inner.addWidget(title)
         inner.addWidget(subtitle)

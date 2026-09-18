@@ -35,9 +35,11 @@ class MainWindow(QMainWindow):
     def __init__(self, context: AppContext) -> None:
         super().__init__()
         self.context = context
+        from .responsive import adaptive_min_window
         self.setWindowTitle(tr("app.title"))
-        self.resize(1180, 760)
-        self.setMinimumSize(960, 640)
+        min_w, min_h = adaptive_min_window()
+        self.resize(max(1180, min_w), max(760, min_h))
+        self.setMinimumSize(min_w, min_h)
 
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)

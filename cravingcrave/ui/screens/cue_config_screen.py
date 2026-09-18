@@ -14,12 +14,14 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
+    QFrame,
     QHBoxLayout,
     QLabel,
     QListWidget,
     QListWidgetItem,
     QMessageBox,
     QPushButton,
+    QScrollArea,
     QVBoxLayout,
     QWidget,
 )
@@ -30,6 +32,7 @@ from ...services.cue_weights import CueWeightLookup
 from ...services.i18n import tr
 from ...services.media_library import media_type_for
 from ..context import AppContext
+from ..responsive import adaptive_dialog_width, adaptive_margins
 
 # Auxiliary (non-substance) media folders shown in the library picker.
 _AUX_CATEGORY_KEYS = {"positive": "substance.positive", "sounds": "substance.sounds"}
@@ -49,7 +52,7 @@ class _LibraryDialog(QDialog):
         super().__init__(parent)
         self.context = context
         self.setWindowTitle(tr("cueconfig.add_from_library"))
-        self.setMinimumSize(460, 420)
+        self.setMinimumSize(min(460, adaptive_dialog_width()), 380)
 
         self.category = QComboBox()
         for cat in self.context.media.category_folders():
@@ -143,20 +146,28 @@ class CueConfigScreen(QWidget):
             buttons += [suggest, export_order]
         buttons += [toggle_en, toggle_pos, enable_all, disable_all, delete]
 
-        side = QVBoxLayout()
+        side_widget = QWidget()
+        side_layout = QVBoxLayout(side_widget)
+        side_layout.setContentsMargins(0, 0, 0, 0)
         for b in buttons:
-            side.addWidget(b)
-        side.addStretch(1)
+            side_layout.addWidget(b)
+        side_layout.addStretch(1)
+        side_scroll = QScrollArea()
+        side_scroll.setWidget(side_widget)
+        side_scroll.setWidgetResizable(True)
+        side_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        side_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        side_scroll.setMaximumWidth(180)
 
         body = QHBoxLayout()
         left = QVBoxLayout()
         left.addWidget(self.empty)
         left.addWidget(self.list, 1)
         body.addLayout(left, 1)
-        body.addLayout(side)
+        body.addWidget(side_scroll)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 24, 36, 24)
+        layout.setContentsMargins(*adaptive_margins())
         layout.addLayout(header)
         layout.addWidget(intro)
         layout.addLayout(body, 1)
@@ -315,7 +326,7 @@ class CueConfigScreen(QWidget):
             return
         dlg = QDialog(self)
         dlg.setWindowTitle(tr("cueconfig.edit_weight"))
-        dlg.setMinimumWidth(360)
+        dlg.setMinimumWidth(min(360, adaptive_dialog_width()))
         form = QFormLayout()
         path_label = QLabel(f"<b>{Path(cue.media_path).name}</b>")
         weight_spin = QDoubleSpinBox()
@@ -385,7 +396,7 @@ class CueConfigScreen(QWidget):
             return
 
         dlg = QDialog(self); dlg.setWindowTitle(tr("cueconfig.suggest_order"))
-        dlg.setMinimumWidth(560)
+        dlg.setMinimumWidth(min(560, adaptive_dialog_width()))
         v = QVBoxLayout(dlg)
         intro = QLabel(tr("cueconfig.suggest_intro")); intro.setWordWrap(True)
         v.addWidget(intro)

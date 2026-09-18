@@ -25,6 +25,7 @@ from ...services import export
 from ...services.i18n import tr
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
+from ..responsive import adaptive_margins
 from .patient_form import PatientFormDialog
 
 _log = logging.getLogger(__name__)
@@ -82,14 +83,17 @@ class PatientScreen(QWidget):
         wizard_btn.setIcon(emoji_icon("🧙")); wizard_btn.setIconSize(QSize(20, 20))
         wizard_btn.clicked.connect(self._run_wizard)
 
-        actions = QHBoxLayout()
-        actions.addWidget(cfg_btn)
-        actions.addWidget(wizard_btn)
-        actions.addWidget(start_btn)
-        actions.addStretch(1)
-        actions.addWidget(report_btn)
-        actions.addWidget(export_btn)
-        actions.addWidget(archive_btn)
+        actions_primary = QHBoxLayout()
+        actions_primary.addWidget(cfg_btn)
+        actions_primary.addWidget(wizard_btn)
+        actions_primary.addWidget(start_btn)
+        actions_primary.addStretch(1)
+
+        actions_secondary = QHBoxLayout()
+        actions_secondary.addStretch(1)
+        actions_secondary.addWidget(report_btn)
+        actions_secondary.addWidget(export_btn)
+        actions_secondary.addWidget(archive_btn)
 
         history_label = QLabel(tr("patient.history"))
         history_label.setObjectName("H2")
@@ -115,10 +119,11 @@ class PatientScreen(QWidget):
         body.addLayout(right, 1)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 24, 36, 24)
+        layout.setContentsMargins(*adaptive_margins())
         layout.addLayout(header)
-        layout.addLayout(actions)
-        layout.addSpacing(8)
+        layout.addLayout(actions_primary)
+        layout.addLayout(actions_secondary)
+        layout.addSpacing(4)
         layout.addLayout(body, 1)
 
         self._refresh()

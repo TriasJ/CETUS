@@ -17,6 +17,7 @@ from ...services import substances as subs
 from ...services.i18n import tr
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
+from ..responsive import adaptive_margins
 from .add_clinician_dialog import AddClinicianDialog
 from .patient_form import PatientFormDialog
 
@@ -54,11 +55,15 @@ class DashboardScreen(QWidget):
         head_text.addWidget(welcome)
         header.addLayout(head_text)
         header.addStretch(1)
-        header.addWidget(add_clinician_btn)
-        header.addWidget(admin_btn)
-        header.addWidget(help_btn)
-        header.addWidget(settings_btn)
-        header.addWidget(logout_btn)
+
+        # Toolbar row — separated from header to avoid clipping at low res.
+        toolbar = QHBoxLayout()
+        toolbar.addWidget(add_clinician_btn)
+        toolbar.addWidget(admin_btn)
+        toolbar.addStretch(1)
+        toolbar.addWidget(help_btn)
+        toolbar.addWidget(settings_btn)
+        toolbar.addWidget(logout_btn)
 
         section = QLabel(tr("dashboard.patients"))
         section.setObjectName("H2")
@@ -82,9 +87,10 @@ class DashboardScreen(QWidget):
         open_btn.clicked.connect(self._open_selected)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 28, 36, 28)
+        layout.setContentsMargins(*adaptive_margins())
         layout.addLayout(header)
-        layout.addSpacing(12)
+        layout.addLayout(toolbar)
+        layout.addSpacing(8)
         layout.addLayout(section_row)
         layout.addWidget(self.empty)
         layout.addWidget(self.list, 1)

@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
 
 from ...services.help import load_help
 from ...services.i18n import current_locale, tr
+from ..responsive import adaptive_nav_width, screen_size
 
 
 class HelpDialog(QDialog):
@@ -24,10 +25,11 @@ class HelpDialog(QDialog):
         data = load_help(locale or current_locale())
         self._sections = data.get("sections", [])
         self.setWindowTitle(data.get("title", tr("dashboard.help")))
-        self.resize(940, 660)
+        sw, sh = screen_size()
+        self.resize(min(940, sw - 40), min(660, sh - 40))
 
         self.toc = QListWidget()
-        self.toc.setMaximumWidth(290)
+        self.toc.setMaximumWidth(min(290, adaptive_nav_width() + 80))
         for s in self._sections:
             self.toc.addItem(QListWidgetItem(s.get("title", "")))
         self.toc.currentRowChanged.connect(self._show)

@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
+    QScrollArea,
     QSpinBox,
     QVBoxLayout,
     QWidget,
@@ -28,6 +29,7 @@ from ...services import substances as subs
 from ...services.i18n import tr
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
+from ..responsive import adaptive_card_margins, adaptive_card_max_width, adaptive_margins
 from ..widgets.session_params_dialog import SessionParamsDialog
 
 
@@ -56,7 +58,7 @@ class SessionSetupScreen(QWidget):
         header.addWidget(back); header.addSpacing(10); header.addWidget(title); header.addStretch(1)
 
         card = QFrame(); card.setObjectName("Card")
-        card.setMaximumWidth(620)
+        card.setMaximumWidth(adaptive_card_max_width())
 
         # Session mode selector: Intense / Interspersed / Custom.
         self.mode_selector = QComboBox()
@@ -136,7 +138,7 @@ class SessionSetupScreen(QWidget):
         self.begin.clicked.connect(self._begin)
 
         inner = QVBoxLayout(card)
-        inner.setContentsMargins(28, 24, 28, 24)
+        inner.setContentsMargins(*adaptive_card_margins())
         inner.setSpacing(14)
         inner.addWidget(QLabel(tr("setup.mode_label")))
         inner.addWidget(self.mode_selector)
@@ -157,13 +159,22 @@ class SessionSetupScreen(QWidget):
         inner.addWidget(self.consent)
         inner.addWidget(self.begin)
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 24, 36, 24)
-        layout.addLayout(header)
+        scroll_inner = QWidget()
+        scroll_layout = QVBoxLayout(scroll_inner)
+        scroll_layout.setContentsMargins(0, 0, 0, 0)
         row = QHBoxLayout()
         row.addStretch(1); row.addWidget(card); row.addStretch(1)
-        layout.addLayout(row)
-        layout.addStretch(1)
+        scroll_layout.addLayout(row)
+        scroll_layout.addStretch(1)
+        scroll = QScrollArea()
+        scroll.setWidget(scroll_inner)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(*adaptive_margins())
+        layout.addLayout(header)
+        layout.addWidget(scroll, 1)
 
         self._update()
 

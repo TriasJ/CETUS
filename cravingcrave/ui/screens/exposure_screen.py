@@ -30,6 +30,7 @@ from .. import hotkeys
 from ..context import AppContext
 from ..emoji_icon import emoji_icon
 from ..hotkeys import AccessibilityInput
+from ..responsive import adaptive_right_panel_width, screen_category
 from ..widgets.craving_chart import CravingChart
 from ..widgets.cue_view import CueView
 from ..widgets.gallery_panel import GalleryPanel
@@ -118,7 +119,7 @@ class ExposureScreen(QWidget):
         right.addWidget(self.ambient_btn)
         self._right_box = QFrame()
         self._right_box.setLayout(right)
-        self._right_box.setMaximumWidth(380)
+        self._right_box.setMaximumWidth(adaptive_right_panel_width())
 
         # --- center ---------------------------------------------------------
         top_row = QHBoxLayout()
@@ -167,8 +168,9 @@ class ExposureScreen(QWidget):
         abl.addStretch(1)
         abl.addWidget(self.end_btn)
 
+        _exp_m = (10, 8, 10, 8) if screen_category() == "compact" else (20, 14, 20, 14)
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(20, 14, 20, 14)
+        self.main_layout.setContentsMargins(*_exp_m)
         self.main_layout.addLayout(body, 1)
         self.main_layout.addWidget(self._actionbar)
 
@@ -328,7 +330,8 @@ class ExposureScreen(QWidget):
         self._chrome_timer.stop(); self._bar_anim.stop()
         self._bar_opacity.setOpacity(1.0)
         self.setAutoFillBackground(False)
-        self.main_layout.setContentsMargins(20, 14, 20, 14)
+        _exp_m = (10, 8, 10, 8) if screen_category() == "compact" else (20, 14, 20, 14)
+        self.main_layout.setContentsMargins(*_exp_m)
         self._right_box.show()
         self.cue_counter.show(); self.hint.show(); self.fs_reminder.show()
         self.legend.setVisible(self.context.config.accessibility_kbmode)

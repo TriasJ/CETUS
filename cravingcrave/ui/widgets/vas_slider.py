@@ -76,7 +76,7 @@ class VasPrompt(Overlay):
 
         card = QWidget(self)
         card.setObjectName("OverlayCard")
-        card.setMinimumWidth(520)
+        card.setMinimumWidth(380)
 
         self.title = QLabel("")
         self.title.setObjectName("H2")
@@ -92,7 +92,7 @@ class VasPrompt(Overlay):
         submit.clicked.connect(self._submit)
 
         inner = QVBoxLayout(card)
-        inner.setContentsMargins(34, 30, 34, 30)
+        inner.setContentsMargins(20, 18, 20, 18)
         inner.setSpacing(18)
         inner.addWidget(self.title)
         inner.addWidget(question)

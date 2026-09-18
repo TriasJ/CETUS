@@ -38,6 +38,7 @@ from ...domain.uscs import USCS_STEPS
 from ...services import backup, cue_ranking, export, patient_admin, patient_bundle
 from ...services.i18n import tr
 from ..context import AppContext
+from ..responsive import adaptive_margins, adaptive_nav_width, screen_size
 from .settings_screen import _NAV_INK_SELECTED, _draw_nav_icon
 
 
@@ -63,7 +64,7 @@ class AdminCenterScreen(QWidget):
         header.addStretch(1); header.addWidget(help_btn)
 
         self.nav = QListWidget(); self.nav.setObjectName("SettingsNav")
-        self.nav.setFixedWidth(200); self.nav.setIconSize(QSize(24, 24))
+        self.nav.setFixedWidth(adaptive_nav_width()); self.nav.setIconSize(QSize(24, 24))
         self.nav.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.stack = QStackedWidget()
         specs = [
@@ -87,7 +88,7 @@ class AdminCenterScreen(QWidget):
         body = QHBoxLayout(); body.setSpacing(18)
         body.addWidget(self.nav); body.addWidget(self.stack, 1)
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(36, 24, 36, 20)
+        layout.setContentsMargins(*adaptive_margins())
         layout.addLayout(header)
         layout.addLayout(body, 1)
 
@@ -103,7 +104,7 @@ class AdminCenterScreen(QWidget):
         for c in cards:
             col.addWidget(c)
         col.addStretch(1)
-        content.setMaximumWidth(860)
+        content.setMaximumWidth(min(860, screen_size()[0] - adaptive_nav_width() - 80))
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
