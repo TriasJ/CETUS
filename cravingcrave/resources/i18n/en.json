@@ -523,7 +523,7 @@
   "settings.session_mode_hint": "Choose how craving and neutral cues are presented during exposure.",
   "settings.vas_display_mode": "Craving scale display",
   "settings.vas_display_hint": "How the 0–10 craving rating is presented. All modes produce the same data.",
-  "settings.min_exposure_sec": "Min. cue exposure time (interspersed)",
+  "settings.min_exposure_sec": "Min. cue exposure time (sec)",
 
   "cueconfig.weight_label": "Craving weight",
   "cueconfig.suggest_weights": "Suggest weights from research data",

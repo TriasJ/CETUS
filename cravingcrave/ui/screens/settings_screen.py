@@ -305,6 +305,10 @@ class SettingsScreen(QWidget):
         v.addWidget(self.video_wait_full_loop)
         v.addWidget(self.show_min_exposure_hint)
         form = QFormLayout(); form.setSpacing(10)
+        self.min_cue_exposure = QSpinBox(); self.min_cue_exposure.setRange(0, 60)
+        self.min_cue_exposure.setSuffix(" s")
+        self.min_cue_exposure.setValue(cfg.interspersed_min_exposure_sec)
+        form.addRow(tr("settings.min_exposure_sec"), self.min_cue_exposure)
         form.addRow(tr("settings.max_cue_exposure_sec"), self.max_cue_exposure)
         # VAS delay: minimum is the min exposure time (in ms) so the patient
         # always sees the cue before the rating overlay appears.
@@ -787,8 +791,10 @@ class SettingsScreen(QWidget):
         if hasattr(self, "pause_video_on_rating"):
             cfg.pause_video_on_rating = self.pause_video_on_rating.isChecked()
             cfg.video_loop = self.video_loop.isChecked()
+            cfg.interspersed_min_exposure_sec = self.min_cue_exposure.value()
             cfg.max_cue_exposure_sec = self.max_cue_exposure.value()
             cfg.show_min_exposure_hint = self.show_min_exposure_hint.isChecked()
+            s.set("interspersed_min_exposure_sec", str(cfg.interspersed_min_exposure_sec))
             cfg.video_wait_full_loop = self.video_wait_full_loop.isChecked()
             cfg.interspersed_vas_delay_ms = self.interspersed_vas_delay.value()
             s.set("pause_video_on_rating", "1" if cfg.pause_video_on_rating else "0")

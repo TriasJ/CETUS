@@ -523,7 +523,7 @@
   "settings.session_mode_hint": "Elige cómo se presentan las señales de deseo y neutras durante la exposición.",
   "settings.vas_display_mode": "Formato de escala de deseo",
   "settings.vas_display_hint": "Cómo se presenta la calificación de deseo 0–10. Todos los formatos producen los mismos datos.",
-  "settings.min_exposure_sec": "Tiempo mín. de exposición por señal (intercalado)",
+  "settings.min_exposure_sec": "Tiempo mín. de exposición por señal (seg)",
 
   "cueconfig.weight_label": "Peso de deseo",
   "cueconfig.suggest_weights": "Sugerir pesos desde datos de investigación",
