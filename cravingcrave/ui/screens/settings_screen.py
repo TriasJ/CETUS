@@ -379,6 +379,16 @@ class SettingsScreen(QWidget):
         v.addWidget(self.adaptive_ordering)
         v.addWidget(hint)
 
+        # Backlog rotation: deprioritize over-exposed cues
+        self.max_cue_repeats = QSpinBox(); self.max_cue_repeats.setRange(0, 50)
+        self.max_cue_repeats.setValue(cfg.max_cue_repeats)
+        backlog_hint = QLabel(tr("settings.max_cue_repeats_hint"))
+        backlog_hint.setObjectName("Muted"); backlog_hint.setWordWrap(True)
+        form_bl = QFormLayout(); form_bl.setSpacing(10)
+        form_bl.addRow(tr("settings.max_cue_repeats"), self.max_cue_repeats)
+        v.addLayout(form_bl)
+        v.addWidget(backlog_hint)
+
         # Auto-coping on consecutive high craving scores
         sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine)
         v.addWidget(sep)
@@ -753,6 +763,9 @@ class SettingsScreen(QWidget):
         if hasattr(self, "adaptive_ordering"):
             cfg.adaptive_ordering = self.adaptive_ordering.isChecked()
             s.set("adaptive_ordering", "1" if cfg.adaptive_ordering else "0")
+        if hasattr(self, "max_cue_repeats"):
+            cfg.max_cue_repeats = self.max_cue_repeats.value()
+            s.set("max_cue_repeats", str(cfg.max_cue_repeats))
         if hasattr(self, "auto_coping_enabled"):
             cfg.auto_coping_enabled = self.auto_coping_enabled.isChecked()
             cfg.auto_coping_threshold = self.auto_coping_threshold.value()
