@@ -1,6 +1,6 @@
 [project]
 name = "cravingcrave"
-version = "0.9.9"
+version = "0.9.10"
 description = "CETUS — clinician-supervised, non-VR Cue Exposure Therapy (CET-USCS) desktop app"
 requires-python = ">=3.11"
 dependencies = [
