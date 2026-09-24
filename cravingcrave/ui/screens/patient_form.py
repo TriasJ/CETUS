@@ -6,6 +6,7 @@ import logging
 import sqlite3
 
 from PySide6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QDialog,
     QDialogButtonBox,
@@ -48,6 +49,15 @@ class PatientFormDialog(QDialog):
         self.notes = QPlainTextEdit()
         self.notes.setFixedHeight(80)
 
+        self.run_wizard = QCheckBox(tr("patient.run_wizard"))
+        # For new patients, wizard runs by default. For existing patients,
+        # check whether the wizard_complete flag is NOT set (meaning it should run).
+        if patient is not None:
+            wizard_done = context.repos.settings.get(f"wizard_complete:{patient.id}")
+            self.run_wizard.setChecked(not wizard_done)
+        else:
+            self.run_wizard.setChecked(True)
+
         if patient:
             self.code.setText(patient.code)
             self.display_name.setText(patient.display_name or "")
@@ -63,6 +73,7 @@ class PatientFormDialog(QDialog):
         form.addRow(tr("patient.birth_year"), self.birth_year)
         form.addRow(tr("patient.substance"), self.substance)
         form.addRow(tr("patient.notes"), self.notes)
+        form.addRow(self.run_wizard)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
@@ -72,6 +83,10 @@ class PatientFormDialog(QDialog):
 
         form.addRow(buttons)
         self.setLayout(form)
+
+    def wants_wizard(self) -> bool:
+        """Whether the clinician wants the setup wizard to run for this patient."""
+        return self.run_wizard.isChecked()
 
     def _save(self) -> None:
         code = self.code.text().strip()

@@ -157,6 +157,7 @@
   "patient.birth_year": "Año de nacimiento (opcional)",
   "patient.substance": "Sustancia principal",
   "patient.notes": "Notas clínicas (opcional)",
+  "patient.run_wizard": "Ejecutar asistente de configuración en próxima sesión",
   "patient.code_required": "El código del paciente es obligatorio.",
   "patient.code_taken": "Ese código ya existe.",
 

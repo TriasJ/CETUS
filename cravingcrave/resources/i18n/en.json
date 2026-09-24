@@ -157,6 +157,7 @@
   "patient.birth_year": "Year of birth (optional)",
   "patient.substance": "Primary substance",
   "patient.notes": "Clinical notes (optional)",
+  "patient.run_wizard": "Run setup wizard on next session",
   "patient.code_required": "The patient code is required.",
   "patient.code_taken": "That code already exists.",
 

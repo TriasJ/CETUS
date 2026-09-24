@@ -102,12 +102,19 @@ class DashboardScreen(QWidget):
         QTimer.singleShot(500, self._check_import_wizard)
 
     def _check_import_wizard(self) -> None:
+        """Auto-launch the Import Wizard on first run only.
+
+        Once the flag is set (whether the wizard was completed or cancelled),
+        it never auto-launches again. The clinician can always open it manually
+        from the cue library or Settings.
+        """
         done = self.context.repos.settings.get("import_wizard_complete")
-        n_neutral = len(self.context.media.by_category("neutral"))
-        if not done or n_neutral == 0:
+        if not done:
             from .import_wizard import ImportWizard
             w = ImportWizard(self.context, self)
             w.exec()
+            # Set flag even if cancelled so it doesn't re-launch on every login.
+            self.context.repos.settings.set("import_wizard_complete", "1")
 
     def _refresh(self) -> None:
         self.list.clear()

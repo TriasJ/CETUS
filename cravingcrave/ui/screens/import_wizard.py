@@ -48,7 +48,13 @@ from ..responsive import screen_size
 # ---------------------------------------------------------------------------
 
 def _load_pexels_key() -> str:
-    """Load Pexels API key from env var or media/pexels.env."""
+    """Load Pexels API key from env var or media/pexels.env.
+
+    Accepts multiple file formats:
+    - ``PEXELS_API_KEY=xxx`` (preferred)
+    - ``key = xxx`` (legacy pexels.env format)
+    - Any ``name=value`` line where value is >20 chars (likely an API key)
+    """
     key = os.environ.get("PEXELS_API_KEY", "")
     if key:
         return key.strip()
@@ -56,8 +62,15 @@ def _load_pexels_key() -> str:
     if env_path.is_file():
         for line in env_path.read_text(encoding="utf-8").splitlines():
             line = line.strip()
+            if not line or line.startswith("#"):
+                continue
             if line.startswith("PEXELS_API_KEY="):
                 return line.split("=", 1)[1].strip()
+            # Legacy format: any "key = value" line with a long value
+            if "=" in line:
+                val = line.split("=", 1)[1].strip()
+                if len(val) > 20:
+                    return val
     return ""
 
 

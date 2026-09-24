@@ -34,7 +34,7 @@ from ...services.cue_weights import CueWeightLookup
 from ...services.i18n import tr
 from ...services.media_library import media_type_for
 from ..context import AppContext
-from ..responsive import adaptive_dialog_width, adaptive_margins
+from ..responsive import adaptive_dialog_width, adaptive_margins, adaptive_nav_width
 
 # Auxiliary (non-substance) media folders shown in the library picker.
 _AUX_CATEGORY_KEYS = {"positive": "substance.positive", "sounds": "substance.sounds"}
@@ -165,7 +165,8 @@ class CueConfigScreen(QWidget):
         side_scroll.setWidgetResizable(True)
         side_scroll.setFrameShape(QFrame.Shape.NoFrame)
         side_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        side_scroll.setMaximumWidth(180)
+        side_scroll.setMinimumWidth(140)
+        side_scroll.setMaximumWidth(max(180, adaptive_nav_width() + 20))
 
         body = QHBoxLayout()
         left = QVBoxLayout()

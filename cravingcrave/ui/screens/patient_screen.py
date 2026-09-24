@@ -208,6 +208,12 @@ class PatientScreen(QWidget):
     def _edit(self) -> None:
         dialog = PatientFormDialog(self.context, self, self.patient)
         if dialog.exec():
+            # Update the wizard toggle based on the clinician's choice.
+            if dialog.wants_wizard():
+                # Clear the flag so the wizard re-triggers on next session setup.
+                self.context.repos.settings.set(f"wizard_complete:{self.patient.id}", "")
+            else:
+                self.context.repos.settings.set(f"wizard_complete:{self.patient.id}", "1")
             self.patient = self.context.repos.patients.get(self.patient.id)
             self.title.setText(tr("patient.detail_title", code=self.patient.code))
             self._refresh()
