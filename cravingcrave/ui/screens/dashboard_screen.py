@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -97,6 +97,17 @@ class DashboardScreen(QWidget):
         layout.addWidget(open_btn, 0, Qt.AlignmentFlag.AlignRight)
 
         self._refresh()
+
+        # Auto-launch the Import Wizard on first run or if no neutral images exist.
+        QTimer.singleShot(500, self._check_import_wizard)
+
+    def _check_import_wizard(self) -> None:
+        done = self.context.repos.settings.get("import_wizard_complete")
+        n_neutral = len(self.context.media.by_category("neutral"))
+        if not done or n_neutral == 0:
+            from .import_wizard import ImportWizard
+            w = ImportWizard(self.context, self)
+            w.exec()
 
     def _refresh(self) -> None:
         self.list.clear()

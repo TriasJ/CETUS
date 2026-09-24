@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QVBoxLayout,
     QWidget,
+    QWizard,
 )
 
 from ...domain.models import CueConfig
@@ -328,10 +329,10 @@ class CueConfigScreen(QWidget):
 
     def _open_import_wizard(self) -> None:
         """Open the Import Images from Web wizard."""
-        # Placeholder until the wizard module is built.
-        QMessageBox.information(
-            self, tr("app.title"),
-            tr("cueconfig.import_wizard") + " — " + tr("common.continue"))
+        from .import_wizard import ImportWizard
+        wizard = ImportWizard(self.context, self)
+        if wizard.exec() == QWizard.DialogCode.Accepted:
+            self._refresh()
 
     def _open_import_web(self) -> None:
         """Launch the Pexels search dialog directly."""
