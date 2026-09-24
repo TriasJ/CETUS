@@ -540,6 +540,13 @@
   "settings.max_cue_repeats": "Máx. repeticiones de señal antes de rotación (0 = desactivado)",
   "settings.max_cue_repeats_hint": "Las señales mostradas más de este número de veces se mueven al final de la lista.",
 
+  "settings.tools_title": "Herramientas de medios",
+  "settings.tools_hint": "Descarga imágenes y videos de señales para la biblioteca de exposición.",
+  "settings.import_web_button": "🌐 Importar desde la web",
+  "settings.import_video_button": "🎬 Importar video",
+  "cueconfig.import_wizard": "🌐 Asistente de importación",
+  "cueconfig.import_web": "🌐 Importar desde la web",
+
   "settings.media_title": "Señales de imagen y video",
   "settings.media_hint": "Cómo se muestran y cronometran las señales de imagen y video durante la exposición.",
   "settings.video_section": "Comportamiento de señales de video",

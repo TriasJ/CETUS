@@ -18,6 +18,7 @@ appropriateness before using with patients.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import os
 import re
@@ -29,7 +30,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-from PySide6.QtCore import QByteArray, QSize, QThread, Qt, Signal
+from PySide6.QtCore import QByteArray, Qt, QThread, Signal
 from PySide6.QtGui import QFont, QImage, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -49,6 +50,167 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+# ---------------------------------------------------------------------------
+# Locale-aware translation (standalone tool — no access to app i18n)
+# ---------------------------------------------------------------------------
+_LOCALE = os.environ.get("CETUS_LOCALE", "es")
+
+_STRINGS = {
+    "en": {
+        "window_title": "CETUS — Import from Web",
+        "title": "Import from Web",
+        "subtitle": "Search and download stock photos & videos from Pexels. "
+                    "The Pexels License permits free research/commercial use — "
+                    "API users must credit the photographer.",
+        "search": "Search",
+        "search_photos": "Photos",
+        "search_videos": "Videos",
+        "placeholder": "e.g. beer glass, bar scene, cigarette…",
+        "orientation": "Orientation:",
+        "orientation_any": "Any",
+        "orientation_landscape": "Landscape",
+        "orientation_portrait": "Portrait",
+        "orientation_square": "Square",
+        "photo_size": "Photo size:",
+        "video_quality": "Video quality:",
+        "rate_default": "Rate limit: —",
+        "select_all": "Select All",
+        "select_none": "Select None",
+        "add_to_queue": "➕ Add to Queue",
+        "clear_queue": "Clear Queue",
+        "download_all": "  Download All Queued  ",
+        "cancel": "Cancel",
+        "queue_n": "Queue: {n}",
+        "queue_cleared": "Queue cleared.",
+        "added_n": "Added {n} item(s) to queue. Total: {total}",
+        "category": "Category:",
+        "folder": "Folder:",
+        "browse": "Browse…",
+        "choose_folder": "Choose save folder",
+        "reencode": "Re-encode videos to H.264 + AAC (safe clinical playback)",
+        "reencode_tip": "Requires ffmpeg on PATH",
+        "prev_page": "← Previous",
+        "next_page": "Next →",
+        "page_info": "Page {page} — {total} total results",
+        "no_results": "No results found.",
+        "no_query": "Enter a search query.",
+        "no_key_title": "API Key Missing",
+        "no_key_msg": "Pexels API key not found.\n\nSet PEXELS_API_KEY environment variable "
+                      "or place the key in\nmedia/pexels.env\n\nGet a free key at "
+                      "https://www.pexels.com/api/",
+        "no_key_short": "No Pexels API key configured.",
+        "nothing_selected": "Nothing selected",
+        "nothing_selected_msg": "Add items to the queue or select items on this page.",
+        "search_failed": "Search failed",
+        "download_complete_title": "Download complete",
+        "download_complete_msg": "Saved {n} file(s) to:\n{folder}\n\n"
+                                "Licenses logged to _licenses.csv.\n"
+                                "Review each file for clinical appropriateness.",
+        "download_failed": "Download failed",
+        "downloading": "Downloading {name} (by {creator})…",
+        "ok": "[ok] {name}",
+        "failed": "! failed: {err}",
+        "cancelled": "Download cancelled.",
+        "done_n": "\n✅ Downloaded {n} file(s). Queue cleared.",
+        "error_n": "\n❌ Error: {msg}",
+        "reencode_msg": "  Re-encoding to H.264 + AAC…",
+        "skipped_dup": "  ⊘ Skipped (duplicate): {name}",
+        "log_placeholder": "Download log will appear here…",
+        "select": "Select",
+        "import_neutral": "📦 Import Neutral Images",
+    },
+    "es": {
+        "window_title": "CETUS — Importar desde la web",
+        "title": "Importar desde la web",
+        "subtitle": "Busca y descarga fotos y videos de stock de Pexels. "
+                    "La Licencia Pexels permite uso libre para investigación/comercial — "
+                    "los usuarios de la API deben dar crédito al fotógrafo.",
+        "search": "Buscar",
+        "search_photos": "Fotos",
+        "search_videos": "Videos",
+        "placeholder": "ej. vaso de cerveza, bar, cigarrillo…",
+        "orientation": "Orientación:",
+        "orientation_any": "Cualquiera",
+        "orientation_landscape": "Horizontal",
+        "orientation_portrait": "Vertical",
+        "orientation_square": "Cuadrada",
+        "photo_size": "Tamaño de foto:",
+        "video_quality": "Calidad de video:",
+        "rate_default": "Límite de tasa: —",
+        "select_all": "Seleccionar todo",
+        "select_none": "Deseleccionar todo",
+        "add_to_queue": "➕ Agregar a cola",
+        "clear_queue": "Vaciar cola",
+        "download_all": "  Descargar todo en cola  ",
+        "cancel": "Cancelar",
+        "queue_n": "Cola: {n}",
+        "queue_cleared": "Cola vaciada.",
+        "added_n": "Agregado(s) {n} elemento(s) a la cola. Total: {total}",
+        "category": "Categoría:",
+        "folder": "Carpeta:",
+        "browse": "Examinar…",
+        "choose_folder": "Elegir carpeta de destino",
+        "reencode": "Recodificar videos a H.264 + AAC (reproducción clínica segura)",
+        "reencode_tip": "Requiere ffmpeg en el PATH",
+        "prev_page": "← Anterior",
+        "next_page": "Siguiente →",
+        "page_info": "Página {page} — {total} resultados totales",
+        "no_results": "Sin resultados.",
+        "no_query": "Escribe un término de búsqueda.",
+        "no_key_title": "Clave API faltante",
+        "no_key_msg": "No se encontró la clave API de Pexels.\n\nEstablece la variable de entorno "
+                      "PEXELS_API_KEY o coloca la clave en\nmedia/pexels.env\n\nObtén una clave "
+                      "gratuita en https://www.pexels.com/api/",
+        "no_key_short": "No se configuró la clave API de Pexels.",
+        "nothing_selected": "Nada seleccionado",
+        "nothing_selected_msg": "Agrega elementos a la cola o selecciona elementos en esta página.",
+        "search_failed": "Búsqueda fallida",
+        "download_complete_title": "Descarga completa",
+        "download_complete_msg": "Guardado(s) {n} archivo(s) en:\n{folder}\n\n"
+                                 "Licencias registradas en _licenses.csv.\n"
+                                 "Revisa cada archivo para idoneidad clínica.",
+        "download_failed": "Descarga fallida",
+        "downloading": "Descargando {name} (por {creator})…",
+        "ok": "[ok] {name}",
+        "failed": "! falló: {err}",
+        "cancelled": "Descarga cancelada.",
+        "done_n": "\n✅ Descargado(s) {n} archivo(s). Cola vaciada.",
+        "error_n": "\n❌ Error: {msg}",
+        "reencode_msg": "  Recodificando a H.264 + AAC…",
+        "skipped_dup": "  ⊘ Omitido (duplicado): {name}",
+        "log_placeholder": "El registro de descarga aparecerá aquí…",
+        "select": "Seleccionar",
+        "import_neutral": "📦 Importar imágenes neutras",
+    },
+}
+
+
+def _t(key: str, **kwargs) -> str:
+    """Translate a UI string using the detected locale."""
+    text = _STRINGS.get(_LOCALE, _STRINGS["en"]).get(key, key)
+    if kwargs:
+        text = text.format(**kwargs)
+    return text
+
+
+# ---------------------------------------------------------------------------
+# Hash-based dedup
+# ---------------------------------------------------------------------------
+
+def _compute_file_hashes(folder: Path) -> set[str]:
+    """Compute SHA-256 hashes of all files in *folder* (for dedup checks)."""
+    hashes: set[str] = set()
+    if not folder.is_dir():
+        return hashes
+    for f in folder.iterdir():
+        if f.is_file() and not f.name.startswith("_"):
+            try:
+                hashes.add(hashlib.sha256(f.read_bytes()).hexdigest())
+            except OSError:
+                pass
+    return hashes
+
 
 # ---------------------------------------------------------------------------
 # Project paths
@@ -222,6 +384,7 @@ class DownloadWorker(QThread):
         self.video_quality = video_quality
         self.reencode = reencode
         self._cancelled = False
+        self._existing_hashes: set[str] = set()  # populated in run()
 
     def cancel(self) -> None:
         self._cancelled = True
@@ -229,13 +392,15 @@ class DownloadWorker(QThread):
     def run(self) -> None:
         try:
             self.save_dir.mkdir(parents=True, exist_ok=True)
+            # Pre-compute hashes of existing files for dedup.
+            self._existing_hashes = _compute_file_hashes(self.save_dir)
             total = len(self.items)
             rows: list[list[str]] = []
             saved = 0
 
             for i, item in enumerate(self.items, start=1):
                 if self._cancelled:
-                    self.log.emit("Download cancelled.")
+                    self.log.emit(_t("cancelled"))
                     break
 
                 self.progress.emit(int((i - 1) / total * 100))
@@ -256,7 +421,7 @@ class DownloadWorker(QThread):
                 with open(lic, "a", newline="", encoding="utf-8") as fh:
                     w = csv.writer(fh)
                     if write_header:
-                        w.writerow(["file", "license", "creator", "source_url"])
+                        w.writerow(["file", "license", "version", "creator", "source_url"])
                     w.writerows(rows)
 
             self.progress.emit(100)
@@ -280,16 +445,23 @@ class DownloadWorker(QThread):
 
         dest = self.save_dir / f"px_{self.slug}_{num:02d}{ext}"
         photographer = photo.get("photographer", "")
-        self.log.emit(f"Downloading {dest.name} (by {photographer})…")
+        self.log.emit(_t("downloading", name=dest.name, creator=photographer))
 
         req = urllib.request.Request(src_url, headers={"User-Agent": USER_AGENT})
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
-                dest.write_bytes(resp.read())
-            self.log.emit(f"  [ok] {dest.name}")
-            return True, [dest.name, "Pexels License", photographer, photo.get("url", "")]
+                data = resp.read()
+            # Dedup: skip if an identical file already exists in the folder.
+            file_hash = hashlib.sha256(data).hexdigest()
+            if file_hash in self._existing_hashes:
+                self.log.emit(_t("skipped_dup", name=dest.name))
+                return False, None
+            dest.write_bytes(data)
+            self._existing_hashes.add(file_hash)
+            self.log.emit("  " + _t("ok", name=dest.name))
+            return True, [dest.name, "Pexels License", "N/A", photographer, photo.get("url", "")]
         except Exception as exc:
-            self.log.emit(f"  ! failed: {exc}")
+            self.log.emit("  " + _t("failed", err=str(exc)))
             return False, None
 
     def _download_video(self, video: dict, num: int) -> tuple[bool, list[str] | None]:
@@ -312,7 +484,7 @@ class DownloadWorker(QThread):
         res = f"{chosen.get('width', '?')}x{chosen.get('height', '?')}"
         dest = self.save_dir / f"px_{self.slug}_{num:02d}.mp4"
         creator = video.get("user", {}).get("name", "")
-        self.log.emit(f"Downloading {dest.name} ({res}, by {creator})…")
+        self.log.emit(_t("downloading", name=f"{dest.name} ({res})", creator=creator))
 
         req = urllib.request.Request(dl_url, headers={"User-Agent": USER_AGENT})
         try:
@@ -322,8 +494,15 @@ class DownloadWorker(QThread):
                 with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
                     tmp_path = Path(tmp.name)
                 with urllib.request.urlopen(req, timeout=120) as resp:
-                    tmp_path.write_bytes(resp.read())
-                self.log.emit(f"  Re-encoding to H.264 + AAC…")
+                    raw = resp.read()
+                # Dedup check on raw bytes before re-encoding.
+                file_hash = hashlib.sha256(raw).hexdigest()
+                if file_hash in self._existing_hashes:
+                    self.log.emit(_t("skipped_dup", name=dest.name))
+                    tmp_path.unlink(missing_ok=True)
+                    return False, None
+                tmp_path.write_bytes(raw)
+                self.log.emit(_t("reencode_msg"))
                 cmd = [
                     "ffmpeg", "-y", "-i", str(tmp_path),
                     "-c:v", "libx264", "-pix_fmt", "yuv420p",
@@ -338,13 +517,20 @@ class DownloadWorker(QThread):
                 if result.returncode != 0:
                     self.log.emit(f"  ! ffmpeg failed: {result.stderr[-200:]}")
                     return False, None
+                self._existing_hashes.add(file_hash)
             else:
                 with urllib.request.urlopen(req, timeout=120) as resp:
-                    dest.write_bytes(resp.read())
-            self.log.emit(f"  [ok] {dest.name}")
-            return True, [dest.name, "Pexels License", creator, video.get("url", "")]
+                    data = resp.read()
+                file_hash = hashlib.sha256(data).hexdigest()
+                if file_hash in self._existing_hashes:
+                    self.log.emit(_t("skipped_dup", name=dest.name))
+                    return False, None
+                dest.write_bytes(data)
+                self._existing_hashes.add(file_hash)
+            self.log.emit("  " + _t("ok", name=dest.name))
+            return True, [dest.name, "Pexels License", "N/A", creator, video.get("url", "")]
         except Exception as exc:
-            self.log.emit(f"  ! failed: {exc}")
+            self.log.emit("  " + _t("failed", err=str(exc)))
             return False, None
 
 
@@ -381,7 +567,7 @@ class ResultCard(QFrame):
         self.info_label.setFont(font)
         layout.addWidget(self.info_label)
 
-        self.checkbox = QCheckBox("Select")
+        self.checkbox = QCheckBox(_t("select"))
         layout.addWidget(self.checkbox)
 
     def set_thumbnail(self, pixmap: QPixmap) -> None:
@@ -402,7 +588,7 @@ class ResultCard(QFrame):
 class PexelsDownloader(QWidget):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("CETUS — Pexels Media Downloader")
+        self.setWindowTitle(_t("window_title"))
         self.setMinimumWidth(740)
 
         self._api_key = _load_api_key()
@@ -419,13 +605,7 @@ class PexelsDownloader(QWidget):
         self._apply_style()
 
         if not self._api_key:
-            QMessageBox.critical(
-                self, "API Key Missing",
-                "Pexels API key not found.\n\n"
-                "Set PEXELS_API_KEY environment variable or place the key in\n"
-                "media/pexels.env\n\n"
-                "Get a free key at https://www.pexels.com/api/",
-            )
+            QMessageBox.critical(self, _t("no_key_title"), _t("no_key_msg"))
 
     # -- UI ----------------------------------------------------------------
 
@@ -435,15 +615,11 @@ class PexelsDownloader(QWidget):
         root.setSpacing(10)
 
         # Header
-        title = QLabel("Pexels Media Downloader")
+        title = QLabel(_t("title"))
         title.setObjectName("H2")
         root.addWidget(title)
 
-        subtitle = QLabel(
-            "Search and download stock photos & videos from Pexels.  "
-            "The Pexels License permits free research/commercial use — "
-            "API users must credit the photographer."
-        )
+        subtitle = QLabel(_t("subtitle"))
         subtitle.setObjectName("Muted")
         subtitle.setWordWrap(True)
         root.addWidget(subtitle)
@@ -451,17 +627,17 @@ class PexelsDownloader(QWidget):
         # Search row
         search_row = QHBoxLayout()
         self.query_edit = QLineEdit()
-        self.query_edit.setPlaceholderText("e.g. beer glass, bar scene, cigarette…")
+        self.query_edit.setPlaceholderText(_t("placeholder"))
         self.query_edit.returnPressed.connect(self._on_search)
         search_row.addWidget(self.query_edit, stretch=1)
 
         self.type_combo = QComboBox()
-        self.type_combo.addItems(["Photos", "Videos"])
+        self.type_combo.addItems([_t("search_photos"), _t("search_videos")])
         self.type_combo.setFixedWidth(90)
         self.type_combo.currentIndexChanged.connect(self._on_type_changed)
         search_row.addWidget(self.type_combo)
 
-        self.search_btn = QPushButton("Search")
+        self.search_btn = QPushButton(_t("search"))
         self.search_btn.setObjectName("Primary")
         self.search_btn.setFixedWidth(80)
         self.search_btn.clicked.connect(self._on_search)
@@ -471,19 +647,21 @@ class PexelsDownloader(QWidget):
         # Filters row
         filter_row = QHBoxLayout()
 
-        filter_row.addWidget(QLabel("Orientation:"))
+        filter_row.addWidget(QLabel(_t("orientation")))
         self.orientation_combo = QComboBox()
-        self.orientation_combo.addItems(ORIENTATIONS)
-        self.orientation_combo.setFixedWidth(100)
+        self.orientation_combo.addItems([
+            _t("orientation_any"), _t("orientation_landscape"),
+            _t("orientation_portrait"), _t("orientation_square")])
+        self.orientation_combo.setFixedWidth(110)
         filter_row.addWidget(self.orientation_combo)
 
-        filter_row.addWidget(QLabel("Photo size:"))
+        filter_row.addWidget(QLabel(_t("photo_size")))
         self.size_combo = QComboBox()
         self.size_combo.addItems(PHOTO_SIZES)
         self.size_combo.setFixedWidth(100)
         filter_row.addWidget(self.size_combo)
 
-        self.quality_label = QLabel("Video quality:")
+        self.quality_label = QLabel(_t("video_quality"))
         filter_row.addWidget(self.quality_label)
         self.quality_combo = QComboBox()
         for label, _, _ in VIDEO_QUALITIES:
@@ -497,7 +675,7 @@ class PexelsDownloader(QWidget):
         root.addLayout(filter_row)
 
         # Rate limit
-        self.rate_label = QLabel("Rate limit: —")
+        self.rate_label = QLabel(_t("rate_default"))
         self.rate_label.setObjectName("Muted")
         root.addWidget(self.rate_label)
 
@@ -514,7 +692,7 @@ class PexelsDownloader(QWidget):
 
         # Pagination
         page_row = QHBoxLayout()
-        self.prev_btn = QPushButton("← Previous")
+        self.prev_btn = QPushButton(_t("prev_page"))
         self.prev_btn.setEnabled(False)
         self.prev_btn.clicked.connect(self._on_prev_page)
         page_row.addWidget(self.prev_btn)
@@ -522,7 +700,7 @@ class PexelsDownloader(QWidget):
         self.page_label.setObjectName("Muted")
         self.page_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         page_row.addWidget(self.page_label, stretch=1)
-        self.next_btn = QPushButton("Next →")
+        self.next_btn = QPushButton(_t("next_page"))
         self.next_btn.setEnabled(False)
         self.next_btn.clicked.connect(self._on_next_page)
         page_row.addWidget(self.next_btn)
@@ -530,62 +708,62 @@ class PexelsDownloader(QWidget):
 
         # Download settings row
         dl_row = QHBoxLayout()
-        dl_row.addWidget(QLabel("Category:"))
+        dl_row.addWidget(QLabel(_t("category")))
         self.category_combo = QComboBox()
         self.category_combo.addItems(CATEGORIES)
         self.category_combo.currentTextChanged.connect(lambda _: self._update_folder())
         dl_row.addWidget(self.category_combo)
 
-        dl_row.addWidget(QLabel("Folder:"))
+        dl_row.addWidget(QLabel(_t("folder")))
         self.folder_edit = QLineEdit()
         self.folder_edit.setReadOnly(True)
         self._update_folder()
         dl_row.addWidget(self.folder_edit, stretch=1)
-        browse_btn = QPushButton("Browse…")
-        browse_btn.setFixedWidth(80)
+        browse_btn = QPushButton(_t("browse"))
+        browse_btn.setFixedWidth(90)
         browse_btn.clicked.connect(self._browse_folder)
         dl_row.addWidget(browse_btn)
         root.addLayout(dl_row)
 
         # Re-encode checkbox (for videos)
-        self.reencode_cb = QCheckBox("Re-encode videos to H.264 + AAC (safe clinical playback)")
+        self.reencode_cb = QCheckBox(_t("reencode"))
         has_ffmpeg = shutil.which("ffmpeg") is not None
         self.reencode_cb.setChecked(has_ffmpeg)
         self.reencode_cb.setEnabled(has_ffmpeg)
         if not has_ffmpeg:
-            self.reencode_cb.setToolTip("Requires ffmpeg on PATH")
+            self.reencode_cb.setToolTip(_t("reencode_tip"))
         root.addWidget(self.reencode_cb)
 
         # Action buttons
         btn_row = QHBoxLayout()
-        self.select_all_btn = QPushButton("Select All")
+        self.select_all_btn = QPushButton(_t("select_all"))
         self.select_all_btn.clicked.connect(lambda: self._set_all_selected(True))
         btn_row.addWidget(self.select_all_btn)
-        self.select_none_btn = QPushButton("Select None")
+        self.select_none_btn = QPushButton(_t("select_none"))
         self.select_none_btn.clicked.connect(lambda: self._set_all_selected(False))
         btn_row.addWidget(self.select_none_btn)
 
-        add_queue_btn = QPushButton("➕ Add to Queue")
+        add_queue_btn = QPushButton(_t("add_to_queue"))
         add_queue_btn.clicked.connect(self._add_to_queue)
         btn_row.addWidget(add_queue_btn)
 
-        self.queue_label = QLabel("Queue: 0")
+        self.queue_label = QLabel(_t("queue_n", n=0))
         self.queue_label.setObjectName("Muted")
         self.queue_label.setMinimumWidth(80)
         btn_row.addWidget(self.queue_label)
 
-        clear_queue_btn = QPushButton("Clear Queue")
+        clear_queue_btn = QPushButton(_t("clear_queue"))
         clear_queue_btn.clicked.connect(self._clear_queue)
         btn_row.addWidget(clear_queue_btn)
 
         btn_row.addStretch()
 
-        self.download_btn = QPushButton("  Download All Queued  ")
+        self.download_btn = QPushButton(_t("download_all"))
         self.download_btn.setObjectName("Primary")
         self.download_btn.clicked.connect(self._on_download)
         btn_row.addWidget(self.download_btn)
 
-        self.cancel_btn = QPushButton("Cancel")
+        self.cancel_btn = QPushButton(_t("cancel"))
         self.cancel_btn.setObjectName("Danger")
         self.cancel_btn.setEnabled(False)
         self.cancel_btn.clicked.connect(self._on_cancel)
@@ -602,7 +780,7 @@ class PexelsDownloader(QWidget):
         self.log_view = QTextEdit()
         self.log_view.setReadOnly(True)
         self.log_view.setMaximumHeight(140)
-        self.log_view.setPlaceholderText("Download log will appear here…")
+        self.log_view.setPlaceholderText(_t("log_placeholder"))
         root.addWidget(self.log_view)
 
     def _apply_style(self) -> None:
@@ -710,7 +888,7 @@ class PexelsDownloader(QWidget):
 
     def _browse_folder(self) -> None:
         folder = QFileDialog.getExistingDirectory(
-            self, "Choose save folder", str(self._current_save_dir()),
+            self, _t("choose_folder"), str(self._current_save_dir()),
         )
         if folder:
             self._custom_folder = Path(folder)
@@ -734,16 +912,16 @@ class PexelsDownloader(QWidget):
                 card.set_selected(False)  # uncheck after queuing
         self._update_queue_label()
         if added:
-            self._on_log(f"Added {added} item(s) to queue. Total: {len(self._queued_items)}")
+            self._on_log(_t("added_n", n=added, total=len(self._queued_items)))
 
     def _clear_queue(self) -> None:
         self._queued_items.clear()
         self._update_queue_label()
-        self._on_log("Queue cleared.")
+        self._on_log(_t("queue_cleared"))
 
     def _update_queue_label(self) -> None:
         n = len(self._queued_items)
-        self.queue_label.setText(f"Queue: {n}")
+        self.queue_label.setText(_t("queue_n", n=n))
         if n > 0:
             self.queue_label.setStyleSheet(f"color: {PRIMARY}; font-weight: 600;")
         else:
@@ -771,10 +949,10 @@ class PexelsDownloader(QWidget):
     def _on_search(self, page: int = 1) -> None:
         query = self.query_edit.text().strip()
         if not query:
-            QMessageBox.warning(self, "Missing query", "Enter a search query.")
+            QMessageBox.warning(self, _t("nothing_selected"), _t("no_query"))
             return
         if not self._api_key:
-            QMessageBox.critical(self, "API Key Missing", "No Pexels API key configured.")
+            QMessageBox.critical(self, _t("no_key_title"), _t("no_key_short"))
             return
 
         self.search_btn.setEnabled(False)
@@ -800,12 +978,12 @@ class PexelsDownloader(QWidget):
 
     def _on_results(self, items: list[dict], meta: dict) -> None:
         self.search_btn.setEnabled(True)
-        self.search_btn.setText("Search")
+        self.search_btn.setText(_t("search"))
         self._current_items = items
         self._current_meta = meta
 
         if not items:
-            self.page_label.setText("No results found.")
+            self.page_label.setText(_t("no_results"))
             self.prev_btn.setEnabled(False)
             self.next_btn.setEnabled(False)
             return
@@ -813,8 +991,7 @@ class PexelsDownloader(QWidget):
         # Pagination info
         total = meta.get("total_results", 0)
         page = meta.get("page", 1)
-        per_page = meta.get("per_page", 20)
-        self.page_label.setText(f"Page {page} — {total} total results")
+        self.page_label.setText(_t("page_info", page=page, total=total))
         self.prev_btn.setEnabled(meta.get("prev_page") is not None)
         self.next_btn.setEnabled(meta.get("next_page") is not None)
 
@@ -863,8 +1040,8 @@ class PexelsDownloader(QWidget):
 
     def _on_search_error(self, msg: str) -> None:
         self.search_btn.setEnabled(True)
-        self.search_btn.setText("Search")
-        QMessageBox.critical(self, "Search failed", msg)
+        self.search_btn.setText(_t("search"))
+        QMessageBox.critical(self, _t("search_failed"), msg)
 
     # -- pagination --------------------------------------------------------
 
@@ -901,8 +1078,7 @@ class PexelsDownloader(QWidget):
         ]
         all_items = self._queued_items + page_selected
         if not all_items:
-            QMessageBox.warning(self, "Nothing selected",
-                                "Add items to the queue or select items on this page.")
+            QMessageBox.warning(self, _t("nothing_selected"), _t("nothing_selected_msg"))
             return
 
         selected_items = all_items
@@ -949,20 +1125,17 @@ class PexelsDownloader(QWidget):
         self.progress_bar.setValue(100)
         self._queued_items.clear()
         self._update_queue_label()
-        self._on_log(f"\n✅ Downloaded {count} file(s). Queue cleared.")
+        self._on_log(_t("done_n", n=count))
         QMessageBox.information(
-            self,
-            "Download complete",
-            f"Saved {count} file(s) to:\n{self._current_save_dir()}\n\n"
-            "Licenses logged to _licenses.csv.\n"
-            "Review each file for clinical appropriateness.",
+            self, _t("download_complete_title"),
+            _t("download_complete_msg", n=count, folder=self._current_save_dir()),
         )
 
     def _on_download_error(self, msg: str) -> None:
         self.download_btn.setEnabled(True)
         self.cancel_btn.setEnabled(False)
-        self._on_log(f"\n❌ Error: {msg}")
-        QMessageBox.critical(self, "Download failed", msg)
+        self._on_log(_t("error_n", msg=msg))
+        QMessageBox.critical(self, _t("download_failed"), msg)
 
 
 # ---------------------------------------------------------------------------
@@ -974,6 +1147,12 @@ def main() -> None:
     app.setFont(QFont("Segoe UI", 10))
     win = PexelsDownloader()
     win.resize(780, 700)
+    # Pre-fill for neutral import if --neutral flag is passed.
+    if "--neutral" in sys.argv:
+        idx = win.category_combo.findText("neutral")
+        if idx >= 0:
+            win.category_combo.setCurrentIndex(idx)
+        win.query_edit.setText("everyday objects office desk kitchen tools")
     win.show()
     sys.exit(app.exec())
 

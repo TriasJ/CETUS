@@ -642,28 +642,27 @@ class SettingsScreen(QWidget):
         if not venv_python.exists():
             return None  # no usable interpreter → hide the card
 
-        box, v = self._card("settings.tools_title" if "settings.tools_title" in
-                            self.context.config.__dict__ else "settings.tools_title")
-        # Use direct strings (local-only, not i18n'd)
-        box.setTitle("Herramientas de medios")
-        hint = QLabel("Descargadores de medios para la biblioteca de señales (solo local).")
-        hint.setObjectName("Muted"); hint.setWordWrap(True)
-        v.addWidget(hint)
+        box, v = self._card("settings.tools_title", "settings.tools_hint")
+        self._tools_venv_python = venv_python
+        self._tools_project_root = project_root
 
         def _launch(script: Path) -> None:
+            import os as _os
+            env = dict(_os.environ)
+            env["CETUS_LOCALE"] = self.context.config.locale
             subprocess.Popen(
                 [str(venv_python), str(script)],
-                cwd=str(project_root),
+                cwd=str(project_root), env=env,
                 creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
             )
 
         row = QHBoxLayout()
         if youtube_gui.exists():
-            yt_btn = QPushButton("🎬  YouTube Importer")
+            yt_btn = QPushButton(tr("settings.import_video_button"))
             yt_btn.clicked.connect(lambda: _launch(youtube_gui))
             row.addWidget(yt_btn)
         if pexels_gui.exists():
-            px_btn = QPushButton("📷  Pexels Downloader")
+            px_btn = QPushButton(tr("settings.import_web_button"))
             px_btn.clicked.connect(lambda: _launch(pexels_gui))
             row.addWidget(px_btn)
         row.addStretch(1)

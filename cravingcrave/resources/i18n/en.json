@@ -540,6 +540,13 @@
   "settings.max_cue_repeats": "Max cue repeats before backlog (0 = off)",
   "settings.max_cue_repeats_hint": "Cues shown more than this many times are moved to the end of the playlist.",
 
+  "settings.tools_title": "Media tools",
+  "settings.tools_hint": "Download cue images and videos for the exposure library.",
+  "settings.import_web_button": "🌐 Import from Web",
+  "settings.import_video_button": "🎬 Import Video",
+  "cueconfig.import_wizard": "🌐 Import Wizard",
+  "cueconfig.import_web": "🌐 Import from Web",
+
   "settings.media_title": "Image & Video Cues",
   "settings.media_hint": "How image and video cues are displayed and timed during exposure.",
   "settings.video_section": "Video cue behavior",

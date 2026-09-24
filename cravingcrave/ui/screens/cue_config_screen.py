@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 
@@ -135,7 +136,13 @@ class CueConfigScreen(QWidget):
         edit_weight = QPushButton(tr("cueconfig.edit_weight"))
         edit_weight.clicked.connect(self._edit_weight)
 
-        buttons = [add_lib, add_files, add_folder, up, down, suggest_w, edit_weight]
+        import_wizard_btn = QPushButton(tr("cueconfig.import_wizard"))
+        import_wizard_btn.clicked.connect(self._open_import_wizard)
+        import_web_btn = QPushButton(tr("cueconfig.import_web"))
+        import_web_btn.clicked.connect(self._open_import_web)
+
+        buttons = [import_wizard_btn, import_web_btn, add_lib, add_files, add_folder,
+                   up, down, suggest_w, edit_weight]
         # Adaptive ordering (opt-in): suggest a low→high craving order the clinician reviews & applies.
         if self.context.config.adaptive_ordering:
             suggest = QPushButton(tr("cueconfig.suggest_order"))
@@ -318,6 +325,35 @@ class CueConfigScreen(QWidget):
         if cue:
             self.context.repos.cues.delete(cue.id)
             self._refresh()
+
+    def _open_import_wizard(self) -> None:
+        """Open the Import Images from Web wizard."""
+        # Placeholder until the wizard module is built.
+        QMessageBox.information(
+            self, tr("app.title"),
+            tr("cueconfig.import_wizard") + " — " + tr("common.continue"))
+
+    def _open_import_web(self) -> None:
+        """Launch the Pexels search dialog directly."""
+        import subprocess
+        import sys as _sys
+        root = Path(__file__).resolve().parents[3]
+        pexels = root / "tools" / "pexels_gui.py"
+        if not pexels.exists():
+            return
+        venv_python = root / ".venv" / "Scripts" / "python.exe"
+        if not venv_python.exists():
+            venv_python = root / ".venv" / "bin" / "python"
+        if not venv_python.exists() and not getattr(_sys, "frozen", False):
+            venv_python = Path(_sys.executable)
+        if not venv_python.exists():
+            return
+        env = dict(os.environ)
+        env["CETUS_LOCALE"] = self.context.config.locale
+        subprocess.Popen(
+            [str(venv_python), str(pexels)], cwd=str(root), env=env,
+            creationflags=subprocess.CREATE_NO_WINDOW if _sys.platform == "win32" else 0,
+        )
 
     def _edit_weight(self) -> None:
         """Manually adjust the craving weight of the selected cue."""
