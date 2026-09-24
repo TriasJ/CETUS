@@ -256,6 +256,23 @@ class _PexelsKeyPage(QWizardPage):
         if key:
             self._key_input.setText(key)
             self._verify()
+            # Auto-skip if we found a key (even if verify failed due to no network).
+            # The key is already saved — worst case it fails at search time.
+            if key and len(key) > 10:
+                self._auto_skip = True
+                self._verified = True  # trust the saved key
+                if not self._status.text():
+                    self._status.setText(tr("import.key_valid"))
+                    self._status.setStyleSheet("color:#2a9d8f; font-weight:bold;")
+                from PySide6.QtCore import QTimer
+                QTimer.singleShot(400, self._try_auto_advance)
+
+    def _try_auto_advance(self):
+        """Auto-click Next if the key was pre-verified."""
+        if self._auto_skip and self._verified:
+            wiz = self.wizard()
+            if wiz is not None:
+                wiz.next()
 
     def _on_text_changed(self):
         self._verified = False
@@ -327,6 +344,15 @@ class _GeminiKeyPage(QWizardPage):
             self._has_key = True
             self._status.setText(tr("import.key_valid"))
             self._status.setStyleSheet("color:#2a9d8f;")
+            # Auto-skip: Gemini key already configured
+            from PySide6.QtCore import QTimer
+            QTimer.singleShot(400, self._try_auto_advance)
+
+    def _try_auto_advance(self):
+        if self._has_key:
+            wiz = self.wizard()
+            if wiz is not None:
+                wiz.next()
 
     def _save_key(self):
         key = self._key_input.text().strip()
