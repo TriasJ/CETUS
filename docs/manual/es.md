@@ -1,6 +1,6 @@
 # Ayuda y base científica — CETUS
 
-_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.8.0._
+_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.9.9._
 
 ## Contents
 
@@ -28,6 +28,7 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 - [Sesiones, registro y exportación](#sesiones-registro-y-exportación)
 - [Informe clínico: métricas y base científica](#informe-clínico-métricas-y-base-científica)
 - [Gestión de pacientes y biblioteca de señales](#gestión-de-pacientes-y-biblioteca-de-señales)
+- [Herramientas de medios: Importar desde la web](#herramientas-de-medios-importar-desde-la-web)
 - [Recuperación de administrador](#recuperación-de-administrador)
 - [Atajos de teclado](#atajos-de-teclado)
 - [Limitaciones y consideraciones éticas](#limitaciones-y-consideraciones-éticas)
@@ -176,6 +177,12 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 ## Gestión de pacientes y biblioteca de señales
 
 <p><b>Pacientes:</b> crea pacientes con un <b>código seudónimo</b> (no uses el nombre real como código). Puedes <b>editar</b> y <b>archivar</b> pacientes desde su ficha (archivar los oculta de la lista sin borrar sus datos).</p><p><b>Biblioteca de señales:</b> en <i>Configurar señales</i> puedes <b>agregar desde la biblioteca</b>, <b>agregar archivos</b> (varios a la vez) o <b>agregar una carpeta completa</b>. Ordena con ↑/↓, activa/desactiva individualmente o todas a la vez, y marca las imágenes positivas. Lo más efectivo es usar <b>señales personalizadas</b> del propio paciente.</p><p>Los medios se guardan en la carpeta <i>media/{alcohol, cigarettes, meth, opioid, positive, sounds, neutral}</i>. Para video se recomienda MP4 H.264 + AAC.</p><h3>Detección de archivos faltantes</h3><p>CETUS valida los archivos de medios en disco al mostrar la biblioteca de señales. Los archivos faltantes o renombrados se señalan con una advertencia <b>⚠</b> en rojo. La pantalla de preparación de sesión también advierte si alguna señal asignada apunta a un archivo faltante, ayudando a los clínicos a detectar problemas del sistema de archivos antes de iniciar una sesión.</p><h3>Pesos de deseo</h3><p>Cada señal en la biblioteca ahora muestra su <b>peso de deseo</b> (cuando está disponible desde datos de investigación) junto al rango apetitivo, ej. <code>[3] w=8.7 meth/mocis_mmc4_050.jpeg</code>. El botón <b>Sugerir pesos</b> autocompleta los pesos desde los datos de investigación MOCIS incluidos para todas las señales coincidentes. Los pesos se autocomplentan al agregar señales desde la biblioteca.</p><!--v040--><h3>Dónde se guardan los datos</h3><p>Según cómo se ejecute CETUS, los datos y medios se guardan en la <b>carpeta de usuario del sistema</b> (Windows <i>%APPDATA%\CETUS</i>, macOS <i>~/Library/Application Support/CETUS</i>, Linux <i>~/.local/share/CETUS</i>) cuando se instala, o <b>junto al ejecutable</b> en la versión portátil (coloca un archivo <i>portable.txt</i> al lado del programa). La primera ejecución crea las carpetas automáticamente. CETUS ofrece <b>instaladores para Windows, macOS y Linux</b>.</p>
+
+---
+
+## Herramientas de medios: Importar desde la web
+
+<p>CETUS incluye herramientas para descargar imágenes y videos de señales desde la web para tu biblioteca de exposición.</p><h3>Asistente de importación</h3><p>El Asistente de Importación (🌐) te guía para configurar fuentes de imágenes y descargar imágenes neutras y de señales de sustancia. Se lanza automáticamente en la primera ejecución, o cuando no hay imágenes neutras disponibles. También puedes abrirlo desde la biblioteca de señales o Ajustes.</p><h3>Importar desde la web (Pexels)</h3><p>Para usuarios experimentados, el diálogo directo <b>Importar desde la web</b> proporciona una interfaz de búsqueda completa con Pexels. Busca por palabra clave, filtra por orientación, previsualiza miniaturas y descarga a cualquier categoría de señales. Las imágenes duplicadas se detectan y omiten automáticamente.</p><h3>Importar video (YouTube)</h3><p>Los videos de señales se pueden importar desde YouTube. El importador descarga el video y opcionalmente lo recodifica a formato H.264 + AAC para reproducción clínica confiable.</p><h3>Licencia de Pexels</h3><p>Las imágenes de Pexels son gratuitas para uso comercial y personal. No se requiere atribución, pero se agradece. No puedes vender copias sin modificar de las imágenes. La licencia completa está disponible en <a href='https://www.pexels.com/license/'>pexels.com/license</a>. Todas las imágenes descargadas se registran en un archivo <code>_licenses.csv</code> en cada carpeta de medios con la atribución del fotógrafo y URL de origen.</p><h3>Claves API</h3><p>Para usar la búsqueda de Pexels, necesitas una clave API gratuita de <a href='https://www.pexels.com/api/'>pexels.com/api</a>. El Asistente de Importación te guía en la configuración. La clave se guarda localmente en <code>media/pexels.env</code> y nunca se transmite a ningún lugar excepto a Pexels para consultas de búsqueda.</p>
 
 ---
 

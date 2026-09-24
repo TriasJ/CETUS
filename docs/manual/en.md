@@ -1,6 +1,6 @@
 # Help and scientific basis — CETUS
 
-_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.8.0._
+_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.9.9._
 
 ## Contents
 
@@ -28,6 +28,7 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 - [Sessions, logging and export](#sessions-logging-and-export)
 - [Clinical report: metrics and scientific basis](#clinical-report-metrics-and-scientific-basis)
 - [Patient management and cue library](#patient-management-and-cue-library)
+- [Media tools: Import from Web](#media-tools-import-from-web)
 - [Administrator recovery](#administrator-recovery)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Limitations and ethical considerations](#limitations-and-ethical-considerations)
@@ -176,6 +177,12 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 ## Patient management and cue library
 
 <p><b>Patients:</b> create patients with a <b>pseudonymous code</b> (do not use the real name as the code). You can <b>edit</b> and <b>archive</b> patients from their record (archiving hides them from the list without deleting their data).</p><p><b>Cue library:</b> in <i>Configure cues</i> you can <b>add from the library</b>, <b>add files</b> (several at once) or <b>add a whole folder</b>. Order with ↑/↓, enable/disable individually or all at once, and mark the positive images. The most effective approach is to use the patient's own <b>personalized cues</b>.</p><p>Media are stored in the <i>media/{alcohol, cigarettes, meth, opioid, positive, sounds, neutral}</i> folder. For video, MP4 H.264 + AAC is recommended.</p><h3>Missing-file detection</h3><p>CETUS validates media files on disk when displaying the cue library. Missing or renamed files are flagged with a <b>⚠</b> warning in red. The session setup screen also warns if any assigned cues point to missing files, helping clinicians catch filesystem problems before starting a session.</p><h3>Craving weights</h3><p>Each cue in the library now shows its <b>craving weight</b> (when available from research data) alongside the appetitive rank, e.g. <code>[3] w=8.7 meth/mocis_mmc4_050.jpeg</code>. The <b>Suggest Weights</b> button auto-populates weights from the bundled MOCIS research data for all matching cues. Weights are auto-populated when adding cues from the library.</p><!--v040--><h3>Where data is stored</h3><p>Depending on how CETUS runs, data and media are stored in the <b>system user folder</b> (Windows <i>%APPDATA%\CETUS</i>, macOS <i>~/Library/Application Support/CETUS</i>, Linux <i>~/.local/share/CETUS</i>) when installed, or <b>next to the executable</b> in the portable version (place a <i>portable.txt</i> file beside the program). First run creates the folders automatically. CETUS provides <b>installers for Windows, macOS and Linux</b>.</p>
+
+---
+
+## Media tools: Import from Web
+
+<p>CETUS includes tools to download cue images and videos from the web for your exposure library.</p><h3>Import Wizard</h3><p>The Import Wizard (🌐) guides you through setting up image sources and downloading neutral and substance cue images. It launches automatically on first run, or when no neutral images are available. You can also open it from the cue library or Settings.</p><h3>Import from Web (Pexels)</h3><p>For experienced users, the direct <b>Import from Web</b> dialog provides a full search interface powered by Pexels. Search by keyword, filter by orientation, preview thumbnails, and download to any cue category. Duplicate images are automatically detected and skipped.</p><h3>Import Video (YouTube)</h3><p>Video cues can be imported from YouTube. The importer downloads the video and optionally re-encodes it to H.264 + AAC format for reliable clinical playback.</p><h3>Pexels License</h3><p>Images from Pexels are free to use for both commercial and personal purposes. Attribution is not required but appreciated. You may not sell unaltered copies of the images. The full license is available at <a href='https://www.pexels.com/license/'>pexels.com/license</a>. All downloaded images are tracked in a <code>_licenses.csv</code> file in each media folder with photographer attribution and source URL.</p><h3>API Keys</h3><p>To use the Pexels search, you need a free API key from <a href='https://www.pexels.com/api/'>pexels.com/api</a>. The Import Wizard guides you through the setup. The key is saved locally in <code>media/pexels.env</code> and never transmitted anywhere except to Pexels for search queries.</p>
 
 ---
 

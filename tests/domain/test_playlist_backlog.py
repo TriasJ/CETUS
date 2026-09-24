@@ -11,14 +11,13 @@ from __future__ import annotations
 
 import random
 
-from cravingcrave.domain.models import CueConfig
+from cravingcrave.domain.models import CueConfig, MediaItem
 from cravingcrave.domain.playlist import (
     build_exposure_playlist,
     build_interspersed_playlist,
     build_playlist_for_mode,
     media_to_neutral_cues,
 )
-from cravingcrave.domain.models import MediaItem
 
 
 def _cue(rank: int, exposure: int = 0, weight: float | None = None,
