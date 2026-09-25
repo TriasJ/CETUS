@@ -34,7 +34,7 @@ from ...services.cue_weights import CueWeightLookup
 from ...services.i18n import tr
 from ...services.media_library import media_type_for
 from ..context import AppContext
-from ..responsive import adaptive_dialog_width, adaptive_margins, adaptive_nav_width
+from ..responsive import adaptive_dialog_width, adaptive_margins
 
 # Auxiliary (non-substance) media folders shown in the library picker.
 _AUX_CATEGORY_KEYS = {"positive": "substance.positive", "sounds": "substance.sounds"}
@@ -154,9 +154,14 @@ class CueConfigScreen(QWidget):
             buttons += [suggest, export_order]
         buttons += [toggle_en, toggle_pos, enable_all, disable_all, delete]
 
+        # Side button column: scrollable vertically, width adapts to content.
+        # No maxWidth — let the buttons show their full labels. The body layout
+        # gives stretch=1 to the cue list (left) and stretch=0 to the side column
+        # so the buttons take only the space they need.
         side_widget = QWidget()
         side_layout = QVBoxLayout(side_widget)
         side_layout.setContentsMargins(0, 0, 0, 0)
+        side_layout.setSpacing(4)
         for b in buttons:
             side_layout.addWidget(b)
         side_layout.addStretch(1)
@@ -164,16 +169,13 @@ class CueConfigScreen(QWidget):
         side_scroll.setWidget(side_widget)
         side_scroll.setWidgetResizable(True)
         side_scroll.setFrameShape(QFrame.Shape.NoFrame)
-        side_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        side_scroll.setMinimumWidth(140)
-        side_scroll.setMaximumWidth(max(180, adaptive_nav_width() + 20))
 
         body = QHBoxLayout()
         left = QVBoxLayout()
         left.addWidget(self.empty)
         left.addWidget(self.list, 1)
         body.addLayout(left, 1)
-        body.addWidget(side_scroll)
+        body.addWidget(side_scroll, 0)  # stretch=0: buttons take natural width
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(*adaptive_margins())
