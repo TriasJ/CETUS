@@ -535,6 +535,8 @@
   "cueconfig.edit_weight_warning": "⚠ Los pesos manuales son estimaciones subjetivas. Cuando hay bases de datos de señales validadas (MOCIS, PLSC), use «Sugerir pesos» — los pesos basados en investigación derivados de calificaciones empíricas de deseo son más confiables que la intuición clínica para el orden graduado.",
   "cueconfig.file_missing": "⚠ Archivo de medios no encontrado — pudo haber sido renombrado o eliminado.",
   "cueconfig.files_missing": "⚠ {n} archivo(s) de señales faltante(s) — revisa la carpeta de medios.",
+  "cueconfig.tools_unavailable": "Las herramientas de importación no están disponibles en esta instalación.",
+  "cueconfig.select_first": "Selecciona una señal de la lista primero.",
 
   "exposure.neutral_indicator": "[neutra]",
 
@@ -637,6 +639,15 @@
   "import.substance_tips": "Consejos para buenas imágenes de señales:\n• Representación clara de la sustancia o parafernalia\n• Iluminación y fondo consistentes\n• Evitar imágenes con rostros identificables\n• Múltiples ángulos y contextos aumentan la variedad",
   "import.select_substance": "Seleccionar sustancia:",
   "import.skip_substance": "Omitir — agregaré señales después",
+  "import.dedup_title": "Buscar duplicados",
+  "import.dedup_subtitle": "Escanea todas las carpetas de medios para encontrar imágenes duplicadas por contenido (SHA-256).",
+  "import.dedup_scan": "Escanear duplicados",
+  "import.dedup_none": "No se encontraron duplicados.",
+  "import.dedup_found": "Se encontraron {n} archivo(s) duplicado(s).",
+  "import.dedup_keep": "Conservar",
+  "import.dedup_remove": "Eliminar seleccionados",
+  "import.dedup_removed": "{n} archivo(s) eliminado(s).",
+  "import.dedup_periodic": "Se encontraron {n} archivo(s) duplicado(s) en la biblioteca de medios. ¿Deseas revisarlos ahora?",
   "import.summary_title": "Importación completa",
   "import.summary_body": "Siempre puedes importar más imágenes desde la biblioteca de señales (botón 🌐 Importar desde la web) o Ajustes → Herramientas de medios.",
   "import.summary_downloaded": "Imágenes descargadas:"

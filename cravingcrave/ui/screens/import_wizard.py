@@ -646,7 +646,135 @@ class _SubstanceDownloadPage(_SearchDownloadPage):
 
 
 # ---------------------------------------------------------------------------
-# Page 6 — Summary
+# Page 6 — Dedup scan across all media folders
+# ---------------------------------------------------------------------------
+
+def scan_duplicates(media_root: Path) -> list[tuple[Path, list[Path]]]:
+    """Scan all media subfolders for duplicate files by SHA-256 hash.
+
+    Returns a list of (keeper, [duplicates]) tuples.  The keeper is the
+    alphabetically-first file; the rest are duplicates.
+    """
+    from collections import defaultdict
+    hash_map: dict[str, list[Path]] = defaultdict(list)
+    if not media_root.is_dir():
+        return []
+    for folder in sorted(media_root.iterdir()):
+        if not folder.is_dir():
+            continue
+        for f in sorted(folder.iterdir()):
+            if not f.is_file() or f.name.startswith("_") or f.suffix.lower() in (".csv", ".json", ".env", ".txt"):
+                continue
+            try:
+                h = hashlib.sha256(f.read_bytes()).hexdigest()
+                hash_map[h].append(f)
+            except OSError:
+                pass
+    return [(paths[0], paths[1:]) for paths in hash_map.values() if len(paths) > 1]
+
+
+class _DedupPage(QWizardPage):
+    """Scan media folders for duplicate files and let the clinician remove them."""
+
+    def __init__(self, context: AppContext, parent=None):
+        super().__init__(parent)
+        self.context = context
+        self._duplicates: list[tuple[Path, list[Path]]] = []
+        self._checks: list[tuple[QCheckBox, Path]] = []
+
+        self.setTitle(tr("import.dedup_title"))
+        self.setSubTitle(tr("import.dedup_subtitle"))
+
+        self._scan_btn = QPushButton(tr("import.dedup_scan"))
+        self._scan_btn.setObjectName("Primary")
+        self._scan_btn.clicked.connect(self._run_scan)
+
+        self._status = QLabel("")
+        self._status.setObjectName("Muted")
+
+        self._list_widget = QWidget()
+        self._list_layout = QVBoxLayout(self._list_widget)
+        self._list_layout.setContentsMargins(0, 0, 0, 0)
+        self._list_layout.setSpacing(2)
+
+        self._scroll = QScrollArea()
+        self._scroll.setWidget(self._list_widget)
+        self._scroll.setWidgetResizable(True)
+        self._scroll.setMinimumHeight(150)
+
+        self._remove_btn = QPushButton(tr("import.dedup_remove"))
+        self._remove_btn.setObjectName("Danger")
+        self._remove_btn.clicked.connect(self._remove_selected)
+        self._remove_btn.setEnabled(False)
+
+        v = QVBoxLayout(self)
+        v.addWidget(self._scan_btn)
+        v.addWidget(self._status)
+        v.addWidget(self._scroll, 1)
+        btn_row = QHBoxLayout()
+        btn_row.addStretch(1)
+        btn_row.addWidget(self._remove_btn)
+        v.addLayout(btn_row)
+
+    def initializePage(self):
+        self._run_scan()
+
+    def _run_scan(self):
+        self._checks.clear()
+        while self._list_layout.count():
+            item = self._list_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        media = Path(self.context.config.media_root)
+        self._duplicates = scan_duplicates(media)
+        if not self._duplicates:
+            self._status.setText(tr("import.dedup_none"))
+            self._remove_btn.setEnabled(False)
+            return
+
+        total_dups = sum(len(dups) for _, dups in self._duplicates)
+        self._status.setText(tr("import.dedup_found", n=total_dups))
+
+        for keeper, dups in self._duplicates:
+            group_label = QLabel(
+                f"<b>{tr('import.dedup_keep')}:</b> {keeper.parent.name}/{keeper.name}")
+            group_label.setStyleSheet("margin-top:6px;")
+            self._list_layout.addWidget(group_label)
+            for dup in dups:
+                cb = QCheckBox(f"  {dup.parent.name}/{dup.name}")
+                cb.setChecked(True)
+                cb.stateChanged.connect(self._update_remove_count)
+                self._list_layout.addWidget(cb)
+                self._checks.append((cb, dup))
+
+        self._list_layout.addStretch(1)
+        self._list_widget.adjustSize()
+        self._update_remove_count()
+
+    def _update_remove_count(self):
+        n = sum(1 for cb, _ in self._checks if cb.isChecked())
+        self._remove_btn.setEnabled(n > 0)
+        self._remove_btn.setText(tr("import.dedup_remove") + f" ({n})")
+
+    def _remove_selected(self):
+        removed = 0
+        for cb, path in self._checks:
+            if cb.isChecked():
+                try:
+                    path.unlink()
+                    removed += 1
+                except OSError:
+                    pass
+        self._status.setText(tr("import.dedup_removed", n=removed))
+        self._run_scan()
+
+    def isComplete(self):
+        return True
+
+
+# ---------------------------------------------------------------------------
+# Page 7 — Summary
 # ---------------------------------------------------------------------------
 
 class _SummaryPage(QWizardPage):
@@ -726,11 +854,13 @@ class ImportWizard(QWizard):
         self._gemini_key = _GeminiKeyPage(context)
         self._neutral_page = _NeutralDownloadPage(context)
         self._substance_page = _SubstanceDownloadPage(context)
+        self._dedup_page = _DedupPage(context)
         self._summary = _SummaryPage(context)
 
-        self.addPage(self._welcome)       # 0
+        self.addPage(self._welcome)        # 0
         self.addPage(self._pexels_key)     # 1
         self.addPage(self._gemini_key)     # 2
         self.addPage(self._neutral_page)   # 3
         self.addPage(self._substance_page) # 4
-        self.addPage(self._summary)        # 5
+        self.addPage(self._dedup_page)     # 5
+        self.addPage(self._summary)        # 6

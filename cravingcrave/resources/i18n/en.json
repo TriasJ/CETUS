@@ -535,6 +535,8 @@
   "cueconfig.edit_weight_warning": "⚠ Manual weights are subjective estimates. When validated cue databases are available (MOCIS, PLSC), use \"Suggest Weights\" instead — research-based weights derived from empirical craving ratings are more reliable than clinical intuition for graded ordering.",
   "cueconfig.file_missing": "⚠ Media file not found — it may have been renamed or deleted.",
   "cueconfig.files_missing": "⚠ {n} cue file(s) missing — check the media folder.",
+  "cueconfig.tools_unavailable": "Import tools are not available in this installation.",
+  "cueconfig.select_first": "Select a cue from the list first.",
 
   "exposure.neutral_indicator": "[neutral]",
 
@@ -637,6 +639,15 @@
   "import.substance_tips": "Tips for good cue images:\n• Clear depiction of the substance or paraphernalia\n• Consistent lighting and background\n• Avoid images with identifiable faces\n• Multiple angles and contexts increase variety",
   "import.select_substance": "Select substance:",
   "import.skip_substance": "Skip — I'll add cues later",
+  "import.dedup_title": "Check for Duplicates",
+  "import.dedup_subtitle": "Scan all media folders for duplicate images by content (SHA-256).",
+  "import.dedup_scan": "Scan for Duplicates",
+  "import.dedup_none": "No duplicates found.",
+  "import.dedup_found": "{n} duplicate file(s) found.",
+  "import.dedup_keep": "Keep",
+  "import.dedup_remove": "Remove Selected",
+  "import.dedup_removed": "{n} file(s) removed.",
+  "import.dedup_periodic": "{n} duplicate file(s) found in your media library. Would you like to review them now?",
   "import.summary_title": "Import Complete",
   "import.summary_body": "You can always import more images from the cue library (🌐 Import from Web button) or Settings → Media Tools.",
   "import.summary_downloaded": "Images downloaded:"

@@ -238,8 +238,12 @@ class CueConfigScreen(QWidget):
             return
         rank = self._next_rank()
         weights = CueWeightLookup()
-        # Sort by path so files added together keep their graded (filename) order.
+        existing_paths = {c.media_path for c in self._cues()}
+        added = skipped = 0
         for m in sorted(dialog.selected(), key=lambda m: m.path):
+            if m.path in existing_paths:
+                skipped += 1
+                continue
             w = weights.suggest(m.path)
             self.context.repos.cues.create(CueConfig(
                 patient_id=self.patient.id, substance=m.substance, media_path=m.path,
@@ -248,8 +252,13 @@ class CueConfigScreen(QWidget):
                 is_neutral=(m.substance == "neutral"),
                 craving_weight=w,
             ))
+            existing_paths.add(m.path)
             rank += 1
+            added += 1
         self._refresh()
+        if skipped:
+            QMessageBox.information(self, tr("app.title"),
+                                    tr("cueconfig.import_result", imported=added, skipped=skipped))
 
     _FILE_FILTER = ("Media (*.jpg *.jpeg *.png *.webp *.bmp *.gif "
                     "*.mp4 *.mov *.m4v *.avi *.mkv *.webm *.mp3 *.wav *.m4a *.aac *.ogg *.flac)")
@@ -258,17 +267,22 @@ class CueConfigScreen(QWidget):
         """Copy media files into the patient's substance folder and create cues.
 
         Shared by multi-file and folder import. Non-media files are skipped; files
-        already present are reused in place. Reports a summary.
+        already present are reused in place. Duplicate paths are skipped.
         """
         category = self.patient.primary_substance or "alcohol"
         dest_dir = Path(self.context.config.media_root) / category
         dest_dir.mkdir(parents=True, exist_ok=True)
+        existing_paths = {c.media_path for c in self._cues()}
         rank = self._next_rank()
         imported = skipped = 0
         for path in paths:
             src = Path(path)
             mtype = media_type_for(src)
             if mtype is None or not src.is_file():
+                skipped += 1
+                continue
+            media_path = f"{category}/{src.name}"
+            if media_path in existing_paths:
                 skipped += 1
                 continue
             dest = dest_dir / src.name
@@ -280,8 +294,9 @@ class CueConfigScreen(QWidget):
                 continue
             self.context.repos.cues.create(CueConfig(
                 patient_id=self.patient.id, substance=category,
-                media_path=f"{category}/{src.name}", media_type=mtype, appetitive_rank=rank,
+                media_path=media_path, media_type=mtype, appetitive_rank=rank,
             ))
+            existing_paths.add(media_path)
             rank += 1
             imported += 1
         self._refresh()
@@ -310,22 +325,28 @@ class CueConfigScreen(QWidget):
         self._refresh()
 
     # --- edit ---------------------------------------------------------------
-    def _toggle_enabled(self) -> None:
+    def _require_selected(self):
         cue = self._selected_cue()
+        if cue is None:
+            QMessageBox.information(self, tr("app.title"), tr("cueconfig.select_first"))
+        return cue
+
+    def _toggle_enabled(self) -> None:
+        cue = self._require_selected()
         if cue:
             cue.enabled = not cue.enabled
             self.context.repos.cues.update(cue)
             self._refresh()
 
     def _toggle_personal(self) -> None:
-        cue = self._selected_cue()
+        cue = self._require_selected()
         if cue:
             cue.is_personal_reason = not cue.is_personal_reason
             self.context.repos.cues.update(cue)
             self._refresh()
 
     def _delete(self) -> None:
-        cue = self._selected_cue()
+        cue = self._require_selected()
         if cue:
             self.context.repos.cues.delete(cue.id)
             self._refresh()
@@ -339,33 +360,54 @@ class CueConfigScreen(QWidget):
 
     def _open_import_web(self) -> None:
         """Prompt which importer to open (Pexels images or YouTube video)."""
-        from PySide6.QtWidgets import QInputDialog
-        items = [
-            tr("settings.import_web_button"),   # 🌐 Import from Web (Pexels)
-            tr("settings.import_video_button"),  # 🎬 Import Video (YouTube)
-        ]
-        choice, ok = QInputDialog.getItem(
-            self, tr("settings.tools_title"), tr("settings.tools_hint"),
-            items, 0, False)
-        if not ok:
-            return
         import subprocess
         import sys as _sys
-        root = Path(__file__).resolve().parents[3]
-        if choice == items[0]:
-            script = root / "tools" / "pexels_gui.py"
+
+        from PySide6.QtWidgets import QInputDialog
+
+        if getattr(_sys, "frozen", False):
+            root = Path(_sys.executable).resolve().parent.parent
         else:
-            script = root / "tools" / "youtube_gui.py"
-        if not script.exists():
-            QMessageBox.information(self, tr("app.title"),
-                                    f"Tool not found: {script.name}")
+            root = Path(__file__).resolve().parents[3]
+
+        tools_dir = root / "tools"
+        pexels_ok = (tools_dir / "pexels_gui.py").exists()
+        youtube_ok = (tools_dir / "youtube_gui.py").exists()
+        if not pexels_ok and not youtube_ok:
+            QMessageBox.information(
+                self, tr("app.title"),
+                tr("cueconfig.tools_unavailable"))
             return
+
+        items = []
+        if pexels_ok:
+            items.append(tr("settings.import_web_button"))
+        if youtube_ok:
+            items.append(tr("settings.import_video_button"))
+
+        if len(items) == 1:
+            choice = items[0]
+        else:
+            choice, ok = QInputDialog.getItem(
+                self, tr("settings.tools_title"), tr("settings.tools_hint"),
+                items, 0, False)
+            if not ok:
+                return
+
+        if pexels_ok and choice == tr("settings.import_web_button"):
+            script = tools_dir / "pexels_gui.py"
+        else:
+            script = tools_dir / "youtube_gui.py"
+
         venv_python = root / ".venv" / "Scripts" / "python.exe"
         if not venv_python.exists():
             venv_python = root / ".venv" / "bin" / "python"
         if not venv_python.exists() and not getattr(_sys, "frozen", False):
             venv_python = Path(_sys.executable)
         if not venv_python.exists():
+            QMessageBox.information(
+                self, tr("app.title"),
+                tr("cueconfig.tools_unavailable"))
             return
         env = dict(os.environ)
         env["CETUS_LOCALE"] = self.context.config.locale
@@ -376,7 +418,7 @@ class CueConfigScreen(QWidget):
 
     def _edit_weight(self) -> None:
         """Manually adjust the craving weight of the selected cue."""
-        cue = self._selected_cue()
+        cue = self._require_selected()
         if cue is None:
             return
         dlg = QDialog(self)

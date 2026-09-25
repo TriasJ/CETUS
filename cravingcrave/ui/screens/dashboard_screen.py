@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import QSize, Qt, QTimer
+from pathlib import Path
+
+from PySide6.QtCore import QSize, Qt, QThread, QTimer, Signal
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QListWidget,
     QListWidgetItem,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -20,6 +23,21 @@ from ..emoji_icon import emoji_icon
 from ..responsive import adaptive_margins
 from .add_clinician_dialog import AddClinicianDialog
 from .patient_form import PatientFormDialog
+
+
+class _DedupWorker(QThread):
+    """Background thread that scans media folders for duplicate files."""
+    finished_signal = Signal(int)  # number of duplicate files found
+
+    def __init__(self, media_root: Path, parent=None):
+        super().__init__(parent)
+        self._media_root = media_root
+
+    def run(self):
+        from .import_wizard import scan_duplicates
+        dups = scan_duplicates(self._media_root)
+        n = sum(len(d) for _, d in dups)
+        self.finished_signal.emit(n)
 
 
 class DashboardScreen(QWidget):
@@ -115,6 +133,36 @@ class DashboardScreen(QWidget):
             w.exec()
             # Set flag even if cancelled so it doesn't re-launch on every login.
             self.context.repos.settings.set("import_wizard_complete", "1")
+        # Periodic dedup check (every 40 launches).
+        QTimer.singleShot(2000, self._maybe_dedup_check)
+
+    def _maybe_dedup_check(self) -> None:
+        """Run a background dedup scan every 40 app launches."""
+        raw = self.context.repos.settings.get("launch_count") or "0"
+        try:
+            count = int(raw) + 1
+        except ValueError:
+            count = 1
+        self.context.repos.settings.set("launch_count", str(count))
+        if count % 40 != 0:
+            return
+        media = Path(self.context.config.media_root)
+        self._dedup_worker = _DedupWorker(media)
+        self._dedup_worker.finished_signal.connect(self._on_dedup_result)
+        self._dedup_worker.start()
+
+    def _on_dedup_result(self, n_duplicates: int) -> None:
+        if n_duplicates <= 0:
+            return
+        reply = QMessageBox.question(
+            self, tr("app.title"),
+            tr("import.dedup_periodic", n=n_duplicates),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            from .import_wizard import ImportWizard
+            w = ImportWizard(self.context, self)
+            w.exec()
 
     def _refresh(self) -> None:
         self.list.clear()
