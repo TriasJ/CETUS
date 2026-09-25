@@ -338,12 +338,27 @@ class CueConfigScreen(QWidget):
             self._refresh()
 
     def _open_import_web(self) -> None:
-        """Launch the Pexels search dialog directly."""
+        """Prompt which importer to open (Pexels images or YouTube video)."""
+        from PySide6.QtWidgets import QInputDialog
+        items = [
+            tr("settings.import_web_button"),   # 🌐 Import from Web (Pexels)
+            tr("settings.import_video_button"),  # 🎬 Import Video (YouTube)
+        ]
+        choice, ok = QInputDialog.getItem(
+            self, tr("settings.tools_title"), tr("settings.tools_hint"),
+            items, 0, False)
+        if not ok:
+            return
         import subprocess
         import sys as _sys
         root = Path(__file__).resolve().parents[3]
-        pexels = root / "tools" / "pexels_gui.py"
-        if not pexels.exists():
+        if choice == items[0]:
+            script = root / "tools" / "pexels_gui.py"
+        else:
+            script = root / "tools" / "youtube_gui.py"
+        if not script.exists():
+            QMessageBox.information(self, tr("app.title"),
+                                    f"Tool not found: {script.name}")
             return
         venv_python = root / ".venv" / "Scripts" / "python.exe"
         if not venv_python.exists():
@@ -355,7 +370,7 @@ class CueConfigScreen(QWidget):
         env = dict(os.environ)
         env["CETUS_LOCALE"] = self.context.config.locale
         subprocess.Popen(
-            [str(venv_python), str(pexels)], cwd=str(root), env=env,
+            [str(venv_python), str(script)], cwd=str(root), env=env,
             creationflags=subprocess.CREATE_NO_WINDOW if _sys.platform == "win32" else 0,
         )
 

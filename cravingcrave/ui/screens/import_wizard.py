@@ -47,6 +47,12 @@ from ..responsive import screen_size
 # Pexels API client (stdlib only, no external deps)
 # ---------------------------------------------------------------------------
 
+def _media_dir() -> Path:
+    """Resolve the media directory — works in both dev and frozen (PyInstaller) builds."""
+    from ... import paths
+    return paths.media_root()
+
+
 def _load_pexels_key() -> str:
     """Load Pexels API key from env var or media/pexels.env.
 
@@ -58,7 +64,7 @@ def _load_pexels_key() -> str:
     key = os.environ.get("PEXELS_API_KEY", "")
     if key:
         return key.strip()
-    env_path = Path(__file__).resolve().parents[3] / "media" / "pexels.env"
+    env_path = _media_dir() / "pexels.env"
     if env_path.is_file():
         for line in env_path.read_text(encoding="utf-8").splitlines():
             line = line.strip()
@@ -75,7 +81,7 @@ def _load_pexels_key() -> str:
 
 
 def _save_pexels_key(key: str) -> None:
-    env_path = Path(__file__).resolve().parents[3] / "media" / "pexels.env"
+    env_path = _media_dir() / "pexels.env"
     env_path.write_text(f"PEXELS_API_KEY={key}\n", encoding="utf-8")
 
 
@@ -83,7 +89,7 @@ def _load_gemini_key() -> str:
     key = os.environ.get("GEMINI_API_KEY", "")
     if key:
         return key.strip()
-    env_path = Path(__file__).resolve().parents[3] / "media" / "gemini.env"
+    env_path = _media_dir() / "gemini.env"
     if env_path.is_file():
         for line in env_path.read_text(encoding="utf-8").splitlines():
             line = line.strip()
@@ -93,7 +99,7 @@ def _load_gemini_key() -> str:
 
 
 def _save_gemini_key(key: str) -> None:
-    env_path = Path(__file__).resolve().parents[3] / "media" / "gemini.env"
+    env_path = _media_dir() / "gemini.env"
     env_path.write_text(f"GEMINI_API_KEY={key}\n", encoding="utf-8")
 
 
