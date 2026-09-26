@@ -103,6 +103,9 @@ def _save_gemini_key(key: str) -> None:
     env_path.write_text(f"GEMINI_API_KEY={key}\n", encoding="utf-8")
 
 
+_UA = "CETUS/1.0 (PySide6; clinical-research)"
+
+
 def _verify_pexels_key(key: str) -> bool:
     """Test Pexels API key with a minimal request."""
     if not key:
@@ -110,7 +113,7 @@ def _verify_pexels_key(key: str) -> bool:
     try:
         req = urllib.request.Request(
             "https://api.pexels.com/v1/search?query=test&per_page=1",
-            headers={"Authorization": key},
+            headers={"Authorization": key, "User-Agent": _UA},
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
             return resp.status == 200
@@ -122,7 +125,7 @@ def _pexels_search(key: str, query: str, page: int = 1, per_page: int = 15):
     """Search Pexels photos. Returns list of dicts with id, src, photographer, url."""
     url = (f"https://api.pexels.com/v1/search?"
            f"query={urllib.parse.quote(query)}&page={page}&per_page={per_page}")
-    req = urllib.request.Request(url, headers={"Authorization": key})
+    req = urllib.request.Request(url, headers={"Authorization": key, "User-Agent": _UA})
     with urllib.request.urlopen(req, timeout=15) as resp:
         data = json.loads(resp.read().decode())
     results = []
