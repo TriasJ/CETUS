@@ -389,6 +389,40 @@ class SettingsScreen(QWidget):
         v.addLayout(form_bl)
         v.addWidget(backlog_hint)
 
+        # --- Weight learning ---
+        sep_w = QFrame(); sep_w.setFrameShape(QFrame.Shape.HLine)
+        v.addWidget(sep_w)
+        self.auto_update_weights = QCheckBox(tr("settings.auto_update_weights"))
+        self.auto_update_weights.setChecked(cfg.auto_update_weights)
+        wt_hint = QLabel(tr("settings.auto_update_weights_hint"))
+        wt_hint.setObjectName("Muted"); wt_hint.setWordWrap(True)
+        v.addWidget(self.auto_update_weights)
+        v.addWidget(wt_hint)
+        self.weight_min_sessions = QSpinBox(); self.weight_min_sessions.setRange(1, 20)
+        self.weight_min_sessions.setValue(cfg.weight_update_min_sessions)
+        self.weight_source = QComboBox()
+        self.weight_source.addItem(tr("settings.weight_source_patient"), "patient")
+        self.weight_source.addItem(tr("settings.weight_source_population"), "population")
+        idx = self.weight_source.findData(cfg.weight_source)
+        if idx >= 0:
+            self.weight_source.setCurrentIndex(idx)
+        form_w = QFormLayout(); form_w.setSpacing(10)
+        form_w.addRow(tr("settings.weight_update_min_sessions"), self.weight_min_sessions)
+        form_w.addRow(tr("settings.weight_source"), self.weight_source)
+        v.addLayout(form_w)
+
+        self.rate_neutral = QCheckBox(tr("settings.rate_neutral_cues"))
+        self.rate_neutral.setChecked(cfg.rate_neutral_cues)
+        rn_hint = QLabel(tr("settings.rate_neutral_cues_hint"))
+        rn_hint.setObjectName("Muted"); rn_hint.setWordWrap(True)
+        v.addWidget(self.rate_neutral)
+        v.addWidget(rn_hint)
+
+        reset_btn = QPushButton(tr("settings.reset_research_weights"))
+        reset_btn.setToolTip(tr("settings.reset_research_weights_hint"))
+        reset_btn.clicked.connect(self._reset_research_weights)
+        v.addWidget(reset_btn)
+
         # Auto-coping on consecutive high craving scores
         sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine)
         v.addWidget(sep)
@@ -729,6 +763,22 @@ class SettingsScreen(QWidget):
             subs.hide_custom(self.context.repos.settings, key)
             self._refresh_substances()
 
+    def _reset_research_weights(self) -> None:
+        """Revert all cue weights to original research values across all patients."""
+        n = 0
+        for p in self.context.repos.patients.list_all():
+            for c in self.context.repos.cues.list_for_patient(p.id):
+                if c.research_weight is not None and c.craving_weight != c.research_weight:
+                    c.craving_weight = c.research_weight
+                    self.context.repos.cues.update(c)
+                    n += 1
+        if n:
+            QMessageBox.information(self, tr("app.title"),
+                                    tr("settings.weights_reset_done", n=n))
+        else:
+            QMessageBox.information(self, tr("app.title"),
+                                    tr("settings.weights_reset_none"))
+
     def _save(self) -> None:
         cfg = self.context.config
         self.context.crisis.save(CrisisInfo(
@@ -766,6 +816,15 @@ class SettingsScreen(QWidget):
         if hasattr(self, "max_cue_repeats"):
             cfg.max_cue_repeats = self.max_cue_repeats.value()
             s.set("max_cue_repeats", str(cfg.max_cue_repeats))
+        if hasattr(self, "auto_update_weights"):
+            cfg.auto_update_weights = self.auto_update_weights.isChecked()
+            cfg.weight_update_min_sessions = self.weight_min_sessions.value()
+            cfg.weight_source = self.weight_source.currentData()
+            cfg.rate_neutral_cues = self.rate_neutral.isChecked()
+            s.set("auto_update_weights", "1" if cfg.auto_update_weights else "0")
+            s.set("weight_update_min_sessions", str(cfg.weight_update_min_sessions))
+            s.set("weight_source", cfg.weight_source)
+            s.set("rate_neutral_cues", "1" if cfg.rate_neutral_cues else "0")
         if hasattr(self, "auto_coping_enabled"):
             cfg.auto_coping_enabled = self.auto_coping_enabled.isChecked()
             cfg.auto_coping_threshold = self.auto_coping_threshold.value()

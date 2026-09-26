@@ -104,7 +104,8 @@ class CueConfig:
     enabled: bool = True
     is_personal_reason: bool = False     # patient's "reasons for recovery" image
     is_neutral: bool = False             # neutral cue (no craving induction)
-    craving_weight: float | None = None  # research-backed craving weight (0..10 scale)
+    craving_weight: float | None = None  # active craving weight (empirical or research, 0..10)
+    research_weight: float | None = None # original research weight (preserved, never auto-updated)
     exposure_count: int = 0              # times shown across sessions (backlog rotation)
     created_at: str = field(default_factory=utc_now_iso)
 

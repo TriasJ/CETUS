@@ -161,11 +161,11 @@ class SessionController(QObject):
         """Whether the current cue warrants a VAS prompt.
 
         In *interspersed* and *custom* modes, neutral cues skip VAS by default
-        unless ``interspersed_vas_on_neutral`` is enabled.
+        unless ``interspersed_vas_on_neutral`` or ``rate_neutral_cues`` is enabled.
         """
         cue = self.current_cue()
         if cue is not None and cue.is_neutral:
-            return self.config.interspersed_vas_on_neutral
+            return self.config.interspersed_vas_on_neutral or self.config.rate_neutral_cues
         return True
 
     def min_cue_seconds(self) -> int:
@@ -284,10 +284,43 @@ class SessionController(QObject):
         self.session.ended_at = utc_now_iso()
         self.session.end_reason = end_reason.value
         self.repos.sessions.finalize(self.session)
+        if self.config.auto_update_weights:
+            self._update_cue_weights()
         self._finalized = True
         self._set_state(SessionState.CALM if end_reason is EndReason.PANIC else SessionState.SUMMARY)
         self.sessionFinalized.emit(self.session)
         return self.session
+
+    def _update_cue_weights(self) -> None:
+        """Write Bayesian-shrunk reactivity scores back to craving_weight after finalize."""
+        from ..domain import cue_ranking as dom
+        from ..services import cue_ranking as svc
+        patient_id = self.session.patient_id
+        cues = self.repos.cues.list_for_patient(patient_id)
+        if not cues:
+            return
+        all_ratings = self.repos.ratings.list_for_patient(patient_id)
+        react = dom.cue_reactivity(all_ratings)
+        min_n = self.config.weight_update_min_sessions
+        if self.config.weight_source == "population":
+            priors = dom.population_prior(svc._population_entries(self.repos))
+        else:
+            priors = dom.population_prior([])
+        meta = {c.id: {"media_path": c.media_path, "substance": c.substance,
+                        "media_type": c.media_type,
+                        "craving_weight": c.research_weight or c.craving_weight}
+                for c in cues}
+        scores = dom.shrunk_scores(meta, react, priors)
+        for c in cues:
+            s = scores.get(c.id)
+            if s is None or s.get("n", 0) < min_n:
+                continue
+            new_w = round(max(0.0, min(10.0, s["score"])), 1)
+            if c.craving_weight != new_w:
+                if c.research_weight is None and c.craving_weight is not None:
+                    c.research_weight = c.craving_weight
+                c.craving_weight = new_w
+                self.repos.cues.update(c)
 
     def panic(self) -> Session:
         return self.finalize(EndReason.PANIC)

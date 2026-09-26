@@ -133,6 +133,14 @@ class AppConfig:
     # "stars"   = 0-10 star rating
     vas_display_mode: str = "slider"
 
+    # Auto-update cue weights from empirical session data (Bayesian-shrunk reactivity).
+    auto_update_weights: bool = True
+    weight_update_min_sessions: int = 3   # min sessions with data before overwriting research weight
+    weight_source: str = "patient"        # "patient" = this patient only, "population" = cross-patient
+
+    # Experimental: collect VAS ratings on neutral cues (off by default).
+    rate_neutral_cues: bool = False
+
     def ensure_dirs(self) -> None:
         """Create external data/media folders if missing (safe, idempotent)."""
         self.data_dir.mkdir(parents=True, exist_ok=True)

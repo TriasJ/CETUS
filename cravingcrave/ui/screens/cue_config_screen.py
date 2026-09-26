@@ -250,7 +250,7 @@ class CueConfigScreen(QWidget):
                 media_type=m.media_type, appetitive_rank=rank,
                 is_personal_reason=(m.substance == "positive"),
                 is_neutral=(m.substance == "neutral"),
-                craving_weight=w,
+                craving_weight=w, research_weight=w,
             ))
             existing_paths.add(m.path)
             rank += 1
@@ -466,7 +466,28 @@ class CueConfigScreen(QWidget):
             self._refresh()
 
     def _suggest_weights(self) -> None:
-        """Populate craving_weight from the bundled research data for all cues that match."""
+        """Populate craving_weight — let clinician choose research, patient, or population source."""
+        from PySide6.QtWidgets import QInputDialog
+        items = [
+            tr("cueconfig.weight_source_research"),
+            tr("cueconfig.weight_source_patient"),
+            tr("cueconfig.weight_source_population"),
+        ]
+        choice, ok = QInputDialog.getItem(
+            self, tr("cueconfig.weight_source_title"),
+            tr("cueconfig.weight_source_hint"), items, 0, False)
+        if not ok:
+            return
+
+        if choice == items[0]:
+            self._apply_research_weights()
+        elif choice == items[1]:
+            self._apply_empirical_weights("patient")
+        else:
+            self._apply_empirical_weights("population")
+
+    def _apply_research_weights(self) -> None:
+        """Apply weights from bundled research databases (MOCIS/PLSC)."""
         weights = CueWeightLookup()
         if not weights.available():
             QMessageBox.information(self, tr("app.title"), tr("cueconfig.suggest_none"))
@@ -475,11 +496,57 @@ class CueConfigScreen(QWidget):
         for cue in self._cues():
             w = weights.suggest(cue.media_path)
             if w is not None and cue.craving_weight != w:
+                if cue.research_weight is None:
+                    cue.research_weight = w
                 cue.craving_weight = w
                 self.context.repos.cues.update(cue)
                 n += 1
         self._refresh()
         QMessageBox.information(self, tr("app.title"), tr("cueconfig.weights_applied", n=n))
+
+    def _apply_empirical_weights(self, source: str) -> None:
+        """Apply weights from session data (patient-only or cross-patient)."""
+        from ...domain import cue_ranking as dom
+        from ...services import cue_ranking as svc
+        cues = self._cues()
+        if not cues:
+            return
+        all_ratings = self.context.repos.ratings.list_for_patient(self.patient.id)
+        react = dom.cue_reactivity(all_ratings)
+        min_n = self.context.config.weight_update_min_sessions
+        if source == "population":
+            priors = dom.population_prior(svc._population_entries(self.context.repos))
+        else:
+            priors = dom.population_prior([])
+        meta = {c.id: {"media_path": c.media_path, "substance": c.substance,
+                        "media_type": c.media_type,
+                        "craving_weight": c.research_weight or c.craving_weight}
+                for c in cues}
+        scores = dom.shrunk_scores(meta, react, priors)
+        n = insufficient = 0
+        for c in cues:
+            s = scores.get(c.id)
+            if s is None:
+                continue
+            if s.get("n", 0) < min_n:
+                insufficient += 1
+                continue
+            new_w = round(max(0.0, min(10.0, s["score"])), 1)
+            if c.craving_weight != new_w:
+                if c.research_weight is None and c.craving_weight is not None:
+                    c.research_weight = c.craving_weight
+                c.craving_weight = new_w
+                self.context.repos.cues.update(c)
+                n += 1
+        self._refresh()
+        source_label = (tr("cueconfig.weight_source_patient") if source == "patient"
+                        else tr("cueconfig.weight_source_population"))
+        if n:
+            QMessageBox.information(self, tr("app.title"),
+                                    tr("cueconfig.weights_applied_empirical", n=n, source=source_label))
+        elif insufficient:
+            QMessageBox.information(self, tr("app.title"),
+                                    tr("cueconfig.weights_insufficient_data", min=min_n))
 
     def _suggest_order(self) -> None:
         """Preview a learned low→high craving order and let the clinician apply it (rewrites ranks)."""

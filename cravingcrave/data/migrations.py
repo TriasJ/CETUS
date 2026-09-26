@@ -11,7 +11,7 @@ import importlib.resources as resources
 import sqlite3
 from collections.abc import Callable
 
-CURRENT_VERSION = 7
+CURRENT_VERSION = 8
 
 
 def _load_schema_sql() -> str:
@@ -84,6 +84,14 @@ def _migrate_to_7(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE cue_config ADD COLUMN exposure_count INTEGER NOT NULL DEFAULT 0")
 
 
+def _migrate_to_8(conn: sqlite3.Connection) -> None:
+    """v8: research_weight column — preserves original research weight when empirical updates run."""
+    cols = [row[1] for row in conn.execute("PRAGMA table_info(cue_config)").fetchall()]
+    if "research_weight" not in cols:
+        conn.execute("ALTER TABLE cue_config ADD COLUMN research_weight REAL")
+        conn.execute("UPDATE cue_config SET research_weight = craving_weight WHERE craving_weight IS NOT NULL")
+
+
 # Ordered: index i upgrades the DB to version (i + 1).
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     _migrate_to_1,
@@ -93,6 +101,7 @@ _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     _migrate_to_5,
     _migrate_to_6,
     _migrate_to_7,
+    _migrate_to_8,
 ]
 
 

@@ -190,11 +190,12 @@ class CueConfigRepo:
             cur = conn.execute(
                 "INSERT INTO cue_config (patient_id, substance, media_path, media_type, "
                 "appetitive_rank, enabled, is_personal_reason, is_neutral, craving_weight, "
-                "exposure_count, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                "research_weight, exposure_count, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     c.patient_id, c.substance, c.media_path, c.media_type,
                     c.appetitive_rank, int(c.enabled), int(c.is_personal_reason),
-                    int(c.is_neutral), c.craving_weight, c.exposure_count, c.created_at,
+                    int(c.is_neutral), c.craving_weight, c.research_weight,
+                    c.exposure_count, c.created_at,
                 ),
             )
             c.id = cur.lastrowid
@@ -216,11 +217,11 @@ class CueConfigRepo:
             conn.execute(
                 "UPDATE cue_config SET substance=?, media_path=?, media_type=?, "
                 "appetitive_rank=?, enabled=?, is_personal_reason=?, is_neutral=?, "
-                "craving_weight=?, exposure_count=? WHERE id=?",
+                "craving_weight=?, research_weight=?, exposure_count=? WHERE id=?",
                 (
                     c.substance, c.media_path, c.media_type, c.appetitive_rank,
                     int(c.enabled), int(c.is_personal_reason), int(c.is_neutral),
-                    c.craving_weight, c.exposure_count, c.id,
+                    c.craving_weight, c.research_weight, c.exposure_count, c.id,
                 ),
             )
 
@@ -242,6 +243,7 @@ class CueConfigRepo:
             is_personal_reason=_b(r["is_personal_reason"]),
             is_neutral=_b(r["is_neutral"]) if "is_neutral" in keys else False,
             craving_weight=r["craving_weight"] if "craving_weight" in keys else None,
+            research_weight=r["research_weight"] if "research_weight" in keys else None,
             exposure_count=int(r["exposure_count"]) if "exposure_count" in keys else 0,
             created_at=r["created_at"],
         )

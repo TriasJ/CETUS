@@ -119,6 +119,14 @@ def _apply_settings(config: AppConfig, repos: Repositories) -> None:
     # Backlog rotation.
     config.max_cue_repeats = as_int("max_cue_repeats", config.max_cue_repeats)
 
+    # Weight learning.
+    config.auto_update_weights = as_bool("auto_update_weights", config.auto_update_weights)
+    config.weight_update_min_sessions = as_int("weight_update_min_sessions", config.weight_update_min_sessions)
+    weight_src = s.get("weight_source")
+    if weight_src in ("patient", "population"):
+        config.weight_source = weight_src
+    config.rate_neutral_cues = as_bool("rate_neutral_cues", config.rate_neutral_cues)
+
     # VAS display mode.
     vas_display = s.get("vas_display_mode")
     if vas_display in ("slider", "circles", "stars"):
