@@ -76,7 +76,8 @@ class VasPrompt(Overlay):
 
         card = QWidget(self)
         card.setObjectName("OverlayCard")
-        card.setMinimumWidth(380)
+        min_w = 460 if mode in ("stars", "circles") else 380
+        card.setMinimumWidth(min_w)
 
         self.title = QLabel("")
         self.title.setObjectName("H2")

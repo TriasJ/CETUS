@@ -82,7 +82,9 @@ class _StarCanvas(QWidget):
         super().__init__(parent)
         self.vas_max = vas_max
         self._value = 0
-        self.setMinimumHeight(64)
+        n = vas_max + 1
+        min_star = 24
+        self.setMinimumSize(n * min_star + (n - 1) * 3 + 8, 48)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def set_value(self, v: int) -> None:
@@ -94,14 +96,15 @@ class _StarCanvas(QWidget):
         w = self.width()
         h = self.height()
         n = self.vas_max + 1
-        star_size = min(48, max(28, (w - 20) / n - 4))
+        gap = 3
+        star_size = min(40, max(20, (w - 8) / n - gap))
         r = star_size / 2
-        total = n * star_size + (n - 1) * 4
+        total = n * star_size + (n - 1) * gap
         x0 = (w - total) / 2 + r
         cy = h / 2
         centers: list[tuple[float, float, float, int]] = []
         for i in range(n):
-            cx = x0 + i * (star_size + 4)
+            cx = x0 + i * (star_size + gap)
             centers.append((cx, cy, r, i))
         return centers
 

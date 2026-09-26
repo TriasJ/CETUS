@@ -66,7 +66,8 @@ class _CircleCanvas(QWidget):
         super().__init__(parent)
         self.vas_max = vas_max
         self._value = 0
-        self.setMinimumHeight(80)
+        n = vas_max + 1
+        self.setMinimumSize(n * 22 + (n - 1) * 4 + 8, 80)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def set_value(self, v: int) -> None:
