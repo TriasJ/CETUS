@@ -648,6 +648,8 @@
   "import.neutral_title": "Descargar imágenes neutras",
   "import.neutral_subtitle": "Las imágenes neutras son estímulos de control sin deseo para el modo de Neutras Intercaladas.",
   "import.neutral_explain": "Busca objetos cotidianos, artículos de oficina, utensilios de cocina o paisajes — cualquier cosa que no provoque deseo.",
+  "import.res_original": "Original (mejor calidad)",
+  "import.res_large": "Grande (conexión lenta)",
   "import.search_placeholder": "Buscar imágenes...",
   "import.select_all": "Seleccionar todo",
   "import.deselect_all": "Deseleccionar todo",

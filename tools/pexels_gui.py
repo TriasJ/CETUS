@@ -243,9 +243,9 @@ PHOTO_API = "https://api.pexels.com/v1/search"
 VIDEO_API = "https://api.pexels.com/v1/videos/search"
 USER_AGENT = "CETUS-ContentTool/0.1 (clinical CET media; respectful use)"
 
-PHOTO_SIZES = ["large", "large2x", "original", "medium", "small"]
-VIDEO_QUALITIES = [("HD (720p)", "hd", 720), ("Full HD (1080p)", "fhd", 1080),
-                   ("SD (480p)", "sd", 480), ("UHD (4K)", "uhd", 2160)]
+PHOTO_SIZES = ["original", "large2x", "large", "medium", "small"]
+VIDEO_QUALITIES = [("Full HD (1080p)", "fhd", 1080), ("HD (720p)", "hd", 720),
+                   ("UHD (4K)", "uhd", 2160), ("SD (480p)", "sd", 480)]
 ORIENTATIONS = ["Any", "Landscape", "Portrait", "Square"]
 THUMB_W, THUMB_H = 160, 110
 GRID_COLS = 4

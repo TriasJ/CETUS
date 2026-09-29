@@ -648,6 +648,8 @@
   "import.neutral_title": "Download Neutral Images",
   "import.neutral_subtitle": "Neutral images are non-craving control stimuli for the Interspersed Neutral session mode.",
   "import.neutral_explain": "Search for everyday objects, office supplies, kitchen items, or landscapes — anything that does not evoke craving.",
+  "import.res_original": "Original (best quality)",
+  "import.res_large": "Large (slow connection)",
   "import.search_placeholder": "Search images...",
   "import.select_all": "Select All",
   "import.deselect_all": "Deselect All",

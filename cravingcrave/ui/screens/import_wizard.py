@@ -134,6 +134,7 @@ def _pexels_search(key: str, query: str, page: int = 1, per_page: int = 15):
             "id": p["id"],
             "src_medium": p["src"]["medium"],
             "src_large": p["src"]["large"],
+            "src_original": p["src"]["original"],
             "photographer": p.get("photographer", ""),
             "url": p.get("url", ""),
         })
@@ -392,6 +393,11 @@ class _SearchDownloadPage(QWizardPage):
         self._downloaded_count = 0
         self._skipped_count = 0
 
+        # Resolution selector
+        self._resolution = QComboBox()
+        self._resolution.addItem(tr("import.res_original"), "src_original")
+        self._resolution.addItem(tr("import.res_large"), "src_large")
+
         # Search bar
         self._search = QLineEdit()
         self._search.setPlaceholderText(tr("import.search_placeholder"))
@@ -401,6 +407,7 @@ class _SearchDownloadPage(QWizardPage):
 
         search_row = QHBoxLayout()
         search_row.addWidget(self._search, 1)
+        search_row.addWidget(self._resolution)
         search_row.addWidget(self._search_btn)
 
         # Thumbnail grid in scroll area
@@ -547,10 +554,11 @@ class _SearchDownloadPage(QWizardPage):
         self._downloaded_count = 0
         self._skipped_count = 0
 
+        res_key = self._resolution.currentData()
         for idx, (_, photo) in enumerate(selected):
             self._progress.setValue(idx)
             try:
-                data = _download_bytes(photo["src_large"])
+                data = _download_bytes(photo.get(res_key) or photo["src_large"])
                 h = hashlib.sha256(data).hexdigest()
                 if h in existing_hashes:
                     self._skipped_count += 1
