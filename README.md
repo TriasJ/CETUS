@@ -25,38 +25,95 @@ English — [drop-in for more](docs/LOCALIZATION.md)), local-only data, built wi
 
 ---
 
-## What's new in 0.7.0
+## What's new in 0.9.11
 
-- 🧭 **Adaptive cue ordering** — CETUS learns which signals provoke more craving for each patient
-  (from the ratings it already records per cue) and **suggests a low→high graded order** the
-  clinician reviews and applies — never a live-session reorder. Small samples are smoothed toward a
-  cross-patient population prior. Export the **order database** + a **population baseline** (CSV).
+- **Three session modes** — *Intense Craving Evocation*, *Interspersed Neutral Stimuli*
+  (craving cues mixed with neutral controls), and *Custom*. Each mode has its own playlist
+  builder and VAS timing rules.
+- **VAS display alternatives** — Slider (default), Circles (progressive sizes), and Stars
+  (gold star rating), switchable in Settings.
+- **Import Images from Web wizard** — a guided 6-page wizard with Pexels API integration,
+  thumbnail search, SHA-256 dedup, and a substance-cue teaching page. Auto-launches on
+  first run.
+- **Weighted cue databases** — ships with MOCIS (360 meth/opioid/neutral) and PLSC
+  (tobacco/neutral) empirically validated craving ratings. Weights serve as Bayesian priors
+  for adaptive cue ranking.
+- **Auto-update weights from session data** — after each session, Bayesian-shrunk reactivity
+  scores are written back to `craving_weight`. Configurable: patient-only or cross-patient
+  population source, minimum sessions before overwrite, and a one-click reset to research
+  values.
+- **Patient Setup Wizard** — evidence-based session recommendations with 16 PubMed
+  citations, mode suggestion based on patient profile.
+- **Media dedup scanning** — SHA-256 scan across all media folders (in the wizard + periodic
+  background check every 40 launches).
+- **Responsive UI** across resolutions — compact/normal/wide screen detection with adaptive
+  margins, dialog sizes, and minimum window dimensions.
+- **Video improvements** — pause/resume during VAS overlays, video-aware VAS deferral (wait
+  for first full loop), configurable loop + max exposure time.
+- **Progressive down-regulation** now uses craving-cue-only time (neutral cues don't advance
+  the regulation timer).
 
-Earlier (0.6.x): a key-gated **Admin Center** — backup/restore (DB + media), patient data handling
-(export bundle / anonymize / hard-delete), clinician & clinic management (disable, transfer
-patients, clinic contact details on reports), cohort & per-clinician reports, storage info, and an
-audit log — plus five **themes** (Light, Dark, High-contrast, Low-vision, Classic Windows). See
+Earlier: **adaptive cue ordering** (0.7.0), key-gated **Admin Center** with backup/restore,
+patient data handling, clinician management, cohort reports (0.6.0), five **themes** (0.6.0),
+and **keyboard accessibility** with remappable shortcuts (0.4.0). See
 [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for the full history.
 
 ---
 
 ## Features
 
+### Exposure & session modes
 - **Graded, personalized cue exposure** — images/video/sound ordered by appetitive
   intensity; optional randomized order; ← → to change cues; loop mode.
+- **Three session modes** — *Intense Craving Evocation* (all craving cues, graded),
+  *Interspersed Neutral Stimuli* (craving cues mixed with neutral controls, last-third rule),
+  and *Custom* (clinician-configured). Default mode configurable in Settings.
+- **Patient-controlled intensity** — shrink, blur, dim, mute the cue (keyboard:
+  `T`/`D`/`O`/`M`, `R` reset) so the patient down-regulates exposure themselves.
+- **Progressive down-regulation (experimental)** — gradually applies a regulation floor
+  over craving-cue time (neutral cues don't count). Linear or stepped mode.
+- **Dynamic neutral increase** — inserts extra neutral cues until craving drops below a
+  configurable threshold.
+- **Video improvements** — configurable loop (default: loop indefinitely), pause/resume
+  during VAS overlays, video-aware VAS deferral (wait for first full loop before prompting),
+  and min/max cue exposure time with a discrete countdown hint.
+
+### Craving measurement
+- **Craving VAS (0–10)** at baseline/peak/endpoint + periodic, with a live habituation
+  curve; configurable habituation criterion.
+- **VAS display alternatives** — Slider (default), Circles (progressive sizes), Stars (gold
+  star rating). Switchable in Settings.
+- **Configurable VAS delay** on interspersed craving cues (clamped to >= min exposure time).
+- **Rate neutral images** (experimental, off by default) — collects VAS on neutral cues for
+  research validation; always excluded from habituation.
+
+### Cue management & weight learning
 - **Adaptive cue ordering (optional)** — learns per-patient cue reactivity from the recorded
   ratings and **suggests a low→high graded order** the clinician reviews and applies (never a live
   reorder); small samples smoothed toward a cross-patient prior. Exportable order database +
   population baseline (CSV).
-- **Patient-controlled intensity** — shrink, blur, dim, mute the cue (keyboard:
-  `T`/`D`/`O`/`M`, `R` reset) so the patient down-regulates exposure themselves.
+- **Weighted cue databases** — ships with MOCIS (360 meth/opioid/neutral) and PLSC
+  (tobacco/neutral) empirically validated craving ratings from published research.
+- **Auto-update weights from session data** — Bayesian-shrunk reactivity scores written back
+  after each session. Configurable: patient-only or cross-patient population source, minimum
+  sessions, and one-click reset to research values.
+- **Reactivity-gated backlog rotation** — over-exposed cues deprioritized unless still
+  high-craving (configurable `max_cue_repeats`, default 2).
+- **Missing-file detection** — red warning in the cue library for moved/deleted media.
+- **Import Images from Web wizard** — 6-page guided Pexels integration with API key setup
+  (auto-skipped when detected), thumbnail search, SHA-256 dedup, and a substance-cue
+  teaching page. Auto-launches on first run.
+- **Media dedup scanning** — SHA-256 scan across all media folders (in the wizard + periodic
+  background check every 40 launches).
+
+### Patient & clinician tools
+- **Patient Setup Wizard** — evidence-based session recommendations with 16 PubMed
+  citations; mode suggestion based on patient profile.
 - **Keyboard-only accessibility mode** — drive the whole exposure with an adaptive keyboard
   (arrows switch cues; `1`/`2`/`3` pick the size/blur/dim axis and `+`/`−` adjust it; digits
   set the craving rating, Enter confirms). Toggleable in Settings; every shortcut is
   remappable (STOP stays locked).
 - **Auto-scroll cues** — optional hands-free advance after each rating and/or every N seconds.
-- **Craving VAS (0–10)** at baseline/peak/endpoint + periodic, with a live habituation
-  curve; configurable habituation criterion.
 - **Guided USCS/CBT coping** (name the feeling → recall a consequence → recall a benefit
   → choose an alternative) and an on-demand **positive counter-stimuli gallery**;
   the four free-text responses export to CSV + PDF for qualitative study.
@@ -70,10 +127,16 @@ audit log — plus five **themes** (Light, Dark, High-contrast, Low-vision, Clas
   clinician & clinic management (rename / disable / delete, **transfer patients**, clinic contact
   details on report headers), **cohort & per-clinician reports** (CSV + PDF), storage info, and an
   admin audit log.
+
+### Reports & export
 - **Clinical reports** — per-session detail (annotated curve, evidence-based metrics,
   per-cue reactivity, coping responses, clinician notes) and cross-session progress;
   export to **CSV** and **landscape PDF** (CETUS-branded header by default, overridable with a
   clinic logo) plus a dedicated **coping-responses CSV** for qualitative study.
+
+### UI & localization
+- **Responsive UI** — adapts to compact, normal, and wide screens with adaptive margins,
+  dialog sizes, and minimum window dimensions.
 - **Selectable themes** — Light (default), Dark, High-contrast, Low-vision (large text), and
   Classic Windows; switchable live from Settings.
 - **In-app Help** (F1) documenting every feature and its scientific basis with citations — also
@@ -183,7 +246,7 @@ tool logs attribution to a `_licenses.csv`. Review all media for clinical approp
 ## Tests
 
 ```bash
-pytest                       # 168 unit/integration + offscreen GUI tests
+pytest                       # ~75 unit/integration + offscreen GUI tests
 python scripts/functional_test.py    # end-to-end harness (9/9 PASS/FAIL report)
 ```
 
@@ -193,12 +256,12 @@ python scripts/functional_test.py    # end-to-end harness (9/9 PASS/FAIL report)
 
 ```
 cravingcrave/
-  domain/     pure clinical rules + models (habituation, vas, playlist, uscs, reports)  — no Qt
-  data/       sqlite3 + repositories + migrations
-  services/   i18n, auth, media discovery, crisis info, substances, help, CSV export
-  session/    SessionController (orchestration) + state machine
-  ui/         PySide6 screens + widgets (cue_view = the scale/blur/dim/mute surface)
-  resources/  i18n/es.json, help/es.json, styles, icons
+  domain/     pure clinical rules + models (habituation, vas, playlist, cue_ranking)  — no Qt
+  data/       sqlite3 + repositories + migrations (schema v8)
+  services/   i18n, auth, media, crisis, substances, help, export, cue_weights
+  session/    SessionController (orchestration) + state machine + weight learning
+  ui/         PySide6 screens + widgets (cue_view, VAS modes, wizards, responsive)
+  resources/  i18n/{es,en}.json, help/{es,en}.json, cue_weights/, styles, icons
 tools/        offline content acquisition (not imported by the app)
 scripts/      developer/QA helpers (functional test, screenshots, grading, samples)
 tests/        domain / data / ui (pytest, pytest-qt)

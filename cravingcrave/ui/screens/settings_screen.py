@@ -711,6 +711,12 @@ class SettingsScreen(QWidget):
             row.addWidget(px_btn)
         row.addStretch(1)
         v.addLayout(row)
+
+        lic = QLabel(tr("settings.pexels_license"))
+        lic.setWordWrap(True)
+        lic.setObjectName("Muted")
+        lic.setStyleSheet("font-size:11px; padding:4px 0;")
+        v.addWidget(lic)
         return box
 
     # --- custom substances (Substances) -------------------------------------

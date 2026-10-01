@@ -802,11 +802,23 @@ class _SummaryPage(QWizardPage):
         body.setWordWrap(True)
         body.setObjectName("Muted")
 
+        license_notice = QLabel(tr("import.pexels_license"))
+        license_notice.setWordWrap(True)
+        license_notice.setStyleSheet(
+            "color:#5a7a8a; font-size:11px; padding:8px; "
+            "background:#f0f5f8; border-radius:4px; margin-top:8px;")
+        license_link = QLabel(f"<a href='https://www.pexels.com/license/'>"
+                              f"{tr('import.pexels_license_link')}</a>")
+        license_link.setOpenExternalLinks(True)
+        license_link.setStyleSheet("font-size:11px;")
+
         v = QVBoxLayout(self)
         v.addWidget(self._summary)
         v.addSpacing(12)
         v.addWidget(body)
         v.addStretch(1)
+        v.addWidget(license_notice)
+        v.addWidget(license_link)
 
     def initializePage(self):
         wizard = self.wizard()

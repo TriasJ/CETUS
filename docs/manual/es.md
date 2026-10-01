@@ -1,6 +1,6 @@
 # Ayuda y base científica — CETUS
 
-_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.9.9._
+_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.9.11._
 
 ## Contents
 
@@ -32,6 +32,8 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 - [Recuperación de administrador](#recuperación-de-administrador)
 - [Atajos de teclado](#atajos-de-teclado)
 - [Limitaciones y consideraciones éticas](#limitaciones-y-consideraciones-éticas)
+- [Aprendizaje automático de pesos](#aprendizaje-automático-de-pesos)
+- [Agregación de pesos cruzada entre pacientes](#agregación-de-pesos-cruzada-entre-pacientes)
 - [Referencias científicas](#referencias-científicas)
 
 ---
@@ -201,6 +203,18 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 ## Limitaciones y consideraciones éticas
 
 <ul><li>La CET digital no-RV <b>no es un tratamiento autónomo probado</b>; úsese como complemento supervisado.</li><li>La evidencia es heterogénea: efectos positivos en estudios abiertos pero <b>resultados nulos</b> en los ECA ciegos (Mellentin 2019; Garfield 2026).</li><li>Exponer señales puede <b>aumentar el deseo</b> y el riesgo de recaída; mantén supervisión y plan de seguridad.</li><li>Usa solo medios con licencia adecuada (Creative Commons o propios) y revisa su idoneidad clínica.</li><li>Los datos son locales; protege el equipo y respeta la confidencialidad del paciente.</li></ul>
+
+---
+
+## Aprendizaje automático de pesos
+
+<p>CETUS puede <b>aprender</b> qué tan inductora de craving es cada imagen a partir de datos reales de sesión y actualizar automáticamente los pesos de señales usados para ordenamiento y rotación.</p><h3>Cómo funciona</h3><p>Después de cada sesión, la app calcula una <b>puntuación de reactividad con contracción bayesiana</b> para cada señal mostrada: <i>score = (n × raw + k × prior) / (n + k)</i>, donde <i>raw</i> es el pico-menos-línea-base de craving del paciente para esa señal, <i>n</i> es el número de sesiones con datos, <i>prior</i> es el peso de investigación o promedio cruzado, y <i>k</i> es el factor de contracción (por defecto 3). Esto significa que las señales nuevas comienzan cerca del peso de investigación pero gradualmente se desplazan hacia la reactividad real del paciente conforme se acumulan más datos.</p><h3>Configuración</h3><ul><li><b>Actualizar pesos automáticamente</b> (por defecto: activado) — activa/desactiva la actualización automática después de cada sesión.</li><li><b>Sesiones mínimas</b> (por defecto: 3) — cuántas sesiones con datos se necesitan antes de que la puntuación empírica sobreescriba el peso de investigación. Previene que una sola sesión ruidosa distorsione el ordenamiento.</li><li><b>Fuente de pesos</b> — <i>Paciente</i> usa solo datos de este paciente; <i>Población</i> usa el promedio cruzado de todos los pacientes en la base de datos de esta clínica.</li></ul><h3>Preservación de pesos de investigación</h3><p>El peso de investigación original (de MOCIS, PLSC o entrada manual) se preserva en un campo separado (<i>research_weight</i>). El clínico siempre puede restaurar todas las señales a sus pesos de investigación vía <b>Ajustes → Avanzado → Restaurar pesos de investigación</b>.</p><h3>Medición de imágenes neutras (experimental)</h3><p>Por defecto, las imágenes neutras no se miden durante las sesiones de exposición — sirven como estímulos de control sin craving. Activar <b>Medir señales neutras</b> en Ajustes → Avanzado recopila mediciones VAS en señales neutras también. Esto es útil para investigación: validar que las imágenes neutras realmente no provocan craving, o detectar reactividad inesperada a estímulos supuestamente neutros. Las mediciones neutras siempre se excluyen del cálculo de habituación independientemente de esta configuración.</p>
+
+---
+
+## Agregación de pesos cruzada entre pacientes
+
+<p>Cuando múltiples pacientes usan las mismas imágenes de señales, CETUS puede agregar sus datos de reactividad para construir un <b>perfil de craving a nivel poblacional</b> para cada imagen.</p><h3>Cómo funciona la agregación</h3><p>Para cada imagen de señal (emparejada por ruta de archivo), el sistema calcula la reactividad media a través de todos los pacientes que han sido expuestos a ella. Este promedio cruzado sirve como un prior más fuerte que el peso de investigación original, porque refleja la población específica de pacientes de tu clínica.</p><h3>Usando pesos poblacionales</h3><p>En la biblioteca de señales, el botón <b>Sugerir pesos</b> ofrece tres fuentes:</p><ul><li><b>Base de datos de investigación</b> — los pesos originales MOCIS/PLSC de estudios publicados.</li><li><b>Este paciente</b> — pesos empíricos solo de las sesiones de este paciente.</li><li><b>Todos los pacientes (población)</b> — el promedio cruzado de toda la base de datos de tu clínica.</li></ul><p>Los pesos poblacionales son más útiles cuando tu clínica ha acumulado datos de 5+ pacientes con el mismo conjunto de señales. Con menos pacientes, la contracción bayesiana mantiene las puntuaciones cercanas a los pesos de investigación de todas formas.</p><h3>Exportar datos agregados</h3><p>El Centro de Administración proporciona dos botones de exportación para uso de investigación:</p><ul><li><b>CSV de Reactividad Poblacional</b> — craving medio por sustancia × tipo de medio entre todos los pacientes.</li><li><b>CSV de Base de Datos de Orden de Señales</b> — puntuaciones de reactividad por paciente, por señal con orden sugerido.</li></ul><p>Estas exportaciones contienen solo códigos pseudónimos de pacientes y nombres de archivos de medios — sin información personal identificable (PII).</p>
 
 ---
 

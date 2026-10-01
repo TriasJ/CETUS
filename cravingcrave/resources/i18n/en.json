@@ -671,7 +671,10 @@
   "import.dedup_remove": "Remove Selected",
   "import.dedup_removed": "{n} file(s) removed.",
   "import.dedup_periodic": "{n} duplicate file(s) found in your media library. Would you like to review them now?",
+  "import.pexels_license": "Images from Pexels are free for personal and commercial use. No attribution required, but appreciated. Images cannot be sold without significant modification.",
+  "import.pexels_license_link": "See full Pexels License at pexels.com/license",
   "import.summary_title": "Import Complete",
   "import.summary_body": "You can always import more images from the cue library (🌐 Import from Web button) or Settings → Media Tools.",
-  "import.summary_downloaded": "Images downloaded:"
+  "import.summary_downloaded": "Images downloaded:",
+  "settings.pexels_license": "Pexels License: Images are free for personal and commercial use. No attribution required. Cannot be sold unmodified."
 }

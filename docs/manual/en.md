@@ -1,6 +1,6 @@
 # Help and scientific basis — CETUS
 
-_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.9.9._
+_Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit by hand — run `scripts/gen_help_docs.py`. CETUS v0.9.11._
 
 ## Contents
 
@@ -32,6 +32,8 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 - [Administrator recovery](#administrator-recovery)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Limitations and ethical considerations](#limitations-and-ethical-considerations)
+- [Automatic weight learning](#automatic-weight-learning)
+- [Cross-patient weight aggregation](#cross-patient-weight-aggregation)
 - [Scientific references](#scientific-references)
 
 ---
@@ -201,6 +203,18 @@ _Auto-generated from CETUS's in-app Help (press **F1** in the app). Do not edit 
 ## Limitations and ethical considerations
 
 <ul><li>Digital non-VR CET <b>is not a proven standalone treatment</b>; use it as a supervised adjunct.</li><li>The evidence is heterogeneous: positive effects in open studies but <b>null results</b> in the blinded RCTs (Mellentin 2019; Garfield 2026).</li><li>Exposing cues can <b>increase craving</b> and the risk of relapse; maintain supervision and a safety plan.</li><li>Use only media with appropriate licensing (Creative Commons or your own) and review their clinical suitability.</li><li>The data are local; protect the device and respect the patient's confidentiality.</li></ul>
+
+---
+
+## Automatic weight learning
+
+<p>CETUS can <b>learn</b> how craving-inducing each image is from real session data and automatically update the cue weights used for ordering and backlog rotation.</p><h3>How it works</h3><p>After each session, the app computes a <b>Bayesian-shrunk reactivity score</b> for every cue shown: <i>score = (n × raw + k × prior) / (n + k)</i>, where <i>raw</i> is the patient's peak-minus-baseline craving for that cue, <i>n</i> is the number of sessions with data, <i>prior</i> is the research weight or cross-patient average, and <i>k</i> is the shrinkage factor (default 3). This means new cues start close to the research weight but gradually shift toward the patient's actual reactivity as more data accumulates.</p><h3>Configuration</h3><ul><li><b>Auto-update weights</b> (default: ON) — toggle the automatic update after each session.</li><li><b>Minimum sessions</b> (default: 3) — how many sessions with data are needed before the empirical score overwrites the research weight. Prevents a single noisy session from distorting the ordering.</li><li><b>Weight source</b> — <i>Patient</i> uses only this patient's data; <i>Population</i> uses the cross-patient average from all patients in this clinic's database.</li></ul><h3>Research weight preservation</h3><p>The original research weight (from MOCIS, PLSC, or manual entry) is preserved in a separate field (<i>research_weight</i>). The clinician can always restore all cues to their research weights via <b>Settings → Advanced → Reset to Research Weights</b>.</p><h3>Neutral image rating (experimental)</h3><p>By default, neutral images are not rated during exposure sessions — they serve as non-craving control stimuli. Enabling <b>Rate neutral images</b> in Settings → Advanced collects VAS ratings on neutral cues too. This is useful for research purposes: validating that neutral images truly evoke no craving, or detecting unexpected reactivity to supposedly neutral stimuli. Neutral ratings are always excluded from the habituation calculation regardless of this setting.</p>
+
+---
+
+## Cross-patient weight aggregation
+
+<p>When multiple patients use the same cue images, CETUS can aggregate their reactivity data to build a <b>population-level craving profile</b> for each image.</p><h3>How aggregation works</h3><p>For each cue image (matched by file path), the system computes the mean reactivity across all patients who have been exposed to it. This cross-patient average serves as a stronger prior than the original research weight, because it reflects your clinic's specific patient population.</p><h3>Using population weights</h3><p>In the cue library, the <b>Suggest Weights</b> button offers three sources:</p><ul><li><b>Research database</b> — the original MOCIS/PLSC weights from published studies.</li><li><b>This patient</b> — empirical weights from this patient's sessions only.</li><li><b>All patients (population)</b> — the cross-patient average from your clinic's entire database.</li></ul><p>Population weights are most useful when your clinic has accumulated data from 5+ patients on the same cue set. With fewer patients, the Bayesian shrinkage keeps scores close to the research weights anyway.</p><h3>Exporting aggregate data</h3><p>The Admin Center provides two export buttons for research use:</p><ul><li><b>Population Reactivity CSV</b> — mean craving by substance × media type across all patients.</li><li><b>Cue Order Database CSV</b> — per-patient, per-cue reactivity scores with suggested ordering.</li></ul><p>These exports contain only pseudonymous patient codes and media file names — no PII.</p>
 
 ---
 

@@ -2,6 +2,112 @@
 
 All notable changes to CETUS. Dates are when the work was done in development.
 
+## 0.9.11 — release build + Pexels license (2026-09)
+
+### Added
+- **Pexels license disclaimer** in the Import Wizard summary page and Settings → Media Tools.
+- **Original resolution by default** for Pexels image downloads; "Large" fallback for slow
+  connections via a resolution dropdown in the wizard.
+
+### Changed
+- Pexels standalone tool defaults to **original** quality (photos) and **1080p** (videos).
+- GitHub repo documentation overhaul (README, CHANGELOG, feature list current with 0.9.x).
+
+## 0.9.10 — weight learning + dedup + bug fixes (2026-09)
+
+### Added
+- **Auto-update craving weights** from session data — Bayesian-shrunk reactivity scores are
+  written back to `craving_weight` after each session (configurable: on/off, min sessions
+  before overwrite, patient-only vs cross-patient source).
+- **Cross-patient weight aggregation** — population-level craving profiles built from all
+  patients exposed to the same cue images.
+- **Weight source picker** on Suggest Weights: research database (MOCIS/PLSC), this patient's
+  empirical data, or cross-patient population average.
+- **Research weight preservation** — original values saved in a separate `research_weight`
+  field (DB migration v8); restorable via Settings → Advanced → Reset to Research Weights.
+- **Rate neutral images** option (experimental, off by default) — collects VAS ratings on
+  neutral cues for research validation; neutral ratings remain excluded from habituation.
+- **SHA-256 dedup scan page** in the Import Wizard — scans all `media/` subfolders for
+  duplicate files by content hash, lets the clinician review and remove them.
+- **Periodic background dedup check** every 40 app launches (non-blocking thread); prompts
+  only when duplicates are found.
+- **Path-based dedup** on Add from Library and Add Files/Folder — prevents duplicate cue
+  entries per patient.
+- **"Select a cue first"** feedback on Edit Weight, Toggle Enabled/Personal, and Delete
+  buttons (was silently ignored).
+- `max_cue_repeats` now visible in Settings → Advanced.
+
+### Fixed
+- Import Wizard API key detection in frozen (PyInstaller) builds — uses `paths.media_root()`
+  instead of `Path(__file__)`.
+- Import from Web button now prompts Pexels vs choice instead of silently failing.
+- Cue config side buttons no longer clipped at narrow widths — removed `maxWidth` cap.
+- Import wizard auto-skips API key pages when keys already exist (400ms auto-advance).
+- Stars/circles VAS — all 11 items visible with proper `setMinimumSize`.
+- Pexels API 403 Forbidden — added `User-Agent` header to all `urllib` requests.
+
+## 0.9.9 — session modes + VAS alternatives + import wizard (2026-09)
+
+### Added
+- **Three session modes** — *Intense Craving Evocation* (graded escalation, default CET),
+  *Interspersed Neutral Stimuli* (craving cues mixed with neutral controls, last-third rule),
+  and *Custom* (clinician-configured combination). Mode selector on the session setup screen;
+  default configurable in Settings.
+- **VAS display alternatives** — *Slider* (default), *Circles* (11 progressively larger
+  circles), *Stars* (gold star rating). Switchable in Settings → Session.
+- **Import Images from Web wizard** — a 6-page in-app QWizard: welcome, Pexels API key setup
+  (auto-skipped when key detected), optional Gemini API key, neutral image search + download
+  with thumbnail grid and SHA-256 dedup, substance cue teaching page, and summary. Auto-
+  launches on first run.
+- **Patient Setup Wizard** — evidence-based session recommendations with 16 PubMed citations,
+  mode suggestion based on patient profile (substance, session count, craving severity).
+- **Weighted cue databases** — MOCIS (360 methamphetamine/opioid/neutral entries) and PLSC
+  (tobacco/neutral) with empirically validated craving ratings. Research weights loaded via
+  `CueWeightLookup` service.
+- **Bayesian cue ranking** with research weight fallback — `craving_weight` serves as the
+  Bayesian prior when no patient data exists; cascade: cross-patient → category → global →
+  research weight.
+- **Reactivity-gated backlog rotation** — cues shown more than `max_cue_repeats` times
+  (default 2) are deprioritized unless still high-craving (reactivity > 2.0).
+- Video **pause/resume** during VAS, coping, and gallery overlays.
+- **Video-aware VAS deferral** — periodic VAS waits for the video to play fully at least once
+  before prompting (when `video_wait_full_loop` is enabled).
+- **Progressive down-regulation** uses craving-cue-only time — neutral cues don't count
+  toward the progression timer.
+- **Dynamic neutral increase** — in interspersed/custom modes, extra neutral cues are inserted
+  after a craving cue until the patient's craving drops below the threshold.
+- **Configurable VAS delay** on interspersed craving cues (`interspersed_vas_delay_ms`),
+  clamped to >= min exposure time with a visual warning.
+- **Min/max cue exposure time** with discrete countdown hint (toggleable, default ON).
+- Neutral images shown in the positive gallery for intense mode.
+- Per-cue dwell VAS only in intense/custom mode (disabled in interspersed — handled by auto-VAS).
+- **Responsive UI** module (`ui/responsive.py`) — compact/normal/wide screen detection with
+  adaptive margins, nav width, card width, dialog width, and minimum window size.
+- **Missing-file detection** in the cue library (red warning for moved/deleted media files).
+- Exposure count display (×N) and weight display (w=X.X) in the cue list.
+
+### Fixed
+- Spinbox arrows render natively (DPI-aware) instead of CSS-styled dots.
+- Wizard opens at 75% screen size (was invisible until manually resized).
+- All wizard text translated to Spanish (6 hardcoded English strings replaced).
+- Wizard buttons translated (Next/Back/Finish via `setButtonText()`).
+- Splash screen visible before login (deferred `window.show()` until `splash.finish()`).
+- VAS delay cannot be set lower than the minimum exposure time.
+
+## 0.8.0 — clinical feedback overhaul (2026-09)
+
+### Added
+- **Video loop control** (default: loop indefinitely; must play at least once fully).
+- **Video wait for full loop** before `max_cue_exposure_sec` cuts the cue.
+- **Toggleable min-exposure countdown hint** (discrete, default ON).
+- **Configurable interspersed VAS delay** with visual warning when less than min exposure.
+- **Per-session overrides** for `video_wait_full_loop` and VAS delay in the Parameters popup.
+
+### Fixed
+- Videos keep playing during VAS ratings (now **paused on overlay open, resumed on close**).
+- Progressive regulation no longer advances during neutral images (craving-cue-only timer).
+- VAS no longer pops before a video has played fully (deferred until first loop completes).
+
 ## 0.7.2 — launch screen + fullscreen reminder (2026-07)
 
 ### Added

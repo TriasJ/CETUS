@@ -671,7 +671,10 @@
   "import.dedup_remove": "Eliminar seleccionados",
   "import.dedup_removed": "{n} archivo(s) eliminado(s).",
   "import.dedup_periodic": "Se encontraron {n} archivo(s) duplicado(s) en la biblioteca de medios. ¿Deseas revisarlos ahora?",
+  "import.pexels_license": "Las imágenes de Pexels son gratuitas para uso personal y comercial. No se requiere atribución, pero se agradece. Las imágenes no pueden venderse sin modificación significativa.",
+  "import.pexels_license_link": "Ver licencia completa de Pexels en pexels.com/license",
   "import.summary_title": "Importación completa",
   "import.summary_body": "Siempre puedes importar más imágenes desde la biblioteca de señales (botón 🌐 Importar desde la web) o Ajustes → Herramientas de medios.",
-  "import.summary_downloaded": "Imágenes descargadas:"
+  "import.summary_downloaded": "Imágenes descargadas:",
+  "settings.pexels_license": "Licencia Pexels: Las imágenes son gratuitas para uso personal y comercial. Sin atribución requerida. No se pueden vender sin modificar."
 }
