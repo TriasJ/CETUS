@@ -106,6 +106,23 @@ def _save_gemini_key(key: str) -> None:
 _UA = "CETUS/1.0 (PySide6; clinical-research)"
 
 
+def _fetch(req: urllib.request.Request, timeout: float, attempts: int = 3) -> bytes:
+    """GET with retries on transient network errors (e.g. SSL handshake timeouts)."""
+    import time
+    last: Exception | None = None
+    for i in range(attempts):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return resp.read()
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            last = exc
+            if i < attempts - 1:
+                time.sleep(1 + 2 * i)
+    raise last  # type: ignore[misc]
+
+
 def _verify_pexels_key(key: str) -> bool:
     """Test Pexels API key with a minimal request."""
     if not key:
@@ -115,8 +132,8 @@ def _verify_pexels_key(key: str) -> bool:
             "https://api.pexels.com/v1/search?query=test&per_page=1",
             headers={"Authorization": key, "User-Agent": _UA},
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return resp.status == 200
+        _fetch(req, timeout=20)
+        return True
     except Exception:
         return False
 
@@ -126,8 +143,7 @@ def _pexels_search(key: str, query: str, page: int = 1, per_page: int = 15):
     url = (f"https://api.pexels.com/v1/search?"
            f"query={urllib.parse.quote(query)}&page={page}&per_page={per_page}")
     req = urllib.request.Request(url, headers={"Authorization": key, "User-Agent": _UA})
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        data = json.loads(resp.read().decode())
+    data = json.loads(_fetch(req, timeout=30).decode())
     results = []
     for p in data.get("photos", []):
         results.append({
@@ -142,9 +158,8 @@ def _pexels_search(key: str, query: str, page: int = 1, per_page: int = 15):
 
 
 def _download_bytes(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "CETUS/1.0"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return resp.read()
+    req = urllib.request.Request(url, headers={"User-Agent": _UA})
+    return _fetch(req, timeout=60)
 
 
 def _file_hashes(folder: Path) -> set[str]:
@@ -469,8 +484,11 @@ class _SearchDownloadPage(QWizardPage):
             return
         try:
             self._results = _pexels_search(key, query, per_page=15)
+        except urllib.error.HTTPError as e:
+            self._status_label.setText(f"HTTP {e.code}: {e.reason}")
+            return
         except Exception as e:
-            self._status_label.setText(str(e))
+            self._status_label.setText(f"{tr('import.network_error')} ({e})")
             return
         self._populate_grid()
 

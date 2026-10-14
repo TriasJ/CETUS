@@ -103,6 +103,9 @@ _STRINGS = {
         "nothing_selected": "Nothing selected",
         "nothing_selected_msg": "Add items to the queue or select items on this page.",
         "search_failed": "Search failed",
+        "network_error": "Could not reach Pexels after 3 attempts. The internet connection "
+                         "may be slow or a firewall/proxy may be blocking pexels.com. "
+                         "Check the connection and try again.",
         "download_complete_title": "Download complete",
         "download_complete_msg": "Saved {n} file(s) to:\n{folder}\n\n"
                                 "Licenses logged to _licenses.csv.\n"
@@ -166,6 +169,9 @@ _STRINGS = {
         "nothing_selected": "Nada seleccionado",
         "nothing_selected_msg": "Agrega elementos a la cola o selecciona elementos en esta página.",
         "search_failed": "Búsqueda fallida",
+        "network_error": "No se pudo conectar con Pexels tras 3 intentos. La conexión a "
+                         "internet puede estar lenta o un firewall/proxy puede estar bloqueando "
+                         "pexels.com. Revisa la conexión e inténtalo de nuevo.",
         "download_complete_title": "Descarga completa",
         "download_complete_msg": "Guardado(s) {n} archivo(s) en:\n{folder}\n\n"
                                  "Licencias registradas en _licenses.csv.\n"
@@ -268,6 +274,34 @@ def _load_api_key() -> str | None:
 
 
 # ---------------------------------------------------------------------------
+# Network helper: retry transient failures (SSL handshake timeouts, resets)
+# ---------------------------------------------------------------------------
+
+def _fetch(req: urllib.request.Request, timeout: float,
+           attempts: int = 3) -> tuple[bytes, dict[str, str]]:
+    """GET with retries on transient network errors. HTTP errors are raised immediately."""
+    import time
+    last: Exception | None = None
+    for i in range(attempts):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                headers = {k.lower(): v for k, v in resp.getheaders()}
+                return resp.read(), headers
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            last = exc
+            if i < attempts - 1:
+                time.sleep(1 + 2 * i)
+    raise last  # type: ignore[misc]
+
+
+def _is_network_error(exc: Exception) -> bool:
+    return isinstance(exc, (urllib.error.URLError, TimeoutError, OSError)) and not isinstance(
+        exc, urllib.error.HTTPError)
+
+
+# ---------------------------------------------------------------------------
 # Workers (QThread)
 # ---------------------------------------------------------------------------
 
@@ -304,9 +338,8 @@ class SearchWorker(QThread):
                 "User-Agent": USER_AGENT,
                 "Authorization": self.api_key,
             })
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                headers = {k.lower(): v for k, v in resp.getheaders()}
-                data = json.loads(resp.read().decode("utf-8"))
+            raw, headers = _fetch(req, timeout=30)
+            data = json.loads(raw.decode("utf-8"))
 
             remaining = headers.get("x-ratelimit-remaining", "?")
             limit = headers.get("x-ratelimit-limit", "?")
@@ -331,7 +364,10 @@ class SearchWorker(QThread):
             else:
                 self.error.emit(f"HTTP error {exc.code}: {exc.reason}")
         except Exception as exc:
-            self.error.emit(str(exc))
+            if _is_network_error(exc):
+                self.error.emit(_t("network_error") + f"\n\n({exc})")
+            else:
+                self.error.emit(str(exc))
 
 
 class ThumbnailWorker(QThread):
@@ -348,8 +384,7 @@ class ThumbnailWorker(QThread):
         for idx, url in self.urls:
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-                with urllib.request.urlopen(req, timeout=15) as resp:
-                    data = resp.read()
+                data, _ = _fetch(req, timeout=20, attempts=2)
                 img = QImage()
                 img.loadFromData(QByteArray(data))
                 if not img.isNull():
@@ -449,8 +484,7 @@ class DownloadWorker(QThread):
 
         req = urllib.request.Request(src_url, headers={"User-Agent": USER_AGENT})
         try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = resp.read()
+            data, _ = _fetch(req, timeout=60)
             # Dedup: skip if an identical file already exists in the folder.
             file_hash = hashlib.sha256(data).hexdigest()
             if file_hash in self._existing_hashes:
@@ -493,8 +527,7 @@ class DownloadWorker(QThread):
                 import tempfile
                 with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
                     tmp_path = Path(tmp.name)
-                with urllib.request.urlopen(req, timeout=120) as resp:
-                    raw = resp.read()
+                raw, _ = _fetch(req, timeout=120)
                 # Dedup check on raw bytes before re-encoding.
                 file_hash = hashlib.sha256(raw).hexdigest()
                 if file_hash in self._existing_hashes:
@@ -519,8 +552,7 @@ class DownloadWorker(QThread):
                     return False, None
                 self._existing_hashes.add(file_hash)
             else:
-                with urllib.request.urlopen(req, timeout=120) as resp:
-                    data = resp.read()
+                data, _ = _fetch(req, timeout=120)
                 file_hash = hashlib.sha256(data).hexdigest()
                 if file_hash in self._existing_hashes:
                     self.log.emit(_t("skipped_dup", name=dest.name))
