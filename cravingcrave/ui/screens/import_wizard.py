@@ -30,6 +30,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QProgressBar,
     QPushButton,
     QScrollArea,
@@ -123,19 +124,21 @@ def _fetch(req: urllib.request.Request, timeout: float, attempts: int = 3) -> by
     raise last  # type: ignore[misc]
 
 
-def _verify_pexels_key(key: str) -> bool:
-    """Test Pexels API key with a minimal request."""
+def _pexels_key_status(key: str) -> str:
+    """"ok", "invalid" (401/403 — wrong, expired or revoked key) or "network" (unreachable)."""
     if not key:
-        return False
+        return "invalid"
     try:
         req = urllib.request.Request(
             "https://api.pexels.com/v1/search?query=test&per_page=1",
             headers={"Authorization": key, "User-Agent": _UA},
         )
         _fetch(req, timeout=20)
-        return True
+        return "ok"
+    except urllib.error.HTTPError as e:
+        return "invalid" if e.code in (401, 403) else "network"
     except Exception:
-        return False
+        return "network"
 
 
 def _pexels_search(key: str, query: str, page: int = 1, per_page: int = 15):
@@ -280,15 +283,10 @@ class _PexelsKeyPage(QWizardPage):
         key = _load_pexels_key()
         if key:
             self._key_input.setText(key)
-            self._verify()
-            # Auto-skip if we found a key (even if verify failed due to no network).
-            # The key is already saved — worst case it fails at search time.
-            if key and len(key) > 10:
+            # Auto-skip only when Pexels confirms the saved key. A rejected key stays
+            # here with an "expired or revoked" notice so the clinician can replace it.
+            if self._verify() == "ok":
                 self._auto_skip = True
-                self._verified = True  # trust the saved key
-                if not self._status.text():
-                    self._status.setText(tr("import.key_valid"))
-                    self._status.setStyleSheet("color:#2a9d8f; font-weight:bold;")
                 from PySide6.QtCore import QTimer
                 QTimer.singleShot(400, self._try_auto_advance)
 
@@ -304,18 +302,26 @@ class _PexelsKeyPage(QWizardPage):
         self._status.setText("")
         self.completeChanged.emit()
 
-    def _verify(self):
+    def _verify(self) -> str:
         key = self._key_input.text().strip()
-        if _verify_pexels_key(key):
+        status = _pexels_key_status(key)
+        if status == "ok":
             self._verified = True
             self._status.setText(tr("import.key_valid"))
             self._status.setStyleSheet("color:#2a9d8f; font-weight:bold;")
             _save_pexels_key(key)
+        elif status == "network":
+            # Can't confirm the key offline — let the clinician continue, but say why.
+            self._verified = True
+            self._status.setText(tr("import.network_error"))
+            self._status.setStyleSheet("color:#8a5a00; font-weight:bold;")
         else:
             self._verified = False
-            self._status.setText(tr("import.key_invalid"))
+            self._status.setText(tr("import.key_rejected"))
             self._status.setStyleSheet("color:#e63946; font-weight:bold;")
+        self._status.setWordWrap(True)
         self.completeChanged.emit()
+        return status
 
     def isComplete(self):
         return self._verified
@@ -485,7 +491,13 @@ class _SearchDownloadPage(QWizardPage):
         try:
             self._results = _pexels_search(key, query, per_page=15)
         except urllib.error.HTTPError as e:
-            self._status_label.setText(f"HTTP {e.code}: {e.reason}")
+            if e.code in (401, 403):
+                self._status_label.setText(tr("import.key_rejected"))
+                QMessageBox.warning(self, tr("app.title"), tr("import.key_rejected"))
+            elif e.code == 429:
+                self._status_label.setText(tr("import.rate_limited"))
+            else:
+                self._status_label.setText(f"HTTP {e.code}: {e.reason}")
             return
         except Exception as e:
             self._status_label.setText(f"{tr('import.network_error')} ({e})")

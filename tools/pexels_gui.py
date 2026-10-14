@@ -103,6 +103,10 @@ _STRINGS = {
         "nothing_selected": "Nothing selected",
         "nothing_selected_msg": "Add items to the queue or select items on this page.",
         "search_failed": "Search failed",
+        "key_rejected": "Pexels rejected the API key (HTTP 401) — it may be wrong, expired or "
+                        "revoked.\n\nGet a new key at https://www.pexels.com/api/ and save it in "
+                        "media/pexels.env (or re-enter it in CETUS → Import Wizard).",
+        "rate_limited": "Pexels request limit reached (HTTP 429). Wait a while and retry.",
         "network_error": "Could not reach Pexels after 3 attempts. The internet connection "
                          "may be slow or a firewall/proxy may be blocking pexels.com. "
                          "Check the connection and try again.",
@@ -169,6 +173,11 @@ _STRINGS = {
         "nothing_selected": "Nada seleccionado",
         "nothing_selected_msg": "Agrega elementos a la cola o selecciona elementos en esta página.",
         "search_failed": "Búsqueda fallida",
+        "key_rejected": "Pexels rechazó la clave API (HTTP 401) — puede ser incorrecta, haber "
+                        "expirado o sido revocada.\n\nObtén una nueva en https://www.pexels.com/api/ "
+                        "y guárdala en media/pexels.env (o vuelve a ingresarla en CETUS → Asistente "
+                        "de importación).",
+        "rate_limited": "Se alcanzó el límite de solicitudes de Pexels (HTTP 429). Espera y reintenta.",
         "network_error": "No se pudo conectar con Pexels tras 3 intentos. La conexión a "
                          "internet puede estar lenta o un firewall/proxy puede estar bloqueando "
                          "pexels.com. Revisa la conexión e inténtalo de nuevo.",
@@ -357,10 +366,10 @@ class SearchWorker(QThread):
             self.results_ready.emit(items, meta)
 
         except urllib.error.HTTPError as exc:
-            if exc.code == 401:
-                self.error.emit("Invalid API key (HTTP 401). Check your key.")
+            if exc.code in (401, 403):
+                self.error.emit(_t("key_rejected"))
             elif exc.code == 429:
-                self.error.emit("Rate limit exceeded (HTTP 429). Wait and retry.")
+                self.error.emit(_t("rate_limited"))
             else:
                 self.error.emit(f"HTTP error {exc.code}: {exc.reason}")
         except Exception as exc:
@@ -991,9 +1000,8 @@ class PexelsDownloader(QWidget):
         self.search_btn.setText("…")
         self._clear_results()
 
-        orientation = self.orientation_combo.currentText().lower()
-        if orientation == "any":
-            orientation = ""
+        # Map by index: the combo shows translated labels, the API needs English values.
+        orientation = ["", "landscape", "portrait", "square"][self.orientation_combo.currentIndex()]
 
         self._search_worker = SearchWorker(
             api_key=self._api_key,
